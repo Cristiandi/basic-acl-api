@@ -1,0 +1,34 @@
+{
+  "name": "basic-acl",
+  "version": "1.0.0",
+  "description": "basic-acl",
+  "main": "index.js",
+  "scripts": {
+    "start": "node 'dist/server.js'",
+    "start:dev": "npm run build:dev",
+    "prebuild": "rimraf dist",
+    "build": "tsc",
+    "build:dev": "npx nodemon 'src/start.ts' --exec 'ts-node' src/start.ts -e ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cristiandi/basic-acl.git"
+  },
+  "keywords": [],
+  "author": "cristiandi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cristiandi/basic-acl/issues"
+  },
+  "homepage": "https://github.com/Cristiandi/basic-acl#readme",
+  "dependencies": {
+    "fastify": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.27",
+    "nodemon": "^2.0.4",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
+  }
+}
