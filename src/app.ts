@@ -1,4 +1,4 @@
-import Fastify from 'fastify'
+import Fastify, { FastifyInstance } from 'fastify'
 
 // order to register / load
 // 1. plugins (from the Fastify ecosystem)
@@ -7,16 +7,15 @@ import Fastify from 'fastify'
 // 4. hooks and middlewares
 // 5. your services
 
-export const build = async () => {
+export const build = async (): Promise<FastifyInstance> => {
   const server = Fastify({
     bodyLimit: 1048576 * 2,
     logger: true
-  });
+  })
 
   server.get('/', async (request, reply) => {
-    reply.status(200).send(`${new Date()}`);
-   })
+    reply.status(200).send(`${new Date()}`)
+  })
 
-   return server;
+  return server
 }
-

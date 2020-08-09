@@ -1,13 +1,13 @@
 import { build } from './app'
 
-const { APP_PORT } = { APP_PORT: 8080 }
+import environment from './environment'
 
 build().then(server => {
-  server.listen(APP_PORT, (err, address) => {
-    if(err) {
+  server.listen(environment.APP_PORT, (err, address) => {
+    if (err) {
       console.error(err)
       process.exit(1)
     }
-    console.log(`server listening at ${address}`)
+    console.log(`server listening at ${address} | on ${environment.NODE_ENV}!`)
   })
 })
