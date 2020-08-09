@@ -1,0 +1,28 @@
+## What did you do?:
+
+<!--
+Tell us in what you have been working
+Example:
+I worked on the initial functionality...
+-->
+
+## How did you do it?:
+
+<!--
+Something that describes how it was implemented.
+Example:
+I worked on the test.js file, doing a better implementation of...
+-->
+
+## How can QA verify the change?:
+
+<!--
+Add screenshots if it's front side, commands if it's backend side or instructions that provide information to make it easier the review.
+
+Examples:
+* How to check it step by step
+* Screenshots that details the results
+* Describe the URL...
+-->
+
+***Is the change ready to review?:*** NO
