@@ -10,6 +10,7 @@ export async function up (knex: Knex): Promise<void> {
     table.string('name', 100).unique()
     table.uuid('uuid').unique()
     table.json('service_account').notNullable()
+    table.string('country_code', 5).notNullable()
     table.timestamps(true, true)
   })
 }

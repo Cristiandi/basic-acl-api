@@ -34,6 +34,7 @@
     "dotenv": "^8.2.0",
     "fastify": "^3.2.0",
     "fastify-plugin": "^2.3.0",
+    "firebase-admin": "^9.1.0",
     "iterare": "^1.2.1",
     "knex": "^0.21.4",
     "path": "^0.12.7",

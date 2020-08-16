@@ -1,5 +1,7 @@
-import { Database } from '../../database'
 import { injectable } from 'tsyringe'
+
+import { Database } from '../../database'
+import { CompanyDao } from './company.dao'
 
 import { throwError, generateUuid } from '../../utils'
 
@@ -10,7 +12,10 @@ import { UpdateCoffeeDto } from './dtos/update-company-dto'
 
 @injectable()
 export class CompanyService {
-  constructor (private readonly database: Database) {}
+  constructor (
+    private readonly database: Database,
+    private readonly companyDao: CompanyDao
+  ) {}
 
   public async create (createCompanyDto: CreateCompanyDto): Promise<any> {
     const toCreate = {
@@ -90,5 +95,9 @@ export class CompanyService {
       ...existing,
       id: undefined
     }
+  }
+
+  public async getServiceAccount (uuid: string): Promise<any> {
+    return this.companyDao.getServiceAccount(uuid)
   }
 }

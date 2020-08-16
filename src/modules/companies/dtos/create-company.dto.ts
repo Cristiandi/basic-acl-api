@@ -46,4 +46,7 @@ export class CreateCompanyDto {
   @ValidateNested()
   @Type(() => ServiceAccount)
   readonly service_account!: ServiceAccount;
+
+  @IsString()
+  readonly country_code!: string;
 }
