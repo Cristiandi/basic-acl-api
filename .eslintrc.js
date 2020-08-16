@@ -30,6 +30,8 @@ module.exports = {
     'node/no-unsupported-features/es-syntax': 'off', // Allows us to use Import and Export keywords.
     // "no-unused-vars": "off",
     // "@typescript-eslint/no-unused-vars": "error",
-    '@typescript-eslint/camelcase': 0
+    '@typescript-eslint/camelcase': 0,
+    camelcase: 0,
+    'no-useless-constructor': 0
   }
 }
