@@ -70,7 +70,9 @@ const validatePayload: (property: string, metatype: any) => preValidationHookHan
 
     const errors = await validate(object, {
       skipMissingProperties: false,
-      validationError: { target: true }
+      validationError: { target: true },
+      whitelist: true,
+      forbidNonWhitelisted: true
     })
 
     if (errors.length) {

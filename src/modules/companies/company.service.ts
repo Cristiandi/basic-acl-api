@@ -5,6 +5,8 @@ import { throwError, generateUuid } from '../../utils'
 
 import { CreateCompanyDto } from './dtos/create-company.dto'
 import { FindOneCompanyDto } from './dtos/find-one-company.dto'
+import { FindAllCompaniesDto } from './dtos/find-all.companies'
+import { UpdateCoffeeDto } from './dtos/update-company-dto'
 
 @injectable()
 export class CompanyService {
@@ -41,5 +43,52 @@ export class CompanyService {
     }
 
     return existing
+  }
+
+  public async findAll (findallCompaniesDto: FindAllCompaniesDto): Promise<any[]> {
+    const { limit, offset } = findallCompaniesDto
+
+    const query = this.database
+      .knex('companies')
+      .select('*')
+      .limit(limit || 1000)
+      .offset(offset)
+
+    const data = await query
+
+    return data
+  }
+
+  public async update (findOneCompanyDto: FindOneCompanyDto, updateCompanyDto: UpdateCoffeeDto): Promise<any> {
+    const existing = await this.findOne(findOneCompanyDto)
+
+    if (updateCompanyDto.name) {
+      const existingsByName = await this.database.getOne('companies', { name: updateCompanyDto.name })
+      if (existingsByName && existing.id !== existingsByName.id) {
+        throw throwError(412, 'already exists a company with that name.')
+      }
+    }
+
+    if (updateCompanyDto.uuid) {
+      const existingByUuid = await this.database.getOne('companies', { uuid: updateCompanyDto.uuid })
+      if (existingByUuid && existing.id !== existingByUuid.id) {
+        throw throwError(412, 'already exists a company with that uuid.')
+      }
+    }
+
+    const updated = await this.database.updateOne('companies', existing.id, updateCompanyDto)
+
+    return updated
+  }
+
+  public async remove (findOneCompanyDto: FindOneCompanyDto): Promise<any> {
+    const existing = await this.findOne(findOneCompanyDto)
+
+    await this.database.deleteOne(existing.id, 'companies')
+
+    return {
+      ...existing,
+      id: undefined
+    }
   }
 }
