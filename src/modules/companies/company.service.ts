@@ -1,7 +1,10 @@
 import { Database } from '../../database'
 import { injectable } from 'tsyringe'
-import { CreateCompanyDto } from './dtos/create-company.dto'
+
 import { throwError, generateUuid } from '../../utils'
+
+import { CreateCompanyDto } from './dtos/create-company.dto'
+import { FindOneCompanyDto } from './dtos/find-one-company.dto'
 
 @injectable()
 export class CompanyService {
@@ -29,11 +32,12 @@ export class CompanyService {
     return created
   }
 
-  public async findOne (id: number): Promise<any> {
+  public async findOne (findOneCompanyDto: FindOneCompanyDto): Promise<any> {
+    const { id } = findOneCompanyDto
     const existing = await this.database.getOne('companies', { id })
 
     if (!existing) {
-      throw throwError(4040, `company ${id} not found`)
+      throw throwError(404, `company ${id} not found`)
     }
 
     return existing
