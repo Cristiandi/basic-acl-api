@@ -1,4 +1,12 @@
+import 'reflect-metadata'
+
 import Fastify, { FastifyInstance } from 'fastify'
+
+// my plugins
+import validatePayloadPlugin from './plugins/validate-payload.plugin'
+
+// services
+import appController from './app.controller'
 
 // order to register / load
 // 1. plugins (from the Fastify ecosystem)
@@ -13,9 +21,11 @@ export const build = async (): Promise<FastifyInstance> => {
     logger: true
   })
 
-  server.get('/', async (request, reply) => {
-    reply.status(200).send(`${new Date()}`)
-  })
+  // my plugins
+  server.register(validatePayloadPlugin)
+
+  // services
+  server.register(appController)
 
   return server
 }
