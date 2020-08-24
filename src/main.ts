@@ -1,3 +1,5 @@
+// import helmet from 'fastify-helmet';
+
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -13,10 +15,17 @@ async function bootstrap() {
     new FastifyAdapter()
   );
   
+  // getting the config service
   const configService = app.get(ConfigService);
   
+  // enabling for cors policy
+  app.enableCors();
+
   const PORT = configService.get<number>('config.app.port');
   const ENVIRONMENT = configService.get<string>('config.environment');
+  
+  // await app.register(helmet);
+
   await app.listen(PORT, '0.0.0.0');
   
   Logger.debug(`server listening at ${PORT} | ${ENVIRONMENT} `, 'main.ts');
