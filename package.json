@@ -34,6 +34,7 @@
     "class-validator": "^0.12.2",
     "dotenv": "^8.2.0",
     "fastify-helmet": "^5.0.1",
+    "firebase-admin": "^9.1.1",
     "path": "^0.12.7",
     "pg": "^8.3.2",
     "reflect-metadata": "^0.1.13",

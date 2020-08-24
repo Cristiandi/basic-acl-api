@@ -1,11 +1,14 @@
 import * as path from 'path';
 
 import { Module } from '@nestjs/common';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
+
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CompanyModule } from './modules/companies/companies.module';
+import { CompaniesModule } from './modules/companies/companies.module';
 
 import appConfig from './config/app.config';
 import appConfigSchema from './config/app.config.schema';
@@ -32,7 +35,7 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
         synchronize: process.env.NODE_ENV !== 'production'
       })
     }),
-    CompanyModule
+    CompaniesModule
   ],
   controllers: [AppController],
   providers: [AppService]

@@ -1,0 +1,6 @@
+export const COUNTRY_CODES_PHONE_NUMBER = 'COUNTRY_CODES_PHONE_NUMBER';
+
+export const COUNTRY_CODES_PHONE_NUMBER_OBJECT = {
+  CO: '+57',
+  MX: '+52'
+};

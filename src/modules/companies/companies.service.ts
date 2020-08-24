@@ -10,6 +10,7 @@ import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { FindAllCompaniesInput } from './dto/find-all-companies-input.dto';
 import { FindOneCompanyInput } from './dto/find-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
+import { GetServiceAccountInput } from './dto/get-service-account-input.dto';
 
 
 @Injectable()
@@ -85,9 +86,26 @@ export class CompaniesService {
     return this.companiesRepository.save(existing);
   }
 
-  async remove(findOneCompanyInput: FindOneCompanyInput) {
+  async remove(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
     const existing = await this.findOne(findOneCompanyInput);
 
     return this.companiesRepository.remove(existing);
+  }
+
+  async getServiceAccount(getServiceAccountInput: GetServiceAccountInput): Promise<string> {
+    const { uuid } = getServiceAccountInput;
+    
+    const existing = await this.companiesRepository.find({
+      select: ['serviceAccount'],
+      where: { uuid }
+    });
+
+    if (!existing.length) {
+      throw new NotFoundException(`can't get the company with uuid ${uuid}.`);
+    }
+
+    const [company] = existing;
+
+    return company.serviceAccount;
   }
 }
