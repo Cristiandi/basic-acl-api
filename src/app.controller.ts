@@ -1,10 +1,12 @@
-import { FastifyInstance, RegisterOptions } from 'fastify'
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service';
 
-import companyController from './modules/companies/company.controller'
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
 
-export default async (server: FastifyInstance, options: RegisterOptions): Promise<void> => {
-  server.get('/', async (request, reply) => {
-    reply.status(200).send(`${new Date()}`)
-  })
-  server.register(companyController, { prefix: 'companies' })
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
 }
