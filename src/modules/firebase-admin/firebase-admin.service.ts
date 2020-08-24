@@ -1,5 +1,5 @@
 import * as firebaseAdmin from 'firebase-admin';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { CompaniesService } from '../companies/companies.service';
 import { COUNTRY_CODES_PHONE_NUMBER, COUNTRY_CODES_PHONE_NUMBER_OBJECT } from './firebase-admin.constants';
 
@@ -9,7 +9,7 @@ export class FirebaseAdminService {
     private readonly companiesService: CompaniesService,
     @Inject(COUNTRY_CODES_PHONE_NUMBER) private readonly countryCodesPhoneNumber: typeof COUNTRY_CODES_PHONE_NUMBER_OBJECT
   ) {
-    console.log('countryCodesPhoneNumber', countryCodesPhoneNumber);
+    Logger.debug(`countryCodesPhoneNumber ${JSON.stringify(countryCodesPhoneNumber)}`, 'FirebaseAdminService');
   }
 
   private async initAdmin (companyUuid: string): Promise<firebaseAdmin.app.App> {
