@@ -14,6 +14,7 @@ import appConfig from './config/app.config';
 import appConfigSchema from './config/app.config.schema';
 import { FirebaseAdminModule } from './modules/firebase-admin/firebase-admin.module';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
+import { CommonModule } from './common/common.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'local';
 const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
@@ -38,13 +39,14 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
       })
     }),
     CompaniesModule,
-    FirebaseAdminModule
+    FirebaseAdminModule,
+    CommonModule
   ],
   controllers: [AppController],
   providers: [AppService]
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer): void {
     consumer.apply(LoggerMiddleware)
       .forRoutes('');
   }    
