@@ -46,7 +46,7 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
   providers: [AppService]
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
+  configure(consumer: MiddlewareConsumer): void {
     consumer.apply(LoggerMiddleware)
       .forRoutes('');
   }    
