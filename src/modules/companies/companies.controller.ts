@@ -1,5 +1,7 @@
-import { Controller, Get, Query, UsePipes, ValidationPipe, Post, Body, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Query, UsePipes, ValidationPipe, Post, Body, Param, Patch, Delete, UseGuards } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
+
+import { Public } from 'src/common/decorators/public.decorator';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { FindAllCompaniesInput } from './dto/find-all-companies-input.dto';
@@ -11,6 +13,7 @@ import { UpdateCompanyInput } from './dto/update-company-input.dto';
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
 
+  @Public()
   @Post()
   create(@Body() createCompanyInput: CreateCompanyInput): Promise<any> {
     return this.companiesService.create(createCompanyInput);
