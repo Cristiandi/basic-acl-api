@@ -12,7 +12,6 @@ import { FindOneCompanyInput } from './dto/find-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
 import { GetServiceAccountInput } from './dto/get-service-account-input.dto';
 
-
 @Injectable()
 export class CompaniesService {
   constructor(
