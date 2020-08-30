@@ -71,6 +71,32 @@ describe('CompanyService', () => {
     });
   });
 
+  describe('findAll', () => {
+    describe('when has results', () => {
+      it('should return a companies array', async () => {
+        const expectedResult = [{}];
+
+        companyRepository.find.mockReturnValue(expectedResult);
+
+        const companies = await service.findAll({ limit: 1, offset: 1 });
+
+        expect(companies).toEqual(expectedResult);
+      });
+    });
+
+    describe('when does not have results', () => {
+      it('should return an empty array', async () => {
+        const expectedResult = [];
+
+        companyRepository.find.mockReturnValue(expectedResult);
+
+        const companies = await service.findAll({ limit: 1, offset: 1 });
+
+        expect(companies).toEqual(expectedResult);
+      });
+    });
+  });
+
   describe('findOne', () => {
     describe('when a company exists', () => {
       it('should return the company object', async () => {
