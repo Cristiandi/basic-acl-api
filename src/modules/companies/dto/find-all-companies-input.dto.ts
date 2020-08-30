@@ -1,3 +1,3 @@
-import { PaginationQueryDto } from 'src/common/pagination-query.dto';
+import { PaginationQueryDto } from '../../../common/dto/pagination-query.dto';
 
 export class FindAllCompaniesInput extends PaginationQueryDto {}

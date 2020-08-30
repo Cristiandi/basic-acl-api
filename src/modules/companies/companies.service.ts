@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestj
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { generateUuid } from 'src/utils';
+import { generateUuid } from '../../utils';
 
 import { Company } from './company.entity';
 

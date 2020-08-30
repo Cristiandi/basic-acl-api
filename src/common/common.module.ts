@@ -2,7 +2,7 @@ import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/c
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 
-import appConfig from 'src/config/app.config';
+import appConfig from '../config/app.config';
 
 import { ApiKeyGuard } from './guards/api-key.guard';
 
