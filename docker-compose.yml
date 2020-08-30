@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    restart: "no"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: toor
+      POSTGRES_DB: basic_acl
+  test-db:
+    image: postgres
+    restart: "no"
+    ports:
+      - "5433:5432" # Note the 5433 port (since we are using 5432 for our regular db)
+    environment:
+      POSTGRES_PASSWORD: toor
+      POSTGRES_DB: basic_acl
