@@ -7,6 +7,8 @@ import { Company } from './company.entity';
 
 import { CompaniesService } from './companies.service';
 import { CreateCompanyInput } from './dto/create-company-input.dto';
+import { UpdateCompanyInput } from './dto/update-company-input.dto';
+import { match } from 'assert';
 
 // function to mock the repositry
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
@@ -14,6 +16,8 @@ const createMockRepository = <T = any>(): MockRepository<T> => ({
   create: jest.fn(),
   find: jest.fn(),
   findOne: jest.fn(),
+  preload: jest.fn(),
+  remove: jest.fn(),
   save: jest.fn()
 });
 
@@ -116,6 +120,88 @@ describe('CompanyService', () => {
 
         try {
           await service.findOne({ id: '1' });
+        } catch (error) {
+          expect(error).toBeInstanceOf(NotFoundException);
+        }
+      });
+    });
+  });
+
+  describe('update', () => {
+    describe('when update a company', () => {
+      it('should return a company object', async () => {
+        const expectedResult = {};
+
+        companyRepository.preload.mockReturnValueOnce({});
+        companyRepository.find.mockReturnValueOnce([]);
+        companyRepository.save.mockReturnValueOnce({});
+
+        const company = await service.update({ id: '1' }, {} as UpdateCompanyInput);
+
+        expect(company).toEqual(expectedResult);
+      });
+    });
+
+    describe('when other company already using unique values', () => {
+      it('should throw the ""HttpException', async () => {
+        companyRepository.preload.mockReturnValueOnce({id: 1});
+        companyRepository.find.mockReturnValueOnce([{id: 1}]);
+        
+        try {
+          await service.update({ id: '1' }, {} as UpdateCompanyInput);
+        } catch (error) {
+          expect(error).toBeInstanceOf(HttpException);
+        }
+      });
+    });
+  });
+
+  describe('remove', () => {
+    describe('when remove a company', () => {
+      it('should return a company object', async () => {
+        const expectedResult = {};
+
+        companyRepository.findOne.mockReturnValueOnce({});
+        companyRepository.remove.mockReturnValue({});
+
+        const company = await service.remove({ id: '1' });
+
+        expect(company).toEqual(expectedResult);
+      });
+    });
+
+    describe('when the company does not exists', () => {
+      it('should throw the "NotFoundException"', async () => {
+        companyRepository.findOne.mockReturnValueOnce(undefined);
+
+        try {
+          await service.remove({ id: '1' });
+        } catch (error) {
+          expect(error).toBeInstanceOf(NotFoundException);
+        }
+      });
+    });
+  });
+
+  describe('getServiceAccount', () => {
+    describe('when company exists', () => {
+      it('should return service account', async () => {
+        const expectedResult = '';
+
+        companyRepository.find.mockReturnValueOnce([{serviceAccount: expectedResult}]);
+
+        const serviceAccount = await service.getServiceAccount({ uuid: 'uuid' });
+
+        expect(serviceAccount).toEqual(expectedResult);
+      });
+    });
+    
+    describe('when compnay does not exists', () => {
+      it('should throw the "NotFoundException"', async () => {
+        companyRepository.find.mockReturnValueOnce([]);
+
+        try {
+          await service.getServiceAccount({ uuid: 'uuid' });
         } catch (error) {
           expect(error).toBeInstanceOf(NotFoundException);
         }

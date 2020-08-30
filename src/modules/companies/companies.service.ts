@@ -82,6 +82,25 @@ export class CompaniesService {
       throw new NotFoundException(`coffee ${id} not found`);
     }
 
+    const compareTo = await this.companiesRepository.find({
+      where: [
+        {
+          name: existing.name
+        },
+        {
+          uuid: existing.uuid
+        }
+      ]
+    });
+
+    if (compareTo.length) {
+      const [companyToCompare] = compareTo;
+
+      if (companyToCompare.id !== existing.id) {
+        throw new HttpException('other company already exists for the name or uuid', 412);
+      }
+    }
+
     return this.companiesRepository.save(existing);
   }
 
