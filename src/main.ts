@@ -22,7 +22,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   
   // enabling for cors policy
-  // app.enableCors();
+  app.enableCors();
 
   // use helmet
   await app.register(helmet, { hidePoweredBy: false });

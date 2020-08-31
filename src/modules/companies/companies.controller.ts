@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UsePipes, ValidationPipe, Post, Body, Param, Patch, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UsePipes, ValidationPipe, Post, Body, Param, Patch, Delete } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 
 import { Public } from '../../common/decorators/public.decorator';

@@ -8,7 +8,6 @@ import { Company } from './company.entity';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
-import { match } from 'assert';
 
 // function to mock the repositry
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
@@ -48,13 +47,13 @@ describe('CompanyService', () => {
   describe('create', () => {
     describe('when create a company', () => {
       it('should return the company object', async () => {
-        const expectedCompany = {} as CreateCompanyInput;
+        const expectedCompany = {};
 
         companyRepository.find.mockReturnValue([]);
         companyRepository.create.mockReturnValue(expectedCompany);
         companyRepository.save.mockResolvedValue(expectedCompany);
 
-        const company = await service.create(expectedCompany);
+        const company = await service.create({} as CreateCompanyInput);
 
         expect(company).toEqual(expectedCompany);
       });

@@ -37,9 +37,9 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
         synchronize: process.env.NODE_ENV !== 'production'
       })
     }),
-    CompaniesModule,
+    CommonModule,
     FirebaseAdminModule,
-    CommonModule
+    CompaniesModule
   ],
   controllers: [AppController],
   providers: [AppService]
