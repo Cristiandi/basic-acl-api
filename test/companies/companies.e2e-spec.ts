@@ -14,6 +14,7 @@ import { CommonModule } from '../../src/common/common.module';
 
 import { HttpExceptionFilter } from '../../src/common/filters/http-exception.filter';
 import { CreateCompanyInput } from 'src/modules/companies/dto/create-company-input.dto';
+import { UpdateCompanyInput } from 'src/modules/companies/dto/update-company-input.dto';
 
 const NODE_ENV = process.env.NODE_ENV || 'local';
 const envPath = path.resolve(__dirname, `../../.env.${NODE_ENV}`);
@@ -81,10 +82,50 @@ describe('[Feature] Companies - /companies', () => {
         expect(body).toHaveProperty('id');
       });
   });
-  it.todo('Get all [GET /]');
-  it.todo('Get one [GET /:id]');
-  it.todo('Update one [PATCH /:id]');
-  it.todo('Delete one [DELETE /:id]');
+  it('Get all [GET /]', () => {
+    return request(app.getHttpServer())
+      .get('/companies')
+      .set('Authorization', process.env.API_KEY)
+      .expect(HttpStatus.OK)
+      .then(({ body }) => {
+        expect(Array.isArray(body)).toBeTruthy();
+        expect(body.length).toBeGreaterThan(0);
+      });
+  });
+  it('Get one [GET /:id]', () => {
+    const id = 1;
+
+    return request(app.getHttpServer())
+      .get(`/companies/${id}`)
+      .set('Authorization', process.env.API_KEY)
+      .expect(HttpStatus.OK)
+      .then(({ body }) => {
+        expect(body).toHaveProperty('id', id);
+      });
+  });
+  it('Update one [PATCH /:id]', () => {
+    const id = 1;
+    const input: UpdateCompanyInput = {
+      name: 'updated'
+    };
+
+    return request(app.getHttpServer())
+      .patch(`/companies/${id}`)
+      .send(input)
+      .set('Authorization', process.env.API_KEY)
+      .expect(HttpStatus.OK)
+      .then(({ body }) => {
+        expect(body).toHaveProperty('name', input.name);
+      });
+  });
+  it('Delete one [DELETE /:id]', () => {
+    const id = 1;
+
+    return request(app.getHttpServer())
+      .delete(`/companies/${id}`)
+      .set('Authorization', process.env.API_KEY)
+      .expect(HttpStatus.OK);
+  });
 
   afterAll(async () => {
     await app.close();
