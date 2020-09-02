@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestj
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { generateUuid } from 'src/utils';
+import { generateUuid } from '../../utils';
 
 import { Company } from './company.entity';
 
@@ -11,7 +11,6 @@ import { FindAllCompaniesInput } from './dto/find-all-companies-input.dto';
 import { FindOneCompanyInput } from './dto/find-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
 import { GetServiceAccountInput } from './dto/get-service-account-input.dto';
-
 
 @Injectable()
 export class CompaniesService {
@@ -81,6 +80,25 @@ export class CompaniesService {
 
     if (!existing) {
       throw new NotFoundException(`coffee ${id} not found`);
+    }
+
+    const compareTo = await this.companiesRepository.find({
+      where: [
+        {
+          name: existing.name
+        },
+        {
+          uuid: existing.uuid
+        }
+      ]
+    });
+
+    if (compareTo.length) {
+      const [companyToCompare] = compareTo;
+
+      if (companyToCompare.id !== existing.id) {
+        throw new HttpException('other company already exists for the name or uuid', 412);
+      }
     }
 
     return this.companiesRepository.save(existing);

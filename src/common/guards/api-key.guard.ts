@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { ConfigType } from '@nestjs/config';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import appConfig from 'src/config/app.config';
+import appConfig from '../../config/app.config';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
