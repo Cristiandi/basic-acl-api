@@ -20,15 +20,7 @@ import { LoggingMiddleware } from './middlewares/logging.middleware';
 export class CommonModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer.apply(LoggingMiddleware)
-      .forRoutes(
-      {
-        path: 'companies',
-        method: RequestMethod.ALL
-      },
-      {
-        path: 'users',
-        method: RequestMethod.ALL
-      });
+      .forRoutes('*');
   }
 
 }

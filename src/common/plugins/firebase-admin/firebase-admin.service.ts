@@ -8,6 +8,7 @@ import { COUNTRY_CODES_PHONE_NUMBER, COUNTRY_CODES_PHONE_NUMBER_OBJECT } from '.
 import { InitAppInput } from './dto/init-app-input.dto';
 import { CreateUserInput } from './dto/create-user-input.dto';
 import { VerifyTokenInput } from './dto/verify-token-input.dto';
+import { GetUsersInput } from './dto/get-users-input.dto';
 
 @Injectable()
 export class FirebaseAdminService {
@@ -63,5 +64,32 @@ export class FirebaseAdminService {
     const decodedToken = await app.auth().verifyIdToken(token);
 
     return decodedToken; 
+  }
+
+  public async getUsers (getUsersInput: GetUsersInput): Promise<firebaseAdmin.auth.UserRecord[]> {
+    const { companyUuid } = getUsersInput;
+
+    const app = await this.initApp({ uuid: companyUuid });
+
+    const maxResults = 1000;
+
+    let nextPageToken: string;
+
+    let listUsersResult = await app.auth().listUsers(maxResults, nextPageToken);
+
+    nextPageToken = listUsersResult.pageToken;
+
+    let userList = [...listUsersResult.users];
+
+    while(nextPageToken) {
+      listUsersResult = await app.auth().listUsers(maxResults, nextPageToken);
+
+      nextPageToken = listUsersResult.pageToken;
+      userList = [...userList, ...listUsersResult.users];
+      // console.log('nextPageToken', nextPageToken, !nextPageToken);
+      // console.log('rows fetched:', userList.length);
+    }
+
+    return userList;
   }
 }

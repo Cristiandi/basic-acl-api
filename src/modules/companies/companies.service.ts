@@ -13,6 +13,7 @@ import { UpdateCompanyInput } from './dto/update-company-input.dto';
 import { GetServiceAccountInput } from './dto/get-service-account-input.dto';
 import { GetFirebaseConfigInput } from './dto/get-firebase-config-input.dto';
 import { GetCompanyByNameInput } from './dto/get-company-by-name-input.dto';
+import { GetCompanyByUuidInput } from './dto/get-company-by-uuid-input.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -161,6 +162,24 @@ export class CompaniesService {
 
     if (!data.length) {
       throw new NotFoundException(`can't get the company with name ${name}.`);
+    }
+
+    const [company] = data;
+
+    return company;
+  }
+
+  async getCompanyByUuid(getCompanyByUuidInput: GetCompanyByUuidInput): Promise<Company> {
+    const { uuid } = getCompanyByUuidInput;
+
+    const data = await this.companiesRepository.find({
+      where: {
+        uuid
+      }
+    });
+
+    if (!data.length) {
+      throw new NotFoundException(`can't get the company with uuid ${uuid}.`);
     }
 
     const [company] = data;

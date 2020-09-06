@@ -8,12 +8,14 @@ import { User } from './user.entitty';
 
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
+import { FirebaseAdminModule } from 'src/common/plugins/firebase-admin/firebase-admin.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     CompaniesModule,
-    FirebaseModule
+    FirebaseModule,
+    FirebaseAdminModule
   ],
   providers: [UsersService],
   controllers: [UsersController],

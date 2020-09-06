@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 
 import { Company } from '../companies/company.entity';
 
 @Entity({ name: 'users' })
+@Unique('uk_users_auth_uid', ['authUid'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,7 +15,7 @@ export class User {
   email: string;
 
   @Column({ name: 'is_admin', type: 'boolean' })
-  isAdmin: string;
+  isAdmin: boolean;
 
   @ManyToOne(type => Company, company => company.users)
   @JoinColumn({ name: 'company_id' })
