@@ -15,6 +15,9 @@ import { GetUserByAuthUidInput } from './dto/get-user-by-auth-uid-input.dto';
 import { SetUserAsAdminInput } from './dto/set-user-as-admin-input.dto';
 import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
+import { FindAllUsersParamInput } from './dto/find-all-users-param-input.dto';
+import { FindAllUsersQueryInput } from './dto/find-all-users-query-input.dto';
+import { CreateUserInput } from './dto/create-user-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -26,9 +29,88 @@ export class UsersService {
     private readonly firebaseAdminService: FirebaseAdminService
   ) { }
 
+  /**
+   * function to create an user for a company
+   *
+   * @param {CreateUserInput} createUserInput
+   * @returns {Promise<User>}
+   * @memberof UsersService
+   */
+  public async create(createUserInput: CreateUserInput): Promise<User> {
+    const { companyUuid } = createUserInput;
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${company}`);
+    }
+
+    const { email, password, phone } = createUserInput;
+
+    const createdFirebaseUser = await this.firebaseAdminService.createUser({
+      companyUuid,
+      countryCode: company.countryCode,
+      email,
+      password,
+      phone
+    });
+
+    const created = this.usersRepository.create({
+      company,
+      authUid: createdFirebaseUser.uid,
+      email,
+      isAdmin: false
+    });
+
+    const saved = await this.usersRepository.save(created);
+
+    delete saved.company;
+
+    return saved;
+  }
+
+  /**
+   * function to get the users of one company
+   *
+   * @param {FindAllUsersParamInput} findAllUsersParamInput
+   * @param {FindAllUsersQueryInput} findAllUsersQueryInput
+   * @returns {Promise<User[]>}
+   * @memberof UsersService
+   */
+  public async findAll(
+    findAllUsersParamInput: FindAllUsersParamInput,
+    findAllUsersQueryInput: FindAllUsersQueryInput
+  ): Promise<User[]> {
+    const { companyUuid } = findAllUsersParamInput;
+    const { limit = 0, offset = 0 } = findAllUsersQueryInput;
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    return this.usersRepository.find({
+      select: ['id', 'authUid', 'email', 'isAdmin'],
+      where: {
+        company
+      },
+      take: limit || undefined,
+      skip: offset,
+      order: {
+        id: 'DESC'
+      }
+    });
+  }
+
+  /**
+   * function to find one user
+   *
+   * @param {FindOneUserInput} findOneUserInput
+   * @returns {Promise<User>}
+   * @memberof UsersService
+   */
   public async findOne(findOneUserInput: FindOneUserInput): Promise<User> {
     const { id } = findOneUserInput;
-    const existing = await this.usersRepository.findOne(id);
+    const existing = await this.usersRepository.findOne(id, {
+      relations: ['company']
+    });
 
     if (!existing) {
       throw new NotFoundException(`user ${id} not found`);
@@ -37,7 +119,18 @@ export class UsersService {
     return existing;
   }
 
-  async update(findOneUserInput: FindOneUserInput, updateUserInput: UpdateUserInput): Promise<User> {
+  /**
+   * function to update a user
+   *
+   * @param {FindOneUserInput} findOneUserInput
+   * @param {UpdateUserInput} updateUserInput
+   * @returns {Promise<User>}
+   * @memberof UsersService
+   */
+  public async update(
+    findOneUserInput: FindOneUserInput,
+    updateUserInput: UpdateUserInput
+  ): Promise<User> {
     const { id } = findOneUserInput;
 
     const existing = await this.usersRepository.preload({
@@ -46,26 +139,59 @@ export class UsersService {
     });
 
     if (!existing) {
-      throw new NotFoundException(`user ${id} not found`);
+      throw new NotFoundException(`user ${id} not found.`);
     }
 
-    const compareTo = await this.usersRepository.find({
-      where: {
-        email: existing.email
-      }
+    const { companyUuid } = updateUserInput;
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${companyUuid}.`);
+    }
+
+    const { email, phone, password } = updateUserInput;
+
+    await this.firebaseAdminService.updateUser({
+      companyUuid,
+      countryCode: company.countryCode,
+      uid: existing.authUid,
+      email,
+      phone,
+      password
     });
-
-    if (compareTo.length) {
-      const [itemToCompare] = compareTo;
-
-      if (itemToCompare.id !== existing.id) {
-        throw new HttpException('other user already have the email,', 412);
-      }
-    }
 
     return this.usersRepository.save(existing);
   }
 
+  /**
+   * function to delete a user
+   *
+   * @param {FindOneUserInput} findOneUserInput
+   * @returns {Promise<User>}
+   * @memberof UsersService
+   */
+  public async remove(findOneUserInput: FindOneUserInput): Promise<User> {
+    const existing = await this.findOne(findOneUserInput);
+
+    const { authUid: uid, company: { uuid: companyUuid } } = existing;
+
+    await this.firebaseAdminService.deleteUser({ companyUuid, uid });
+
+    const removed = await this.usersRepository.remove(existing);
+
+    delete removed.company;
+
+    return removed;
+  }
+
+  /**
+   * function to login a user
+   *
+   * @param {LoginUserInput} loginUserInput
+   * @returns {Promise<any>}
+   * @memberof UsersService
+   */
   public async loginUser(loginUserInput: LoginUserInput): Promise<any> {
     const { companyName } = loginUserInput;
 
@@ -107,6 +233,13 @@ export class UsersService {
     return response;
   }
 
+  /**
+   * function to the get a user by the authUid attribute
+   *
+   * @param {GetUserByAuthUidInput} getUserByAuthUidInput
+   * @returns {(Promise<User | null>)}
+   * @memberof UsersService
+   */
   public async getUserByAuthUid(getUserByAuthUidInput: GetUserByAuthUidInput): Promise<User | null> {
     const { authUid } = getUserByAuthUidInput;
 
@@ -123,6 +256,15 @@ export class UsersService {
     return user;
   }
 
+  /**
+   * function to create a user from a firebaso user
+   * process: creation_of_users_from_firebase
+   *
+   * @private
+   * @param {CreateUserFromFirebaseInput} createUserFromFirebaseInput
+   * @returns
+   * @memberof UsersService
+   */
   private async createUserFromFirebase(createUserFromFirebaseInput: CreateUserFromFirebaseInput) {
     const { companyUuid } = createUserFromFirebaseInput;
 
@@ -140,6 +282,14 @@ export class UsersService {
     return this.usersRepository.save(created);
   }
 
+  /**
+   * function to "import" the users from firebase
+   * process: creation_of_users_from_firebase
+   *
+   * @param {CreateUsersFromFirebaseInput} createUsersFromFirebaseInput
+   * @returns {Promise<{ message: string }>}
+   * @memberof UsersService
+   */
   public async createUsersFromFirebase(createUsersFromFirebaseInput: CreateUsersFromFirebaseInput): Promise<{ message: string }> {
     (async () => {
       const { companyUuid } = createUsersFromFirebaseInput;
@@ -173,6 +323,13 @@ export class UsersService {
     };
   }
 
+  /**
+   * function to set a user as admin
+   *
+   * @param {SetUserAsAdminInput} setUserAsAdminInput
+   * @returns {Promise<User>}
+   * @memberof UsersService
+   */
   public async setUserAsAdmin(setUserAsAdminInput: SetUserAsAdminInput): Promise<User> {
     const { companyUuid, email } = setUserAsAdminInput;
 
@@ -197,7 +354,7 @@ export class UsersService {
       throw new NotFoundException(`can't get the user with email ${email} and for the company ${companyUuid}.`);
     }
 
-    const updated = await this.update({ id: '' + target.id }, { isAdmin: true });
+    const updated = await this.update({ id: '' + target.id }, { companyUuid, isAdmin: true });
 
     return updated;
   }

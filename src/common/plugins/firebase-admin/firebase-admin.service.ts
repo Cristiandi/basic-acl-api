@@ -1,5 +1,5 @@
 import * as firebaseAdmin from 'firebase-admin';
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Inject, Logger, NotFoundException } from '@nestjs/common';
 
 import { CompaniesService } from '../../../modules/companies/companies.service';
 
@@ -9,6 +9,9 @@ import { InitAppInput } from './dto/init-app-input.dto';
 import { CreateUserInput } from './dto/create-user-input.dto';
 import { VerifyTokenInput } from './dto/verify-token-input.dto';
 import { GetUsersInput } from './dto/get-users-input.dto';
+import { UpdateUserInput } from './dto/update-user-input.dto';
+import { GetUserByUidInput } from './dto/get-user-by-uid-input.dto';
+import { RemoveUserInput } from './dto/remove-user-input.dto';
 
 @Injectable()
 export class FirebaseAdminService {
@@ -55,17 +58,6 @@ export class FirebaseAdminService {
     return userRecord;
   }
 
-  public async verifyToken (verifyTokenInput: VerifyTokenInput): Promise<firebaseAdmin.auth.DecodedIdToken> {
-    const { companyUuid } = verifyTokenInput;
-    
-    const app = await this.initApp({ uuid: companyUuid });
-
-    const { token } = verifyTokenInput;
-    const decodedToken = await app.auth().verifyIdToken(token);
-
-    return decodedToken; 
-  }
-
   public async getUsers (getUsersInput: GetUsersInput): Promise<firebaseAdmin.auth.UserRecord[]> {
     const { companyUuid } = getUsersInput;
 
@@ -91,5 +83,61 @@ export class FirebaseAdminService {
     }
 
     return userList;
+  }
+
+  public async getUserByUid(getUserByUidInput: GetUserByUidInput): Promise<firebaseAdmin.auth.UserRecord> {
+    const { companyUuid } = getUserByUidInput;
+
+    const app = await this.initApp({ uuid: companyUuid });
+
+    try {
+      const { uid } = getUserByUidInput;
+
+      const user = await app.auth().getUser(uid);
+
+      return user;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  public async updateUser(updateUserInput: UpdateUserInput): Promise<firebaseAdmin.auth.UserRecord> {
+    const { companyUuid } = updateUserInput;
+
+    const app = await this.initApp({ uuid: companyUuid });
+
+    const { uid } = updateUserInput;
+
+    const { countryCode, phone, email, password } = updateUserInput;
+
+    let updateRequest = {};
+    if (email) updateRequest = { ...updateRequest, email };
+    if (password) updateRequest = {...updateRequest, password };
+    if (phone) updateRequest = { ...updateRequest, phone: `${this.countryCodesPhoneNumber[countryCode]}${phone}` };
+
+    // console.log(updateRequest, 'updateRequest');
+
+    return app.auth().updateUser(uid, updateRequest);
+  }
+
+  public async deleteUser(removeUserInput: RemoveUserInput): Promise<void> {
+    const { companyUuid } = removeUserInput;
+
+    const app = await this.initApp({ uuid: companyUuid });
+
+    const { uid } = removeUserInput;
+
+    return app.auth().deleteUser(uid);
+  }
+
+  public async verifyToken (verifyTokenInput: VerifyTokenInput): Promise<firebaseAdmin.auth.DecodedIdToken> {
+    const { companyUuid } = verifyTokenInput;
+    
+    const app = await this.initApp({ uuid: companyUuid });
+
+    const { token } = verifyTokenInput;
+    const decodedToken = await app.auth().verifyIdToken(token);
+
+    return decodedToken; 
   }
 }

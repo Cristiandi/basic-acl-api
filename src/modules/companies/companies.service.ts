@@ -86,7 +86,7 @@ export class CompaniesService {
     });
 
     if (!existing) {
-      throw new NotFoundException(`coffee ${id} not found`);
+      throw new NotFoundException(`company ${id} not found.`);
     }
 
     const compareTo = await this.companiesRepository.find({
