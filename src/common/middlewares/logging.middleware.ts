@@ -7,10 +7,13 @@ export class LoggingMiddleware implements NestMiddleware {
     // eslint-disable-next-line no-console
     console.time('request-response time');
 
-    Logger.log(`requested route: ${req.originalUrl} | method: ${req.method}`, LoggingMiddleware.name);
+    // Logger.log(`requested route: ${req.originalUrl} | method: ${req.method}`, LoggingMiddleware.name);
 
-    // eslint-disable-next-line no-console
-    res.on('finish', () => console.timeEnd('request-response time'));
+    res.on('finish', () => {
+      Logger.log(`requested route: ${req.originalUrl} | method: ${req.method} | status: ${res.statusCode}`, LoggingMiddleware.name);
+      // eslint-disable-next-line no-console
+      console.timeEnd('request-response time');
+    });
 
     next();
   }

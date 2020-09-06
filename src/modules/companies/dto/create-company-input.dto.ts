@@ -33,6 +33,32 @@ class ServiceAccount {
   readonly client_x509_cert_url: string;
 }
 
+class FireBaseConfig {
+  @IsString()
+  readonly apiKey: string;
+  
+  @IsString()
+  readonly authDomain: string;
+  
+  @IsString()
+  readonly databaseURL: string;
+  
+  @IsString()
+  readonly projectId: string;
+  
+  @IsString()
+  readonly storageBucket: string;
+  
+  @IsString()
+  readonly messagingSenderId: string;
+  
+  @IsString()
+  readonly appId: string;
+  
+  @IsString()
+  readonly measurementId: string;
+}
+
 export class CreateCompanyInput {
   @IsString()
   readonly name: string;
@@ -46,6 +72,11 @@ export class CreateCompanyInput {
   @ValidateNested()
   @Type(() => ServiceAccount)
   readonly serviceAccount: ServiceAccount;
+
+  @IsDefined()
+  @ValidateNested()
+  @Type(() => FireBaseConfig)
+  readonly firebaseConfig;
 
   @IsString()
   readonly countryCode: string;

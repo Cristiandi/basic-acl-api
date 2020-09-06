@@ -12,8 +12,8 @@ import { CompaniesModule } from './modules/companies/companies.module';
 
 import appConfig from './config/app.config';
 import appConfigSchema from './config/app.config.schema';
-import { FirebaseAdminModule } from './modules/firebase-admin/firebase-admin.module';
 import { CommonModule } from './common/common.module';
+import { UsersModule } from './modules/users/users.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'local';
 const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
@@ -38,8 +38,8 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
       })
     }),
     CommonModule,
-    FirebaseAdminModule,
-    CompaniesModule
+    CompaniesModule,
+    UsersModule
   ],
   controllers: [AppController],
   providers: [AppService]

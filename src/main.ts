@@ -10,7 +10,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
 
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { CustomExceptionFilter } from './common/filters/cutstom-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -28,7 +28,7 @@ async function bootstrap() {
   await app.register(helmet, { hidePoweredBy: false });
   
   // using the filters
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new CustomExceptionFilter());
 
   // Setting up Swagger document 
   const options = new DocumentBuilder()

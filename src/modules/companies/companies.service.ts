@@ -11,6 +11,8 @@ import { FindAllCompaniesInput } from './dto/find-all-companies-input.dto';
 import { FindOneCompanyInput } from './dto/find-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
 import { GetServiceAccountInput } from './dto/get-service-account-input.dto';
+import { GetFirebaseConfigInput } from './dto/get-firebase-config-input.dto';
+import { GetCompanyByNameInput } from './dto/get-company-by-name-input.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -43,18 +45,22 @@ export class CompaniesService {
       name: createCompanyInput.name,
       countryCode: createCompanyInput.countryCode,
       uuid: createCompanyInput.uuid || generateUuid(),
-      serviceAccount: createCompanyInput.serviceAccount as any
+      serviceAccount: createCompanyInput.serviceAccount as any,
+      firebaseConfig: createCompanyInput.firebaseConfig as any
     });
 
     return this.companiesRepository.save(created);
   }
 
   async findAll(findAllCompaniesInput: FindAllCompaniesInput): Promise<Company[]> {
-    const { limit = 1, offset = 0 } = findAllCompaniesInput;
+    const { limit = 0, offset = 0 } = findAllCompaniesInput;
 
     return this.companiesRepository.find({
-      take: limit,
-      skip: offset
+      take: limit || undefined,
+      skip: offset,
+      order: {
+        id: 'DESC'
+      }
     });
   }
 
@@ -125,5 +131,40 @@ export class CompaniesService {
     const [company] = existing;
 
     return company.serviceAccount;
+  }
+
+  async getFirebaseConfig(getFirebaseConfigInput: GetFirebaseConfigInput): Promise<string> {
+    const { uuid } = getFirebaseConfigInput;
+    
+    const existing = await this.companiesRepository.find({
+      select: ['firebaseConfig'],
+      where: { uuid }
+    });
+
+    if (!existing.length) {
+      throw new NotFoundException(`can't get the company with uuid ${uuid}.`);
+    }
+
+    const [company] = existing;
+
+    return company.firebaseConfig;
+  }
+
+  async getCompanyByName(getCompanyByNameInput: GetCompanyByNameInput): Promise<Company> {
+    const { name } = getCompanyByNameInput;
+
+    const data = await this.companiesRepository.find({
+      where: {
+        name: name
+      }
+    });
+
+    if (!data.length) {
+      throw new NotFoundException(`can't get the company with name ${name}.`);
+    }
+
+    const [company] = data;
+
+    return company;
   }
 }

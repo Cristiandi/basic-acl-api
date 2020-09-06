@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { CompaniesModule } from '../companies/companies.module';
+import { CompaniesModule } from '../../../modules/companies/companies.module';
 
 import { FirebaseAdminService } from './firebase-admin.service';
 import { COUNTRY_CODES_PHONE_NUMBER, COUNTRY_CODES_PHONE_NUMBER_OBJECT } from './firebase-admin.constants';
