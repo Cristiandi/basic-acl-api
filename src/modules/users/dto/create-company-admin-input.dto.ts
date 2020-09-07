@@ -1,6 +1,6 @@
-import { IsUUID, IsString, IsBoolean, IsEmail, IsOptional, Length } from 'class-validator';
+import { IsUUID, IsString, IsEmail, Length } from 'class-validator';
 
-export class CreateUserInput {
+export class CreateCompanyAdminInput {
   @IsUUID()
   readonly companyUuid: string;
 
@@ -14,8 +14,4 @@ export class CreateUserInput {
   @IsString()
   @Length(10, 10)
   readonly phone: string;
-
-  @IsOptional()
-  @IsBoolean()
-  readonly isAdmin?: boolean;
 }

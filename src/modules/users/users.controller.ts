@@ -12,6 +12,7 @@ import { FindAllUsersQueryInput } from './dto/find-all-users-query-input.dto';
 import { CreateUserInput } from './dto/create-user-input.dto';
 import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
+import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
@@ -61,6 +62,12 @@ export class UsersController {
   @Patch('/set-user-as-admin')
   setUSerAsAdmin(@Body() setUserAsAdminInput: SetUserAsAdminInput): Promise<any> {
     return this.usersService.setUserAsAdmin(setUserAsAdminInput);
+  }
+
+  @Public()
+  @Post('/company-admin')
+  createCompanyAdmin(@Body() createCompanyAdminInput: CreateCompanyAdminInput): Promise<any> {
+    return this.usersService.createCompanyAdmin(createCompanyAdminInput);
   }
 
 }

@@ -18,6 +18,7 @@ import { UpdateUserInput } from './dto/update-user-input.dto';
 import { FindAllUsersParamInput } from './dto/find-all-users-param-input.dto';
 import { FindAllUsersQueryInput } from './dto/find-all-users-query-input.dto';
 import { CreateUserInput } from './dto/create-user-input.dto';
+import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -363,6 +364,50 @@ export class UsersService {
     }
 
     const updated = await this.update({ id: '' + target.id }, { companyUuid, isAdmin: true });
+
+    return updated;
+  }
+
+  /**
+   * function to create an admin user for the company
+   *
+   * @param {CreateCompanyAdminInput} createCompanyAdminInput
+   * @returns {Promise<User>}
+   * @memberof UsersService
+   */
+  public async createCompanyAdmin(createCompanyAdminInput: CreateCompanyAdminInput): Promise<User> {
+    const { companyUuid } = createCompanyAdminInput;
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${company}`);
+    }
+
+    const existingAdmin = await this.usersRepository.find({
+      where: {
+        company,
+        isAdmin: true
+      }
+    });
+
+    if (existingAdmin.length) {
+      throw new HttpException(`company ${companyUuid} already has an admin user.`, HttpStatus.PRECONDITION_FAILED);
+    }
+
+    const created = await this.create({
+      companyUuid,
+      email: createCompanyAdminInput.email,
+      password: createCompanyAdminInput.password,
+      phone: createCompanyAdminInput.phone
+    });
+
+    const updated = await this.update(
+      { id: '' + created.id },
+      { companyUuid, isAdmin: true }
+    );
+
+    delete updated.company;
 
     return updated;
   }
