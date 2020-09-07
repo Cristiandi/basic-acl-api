@@ -14,6 +14,7 @@ import { GetServiceAccountInput } from './dto/get-service-account-input.dto';
 import { GetFirebaseConfigInput } from './dto/get-firebase-config-input.dto';
 import { GetCompanyByNameInput } from './dto/get-company-by-name-input.dto';
 import { GetCompanyByUuidInput } from './dto/get-company-by-uuid-input.dto';
+import { GetYourCompanyInput } from './dto/get-your-company-input.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -22,7 +23,7 @@ export class CompaniesService {
   private readonly companiesRepository: Repository<Company>
   ) {}
 
-  async create(createCompanyInput: CreateCompanyInput): Promise<Company> {
+  public async create(createCompanyInput: CreateCompanyInput): Promise<Company> {
     const query = this.companiesRepository.find({
       select: [ 'id' ],
       where: [
@@ -53,7 +54,7 @@ export class CompaniesService {
     return this.companiesRepository.save(created);
   }
 
-  async findAll(findAllCompaniesInput: FindAllCompaniesInput): Promise<Company[]> {
+  public async findAll(findAllCompaniesInput: FindAllCompaniesInput): Promise<Company[]> {
     const { limit = 0, offset = 0 } = findAllCompaniesInput;
 
     return this.companiesRepository.find({
@@ -65,7 +66,7 @@ export class CompaniesService {
     });
   }
 
-  async findOne(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
+  public async findOne(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
     const { id } = findOneCompanyInput;
     const existing = await this.companiesRepository.findOne(id);
 
@@ -76,7 +77,7 @@ export class CompaniesService {
     return existing;
   }
 
-  async update(findOneCompanyInput: FindOneCompanyInput, updateCompanyInput: UpdateCompanyInput): Promise<Company> {
+  public async update(findOneCompanyInput: FindOneCompanyInput, updateCompanyInput: UpdateCompanyInput): Promise<Company> {
     const { id } = findOneCompanyInput;
 
     const existing = await this.companiesRepository.preload({
@@ -111,13 +112,13 @@ export class CompaniesService {
     return this.companiesRepository.save(existing);
   }
 
-  async remove(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
+  public async remove(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
     const existing = await this.findOne(findOneCompanyInput);
 
     return this.companiesRepository.remove(existing);
   }
 
-  async getServiceAccount(getServiceAccountInput: GetServiceAccountInput): Promise<string> {
+  public async getServiceAccount(getServiceAccountInput: GetServiceAccountInput): Promise<string> {
     const { uuid } = getServiceAccountInput;
     
     const existing = await this.companiesRepository.find({
@@ -134,7 +135,7 @@ export class CompaniesService {
     return company.serviceAccount;
   }
 
-  async getFirebaseConfig(getFirebaseConfigInput: GetFirebaseConfigInput): Promise<string> {
+  public async getFirebaseConfig(getFirebaseConfigInput: GetFirebaseConfigInput): Promise<string> {
     const { uuid } = getFirebaseConfigInput;
     
     const existing = await this.companiesRepository.find({
@@ -151,7 +152,7 @@ export class CompaniesService {
     return company.firebaseConfig;
   }
 
-  async getCompanyByName(getCompanyByNameInput: GetCompanyByNameInput): Promise<Company> {
+  public async getCompanyByName(getCompanyByNameInput: GetCompanyByNameInput): Promise<Company> {
     const { name } = getCompanyByNameInput;
 
     const data = await this.companiesRepository.find({
@@ -169,7 +170,7 @@ export class CompaniesService {
     return company;
   }
 
-  async getCompanyByUuid(getCompanyByUuidInput: GetCompanyByUuidInput): Promise<Company> {
+  public async getCompanyByUuid(getCompanyByUuidInput: GetCompanyByUuidInput): Promise<Company | null> {
     const { uuid } = getCompanyByUuidInput;
 
     const data = await this.companiesRepository.find({
@@ -179,10 +180,22 @@ export class CompaniesService {
     });
 
     if (!data.length) {
-      throw new NotFoundException(`can't get the company with uuid ${uuid}.`);
+      return null;
     }
 
     const [company] = data;
+
+    return company;
+  }
+
+  public async getYourCompany(getYourCompanyInput: GetYourCompanyInput): Promise<Company> {
+    const { uuid } = getYourCompanyInput;
+
+    const company = await this.getCompanyByUuid({ uuid });
+
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${uuid}.`);
+    }
 
     return company;
   }

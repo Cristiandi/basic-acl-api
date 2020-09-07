@@ -86,6 +86,10 @@ export class UsersService {
 
     const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
 
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${company}`);
+    }
+
     return this.usersRepository.find({
       select: ['id', 'authUid', 'email', 'isAdmin'],
       where: {
@@ -269,6 +273,10 @@ export class UsersService {
     const { companyUuid } = createUserFromFirebaseInput;
 
     const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${company}`);
+    }
 
     const { authUid, email } = createUserFromFirebaseInput;
 

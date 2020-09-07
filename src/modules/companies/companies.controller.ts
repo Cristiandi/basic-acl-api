@@ -7,6 +7,7 @@ import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { FindAllCompaniesInput } from './dto/find-all-companies-input.dto';
 import { FindOneCompanyInput } from './dto/find-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
+import { GetYourCompanyInput } from './dto/get-your-company-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('companies')
@@ -37,5 +38,10 @@ export class CompaniesController {
   @Delete(':id')
   remove(@Param() findOneCompanyInput: FindOneCompanyInput): Promise<any> {
     return this.companiesService.remove(findOneCompanyInput);
+  }
+
+  @Get('/your-company/:uuid')
+  getYourCompany(@Param() getYourCompanyInput: GetYourCompanyInput): Promise<any> {
+    return this.companiesService.getYourCompany(getYourCompanyInput);
   }
 }
