@@ -1,19 +1,19 @@
 import * as path from 'path';
-
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { CommonModule } from './common/common.module';
 import { CompaniesModule } from './modules/companies/companies.module';
+import { UsersModule } from './modules/users/users.module';
 
 import appConfig from './config/app.config';
 import appConfigSchema from './config/app.config.schema';
-import { CommonModule } from './common/common.module';
-import { UsersModule } from './modules/users/users.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'local';
 const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
@@ -44,4 +44,4 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
   controllers: [AppController],
   providers: [AppService]
 })
-export class AppModule {}
+export class AppModule { }
