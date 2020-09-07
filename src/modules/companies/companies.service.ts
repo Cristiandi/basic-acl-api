@@ -11,6 +11,10 @@ import { FindAllCompaniesInput } from './dto/find-all-companies-input.dto';
 import { FindOneCompanyInput } from './dto/find-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
 import { GetServiceAccountInput } from './dto/get-service-account-input.dto';
+import { GetFirebaseConfigInput } from './dto/get-firebase-config-input.dto';
+import { GetCompanyByNameInput } from './dto/get-company-by-name-input.dto';
+import { GetCompanyByUuidInput } from './dto/get-company-by-uuid-input.dto';
+import { GetYourCompanyInput } from './dto/get-your-company-input.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -19,7 +23,7 @@ export class CompaniesService {
   private readonly companiesRepository: Repository<Company>
   ) {}
 
-  async create(createCompanyInput: CreateCompanyInput): Promise<Company> {
+  public async create(createCompanyInput: CreateCompanyInput): Promise<Company> {
     const query = this.companiesRepository.find({
       select: [ 'id' ],
       where: [
@@ -43,22 +47,26 @@ export class CompaniesService {
       name: createCompanyInput.name,
       countryCode: createCompanyInput.countryCode,
       uuid: createCompanyInput.uuid || generateUuid(),
-      serviceAccount: createCompanyInput.serviceAccount as any
+      serviceAccount: createCompanyInput.serviceAccount as any,
+      firebaseConfig: createCompanyInput.firebaseConfig as any
     });
 
     return this.companiesRepository.save(created);
   }
 
-  async findAll(findAllCompaniesInput: FindAllCompaniesInput): Promise<Company[]> {
-    const { limit = 1, offset = 0 } = findAllCompaniesInput;
+  public async findAll(findAllCompaniesInput: FindAllCompaniesInput): Promise<Company[]> {
+    const { limit = 0, offset = 0 } = findAllCompaniesInput;
 
     return this.companiesRepository.find({
-      take: limit,
-      skip: offset
+      take: limit || undefined,
+      skip: offset,
+      order: {
+        id: 'DESC'
+      }
     });
   }
 
-  async findOne(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
+  public async findOne(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
     const { id } = findOneCompanyInput;
     const existing = await this.companiesRepository.findOne(id);
 
@@ -69,7 +77,7 @@ export class CompaniesService {
     return existing;
   }
 
-  async update(findOneCompanyInput: FindOneCompanyInput, updateCompanyInput: UpdateCompanyInput): Promise<Company> {
+  public async update(findOneCompanyInput: FindOneCompanyInput, updateCompanyInput: UpdateCompanyInput): Promise<Company> {
     const { id } = findOneCompanyInput;
 
     const existing = await this.companiesRepository.preload({
@@ -79,7 +87,7 @@ export class CompaniesService {
     });
 
     if (!existing) {
-      throw new NotFoundException(`coffee ${id} not found`);
+      throw new NotFoundException(`company ${id} not found.`);
     }
 
     const compareTo = await this.companiesRepository.find({
@@ -104,13 +112,13 @@ export class CompaniesService {
     return this.companiesRepository.save(existing);
   }
 
-  async remove(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
+  public async remove(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
     const existing = await this.findOne(findOneCompanyInput);
 
     return this.companiesRepository.remove(existing);
   }
 
-  async getServiceAccount(getServiceAccountInput: GetServiceAccountInput): Promise<string> {
+  public async getServiceAccount(getServiceAccountInput: GetServiceAccountInput): Promise<string> {
     const { uuid } = getServiceAccountInput;
     
     const existing = await this.companiesRepository.find({
@@ -125,5 +133,70 @@ export class CompaniesService {
     const [company] = existing;
 
     return company.serviceAccount;
+  }
+
+  public async getFirebaseConfig(getFirebaseConfigInput: GetFirebaseConfigInput): Promise<string> {
+    const { uuid } = getFirebaseConfigInput;
+    
+    const existing = await this.companiesRepository.find({
+      select: ['firebaseConfig'],
+      where: { uuid }
+    });
+
+    if (!existing.length) {
+      throw new NotFoundException(`can't get the company with uuid ${uuid}.`);
+    }
+
+    const [company] = existing;
+
+    return company.firebaseConfig;
+  }
+
+  public async getCompanyByName(getCompanyByNameInput: GetCompanyByNameInput): Promise<Company> {
+    const { name } = getCompanyByNameInput;
+
+    const data = await this.companiesRepository.find({
+      where: {
+        name: name
+      }
+    });
+
+    if (!data.length) {
+      throw new NotFoundException(`can't get the company with name ${name}.`);
+    }
+
+    const [company] = data;
+
+    return company;
+  }
+
+  public async getCompanyByUuid(getCompanyByUuidInput: GetCompanyByUuidInput): Promise<Company | null> {
+    const { uuid } = getCompanyByUuidInput;
+
+    const data = await this.companiesRepository.find({
+      where: {
+        uuid
+      }
+    });
+
+    if (!data.length) {
+      return null;
+    }
+
+    const [company] = data;
+
+    return company;
+  }
+
+  public async getYourCompany(getYourCompanyInput: GetYourCompanyInput): Promise<Company> {
+    const { uuid } = getYourCompanyInput;
+
+    const company = await this.getCompanyByUuid({ uuid });
+
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${uuid}.`);
+    }
+
+    return company;
   }
 }

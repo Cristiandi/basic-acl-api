@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+
+import { User } from '../users/user.entitty';
 
 @Entity({ name: 'companies' })
 @Unique('uk_companies_name', ['name'])
@@ -19,9 +21,16 @@ export class Company {
   @Column({ name: 'service_account', type: 'json' })
   serviceAccount: string;
 
+  @Column({ name: 'firebase_config', type: 'json' })
+  firebaseConfig: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  // relations
+  @OneToMany(type => User, user => user.company)
+  users: User[];
 }
