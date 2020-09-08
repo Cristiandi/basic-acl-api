@@ -56,8 +56,7 @@ export class HitLimitGuard implements CanActivate {
     // define the key value
     const keyValue = {
       hits: 1,
-      initalTime: initialTimeDate.getTime(),
-      expirationTime: initialTimeDate.getTime() + (timeRange * 1000)
+      initalTime: initialTimeDate.getTime()
     };
 
     // try to get the key value
@@ -65,23 +64,13 @@ export class HitLimitGuard implements CanActivate {
 
     // if i do not have value for that key
     if (!unParsedKeyValue) {
-      await redisClient.set(key, JSON.stringify(keyValue));
+      await redisClient.set(key, JSON.stringify(keyValue), 'EX', timeRange);
     } else {
       // try to parse
       const parsedKeyValue = JSON.parse(unParsedKeyValue);
 
       // get the attributes from the key value 
-      const { hits, initalTime, expirationTime } = parsedKeyValue;
-
-      // determine if the value key is expired
-      const isExpired = new Date().getTime() > expirationTime;
-
-      // if the value is expired... so its ok
-      if (isExpired) {
-        await redisClient.del(key);
-        await redisClient.set(key, JSON.stringify(keyValue));
-        return true;
-      }
+      const { hits, initalTime } = parsedKeyValue;
 
       // otherwise check the number of hits
       if (hits >= hitsAllowed) {
@@ -91,11 +80,12 @@ export class HitLimitGuard implements CanActivate {
       // set the new value for the key
       const newKeyValue = {
         hits: hits + 1,
-        initalTime,
-        expirationTime
+        initalTime
       };
 
-      await redisClient.set(key, JSON.stringify(newKeyValue));
+      await redisClient.set(key, JSON.stringify(newKeyValue), 'EX', timeRange);
     }
+
+    return true;
   }
 }
