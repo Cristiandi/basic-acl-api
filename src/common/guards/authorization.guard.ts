@@ -2,8 +2,11 @@ import { CanActivate, ExecutionContext, Injectable, Inject, HttpException, HttpS
 // import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { ConfigType } from '@nestjs/config';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+
 import appConfig from '../../config/app.config';
+
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+
 import { FirebaseAdminService } from '../plugins/firebase-admin/firebase-admin.service';
 
 @Injectable()

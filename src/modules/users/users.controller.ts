@@ -13,6 +13,7 @@ import { CreateUserInput } from './dto/create-user-input.dto';
 import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
+import { HitsWatcher } from 'src/common/decorators/hits-watcher.decorator';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
@@ -51,6 +52,7 @@ export class UsersController {
     return this.usersService.loginUser(loginUserInput);
   }
 
+  @HitsWatcher(1, 86400)
   @Public()
   @HttpCode(HttpStatus.ACCEPTED)
   @Post('/create-users-from-firebase')
