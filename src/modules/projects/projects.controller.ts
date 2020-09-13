@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { ProjectsService } from './projects.service';
 
 import { CreateProjectInput } from './dto/create-project-input.dto';
 import { FindAllProjectsParamInput } from './dto/find-all-projects-param-input.dto';
 import { FindAllProjectsQueryInput } from './dto/find-all-projects-query-input.dto';
+import { FindOneProjectInput } from './dto/find-one-project-input.dto';
+import { UpdateProjectInput } from './dto/update-project-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('projects')
@@ -22,5 +24,18 @@ export class ProjectsController {
         @Query() FindAllProjectsQueryInput: FindAllProjectsQueryInput
     ): Promise<any>  {
         return this.projectsService.findAll(findAllProjectsParamInput, FindAllProjectsQueryInput);
+    }
+
+    @Patch(':companyUuid/:id')
+    update(
+        @Param() findOneProjectInput: FindOneProjectInput,
+        @Body() updateProjectInput: UpdateProjectInput
+    ): Promise<any> {
+        return this.projectsService.update(findOneProjectInput, updateProjectInput);
+    }
+
+    @Delete(':companyUuid/:id')
+    remove(@Param() findOneProjectInput: FindOneProjectInput): Promise<any> {
+        return this.projectsService.remove(findOneProjectInput);
     }
 }

@@ -9,6 +9,8 @@ import { CompaniesService } from '../companies/companies.service';
 import { CreateProjectInput } from './dto/create-project-input.dto';
 import { FindAllProjectsParamInput } from './dto/find-all-projects-param-input.dto';
 import { FindAllProjectsQueryInput } from './dto/find-all-projects-query-input.dto';
+import { FindOneProjectInput } from './dto/find-one-project-input.dto';
+import { UpdateProjectInput } from './dto/update-project-input.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -95,5 +97,105 @@ export class ProjectsService {
                 id: 'DESC'
             }
         });
+    }
+
+    /**
+     * function to find one user
+     *
+     * @param {FindOneUserInput} findOneUserInput
+     * @returns {Promise<User>}
+     * @memberof UsersService
+     */
+    public async findOne(findOneProjectInput: FindOneProjectInput): Promise<Project> {
+        const { companyUuid } = findOneProjectInput;
+
+        const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+        if (!company) {
+            throw new NotFoundException(`can not get the company with uuid ${companyUuid}.`);
+        }
+
+        const { id } = findOneProjectInput;
+        const existing = await this.projectRepository.findOne(id, {
+            where: {
+                company
+            },
+            relations: ['company']
+        });
+
+        if (!existing) {
+            throw new NotFoundException(`project ${id} not found`);
+        }
+
+        return existing;
+    }
+
+    /**
+     * function to update a project
+     *
+     * @param {FindOneProjectInput} findOneProjectInput
+     * @param {UpdateProjectInput} updateProjectInput
+     * @return {*}  {Promise<Project>}
+     * @memberof ProjectsService
+     */
+    public async update(
+        findOneProjectInput: FindOneProjectInput,
+        updateProjectInput: UpdateProjectInput
+    ): Promise<Project> {
+        const { id, companyUuid } = findOneProjectInput;
+
+        const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+        if (!company) {
+            throw new NotFoundException(`can't get the company with uuid ${companyUuid}`);
+        }
+
+        const existing = await this.projectRepository.preload({
+            id: +id,
+            company,
+            ...updateProjectInput
+        });
+
+        if (!existing) {
+            throw new NotFoundException(`project ${id} not found.`);
+        }
+
+        const compareTo = await this.projectRepository.find({
+            where: {
+                company: existing.company,
+                code: existing.company
+            }
+        });
+
+        if (compareTo.length) {
+            const [projectToCompare] = compareTo;
+
+            if (projectToCompare.id !== existing.id) {
+                throw new HttpException('other project already exists for the company or code.', 412);
+              }
+        }
+
+        const saved = await this.projectRepository.save(existing);
+
+        delete saved.company;
+
+        return saved;
+    }
+
+    /**
+     * function to delete a project company
+     *
+     * @param {FindOneProjectInput} findOneProjectInput
+     * @return {*}  {Promise<Project>}
+     * @memberof ProjectsService
+     */
+    public async remove(findOneProjectInput: FindOneProjectInput): Promise<Project> {
+        const existing = await this.findOne(findOneProjectInput);
+
+        const removed = await this.projectRepository.remove(existing);
+
+        delete removed.company;
+
+        return removed;
     }
 }
