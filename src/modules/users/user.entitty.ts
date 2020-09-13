@@ -17,6 +17,8 @@ export class User {
   @Column({ name: 'is_admin', type: 'boolean' })
   isAdmin: boolean;
 
+  // relations
+
   @ManyToOne(type => Company, company => company.users)
   @JoinColumn({ name: 'company_id' })
   company: Company;

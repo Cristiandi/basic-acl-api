@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 
 import { User } from '../users/user.entitty';
+import { Project } from '../projects/project.entity';
 
 @Entity({ name: 'companies' })
 @Unique('uk_companies_name', ['name'])
@@ -33,4 +34,7 @@ export class Company {
   // relations
   @OneToMany(type => User, user => user.company)
   users: User[];
+
+  @OneToMany(type => Project, project => project.company)
+  projects: Project[];
 }
