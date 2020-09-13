@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 import { Company } from '../companies/company.entity';
 
 @Entity({ name: 'projects' })
@@ -12,6 +12,12 @@ export class Project {
 
     @Column({ type: 'varchar', length: 5 })
     code: string;
+
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date;
+  
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date;
 
     // relations
 
