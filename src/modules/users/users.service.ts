@@ -112,8 +112,19 @@ export class UsersService {
    * @memberof UsersService
    */
   public async findOne(findOneUserInput: FindOneUserInput): Promise<User> {
+    const { companyUuid } = findOneUserInput;
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${companyUuid}.`);
+    }
+
     const { id } = findOneUserInput;
     const existing = await this.usersRepository.findOne(id, {
+      where: {
+        company
+      },
       relations: ['company']
     });
 
@@ -136,7 +147,13 @@ export class UsersService {
     findOneUserInput: FindOneUserInput,
     updateUserInput: UpdateUserInput
   ): Promise<User> {
-    const { id } = findOneUserInput;
+    const { id, companyUuid } = findOneUserInput;
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${companyUuid}.`);
+    }
 
     const existing = await this.usersRepository.preload({
       id: +id,
@@ -145,14 +162,6 @@ export class UsersService {
 
     if (!existing) {
       throw new NotFoundException(`user ${id} not found.`);
-    }
-
-    const { companyUuid } = updateUserInput;
-
-    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
-
-    if (!company) {
-      throw new NotFoundException(`can not get the company with uuid ${companyUuid}.`);
     }
 
     const { email, phone, password } = updateUserInput;
@@ -333,42 +342,6 @@ export class UsersService {
   }
 
   /**
-   * function to set a user as admin
-   *
-   * @param {SetUserAsAdminInput} setUserAsAdminInput
-   * @returns {Promise<User>}
-   * @memberof UsersService
-   */
-  public async setUserAsAdmin(setUserAsAdminInput: SetUserAsAdminInput): Promise<User> {
-    const { companyUuid, email } = setUserAsAdminInput;
-
-    const existing = await this.usersRepository.createQueryBuilder('u')
-      .innerJoin('u.company', 'c')
-      .where('c.uuid = :companyUuid', { companyUuid })
-      .andWhere('u.email = :email', { email })
-      .andWhere('u.isAdmin = true')
-      .getOne();
-
-    if (existing) {
-      throw new HttpException('the company already has an admin.', HttpStatus.PRECONDITION_FAILED);
-    }
-
-    const target = await this.usersRepository.createQueryBuilder('u')
-      .innerJoin('u.company', 'c')
-      .where('c.uuid = :companyUuid', { companyUuid })
-      .andWhere('u.email = :email', { email })
-      .getOne();
-
-    if (!target) {
-      throw new NotFoundException(`can't get the user with email ${email} and for the company ${companyUuid}.`);
-    }
-
-    const updated = await this.update({ id: '' + target.id }, { companyUuid, isAdmin: true });
-
-    return updated;
-  }
-
-  /**
    * function to create an admin user for the company
    *
    * @param {CreateCompanyAdminInput} createCompanyAdminInput
@@ -402,13 +375,16 @@ export class UsersService {
       phone: createCompanyAdminInput.phone
     });
 
-    const updated = await this.update(
-      { id: '' + created.id },
-      { companyUuid, isAdmin: true }
-    );
+    const existing = await this.usersRepository.preload({
+      id: created.id,
+      ...created,
+      isAdmin: true
+    });
 
-    delete updated.company;
+    const saved = await this.usersRepository.save(existing);
 
-    return updated;
+    delete saved.company;
+
+    return saved;
   }
 }

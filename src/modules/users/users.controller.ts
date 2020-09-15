@@ -33,7 +33,7 @@ export class UsersController {
     return this.usersService.findAll(findAllUsersParamInput, findAllUsersQueryInput);
   }
 
-  @Patch(':id')
+  @Patch(':companyUuid/:id')
   update(
     @Param() findOneUserInput: FindOneUserInput,
     @Body() updateUserInput: UpdateUserInput
@@ -41,7 +41,7 @@ export class UsersController {
     return this.usersService.update(findOneUserInput, updateUserInput);
   }
 
-  @Delete(':id')
+  @Delete(':companyUuid/:id')
   remove(@Param() findOneUserInput: FindOneUserInput): Promise<any> {
     return this.usersService.remove(findOneUserInput);
   }
@@ -58,12 +58,6 @@ export class UsersController {
   @Post('/create-users-from-firebase')
   createUsersFromFirebase(@Body() createUsersFromFirebaseInput: CreateUsersFromFirebaseInput): Promise<any> {
     return this.usersService.createUsersFromFirebase(createUsersFromFirebaseInput);
-  }
-
-  @Public()
-  @Patch('/set-user-as-admin')
-  setUSerAsAdmin(@Body() setUserAsAdminInput: SetUserAsAdminInput): Promise<any> {
-    return this.usersService.setUserAsAdmin(setUserAsAdminInput);
   }
 
   @Public()
