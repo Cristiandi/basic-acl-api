@@ -163,7 +163,7 @@ export class ProjectsService {
         const compareTo = await this.projectRepository.find({
             where: {
                 company: existing.company,
-                code: existing.company
+                code: existing.code
             }
         });
 
