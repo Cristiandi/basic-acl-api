@@ -1,5 +1,5 @@
 import * as firebaseAdmin from 'firebase-admin';
-import { Injectable, Inject, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 
 import { CompaniesService } from '../../../modules/companies/companies.service';
 
