@@ -100,11 +100,11 @@ export class ProjectsService {
     }
 
     /**
-     * function to find one user
+     * function to find one project
      *
-     * @param {FindOneUserInput} findOneUserInput
-     * @returns {Promise<User>}
-     * @memberof UsersService
+     * @param {FindOneProjectInput} findOneProjectInput
+     * @returns {Promise<Project>}
+     * @memberof ProjectsService
      */
     public async findOne(findOneProjectInput: FindOneProjectInput): Promise<Project> {
         const { companyUuid } = findOneProjectInput;

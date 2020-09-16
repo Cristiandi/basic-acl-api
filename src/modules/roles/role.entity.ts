@@ -1,11 +1,10 @@
-import { company } from 'faker';
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 
 import { Company } from '../companies/company.entity';
 
 
 @Entity({ name: 'roles' })
-@Unique('uk_projects', ['code', 'company'])
+@Unique('uk_roles', ['code', 'company'])
 export class Role {
     @PrimaryGeneratedColumn()
     id: number;
