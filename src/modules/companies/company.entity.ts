@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, Updat
 
 import { User } from '../users/user.entitty';
 import { Project } from '../projects/project.entity';
+import { Role } from '../roles/role.entity';
 
 @Entity({ name: 'companies' })
 @Unique('uk_companies_name', ['name'])
@@ -37,4 +38,7 @@ export class Company {
 
   @OneToMany(type => Project, project => project.company)
   projects: Project[];
+
+  @OneToMany(type => Role, role => role.company)
+  roles: Role[]
 }
