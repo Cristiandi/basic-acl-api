@@ -6,7 +6,6 @@ import { Public } from 'src/common/decorators/public.decorator';
 
 import { LoginUserInput } from './dto/login-user-input-dto';
 import { CreateUsersFromFirebaseInput } from './dto/create-users-from-firebase-input.dto';
-import { SetUserAsAdminInput } from './dto/set-user-as-admin-input.dto';
 import { FindAllUsersParamInput } from './dto/find-all-users-param-input.dto';
 import { FindAllUsersQueryInput } from './dto/find-all-users-query-input.dto';
 import { CreateUserInput } from './dto/create-user-input.dto';
