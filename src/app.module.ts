@@ -13,6 +13,7 @@ import { CompaniesModule } from './modules/companies/companies.module';
 import { UsersModule } from './modules/users/users.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { RolesModule } from './modules/roles/roles.module';
+import { ApiKeysModule } from './modules/api-keys/api-keys.module';
 
 import appConfig from './config/app.config';
 import appConfigSchema from './config/app.config.schema';
@@ -43,7 +44,8 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
     CompaniesModule,
     UsersModule,
     ProjectsModule,
-    RolesModule
+    RolesModule,
+    ApiKeysModule
   ],
   controllers: [AppController],
   providers: [AppService]
