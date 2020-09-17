@@ -39,7 +39,7 @@
     "faker": "5.1.0",
     "fastify-helmet": "5.0.3",
     "fastify-swagger": "3.3.0",
-    "firebase": "7.20.0",
+    "firebase": "7.21.0",
     "firebase-admin": "9.2.0",
     "md5": "2.3.0",
     "nestjs-redis": "1.2.8",
