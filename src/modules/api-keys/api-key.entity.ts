@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 
 import { Company } from '../companies/company.entity';
+import { AssignedRole } from '../assigned-roles/assigned-role.entity';
 
 @Entity({ name: 'api_keys' })
 @Unique('uk_api_keys', ['value', 'company'])
@@ -25,4 +26,7 @@ export class ApiKey {
     @ManyToOne(type => Company, company => company.apiKeys)
     @JoinColumn({ name: 'company_id' })
     company: Company;
+
+    @OneToMany(type => AssignedRole, assignedRole => assignedRole.apiKey)
+    assignedRoles: AssignedRole[];
 }
