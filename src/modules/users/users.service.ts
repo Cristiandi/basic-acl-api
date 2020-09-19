@@ -12,7 +12,6 @@ import { LoginUserInput } from './dto/login-user-input-dto';
 import { CreateUsersFromFirebaseInput } from './dto/create-users-from-firebase-input.dto';
 import { CreateUserFromFirebaseInput } from './dto/create-user-from-firebase-input.dto';
 import { GetUserByAuthUidInput } from './dto/get-user-by-auth-uid-input.dto';
-import { SetUserAsAdminInput } from './dto/set-user-as-admin-input.dto';
 import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
 import { FindAllUsersParamInput } from './dto/find-all-users-param-input.dto';
