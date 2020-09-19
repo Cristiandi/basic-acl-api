@@ -1,7 +1,7 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 
 import { Company } from '../companies/company.entity';
-
+import { AssignedRole } from '../assigned-roles/assigned-role.entity';
 
 @Entity({ name: 'roles' })
 @Unique('uk_roles', ['code', 'company'])
@@ -26,4 +26,7 @@ export class Role {
     @ManyToOne(type => Company, company => company.roles)
     @JoinColumn({ name: 'company_id' })
     company: Company;
+
+    @OneToMany(type => AssignedRole, assignedRole => assignedRole.role)
+    assignedRoles: AssignedRole[];
 }
