@@ -95,7 +95,7 @@ export class AssignedRolesService {
     const { limit = 0, offset = 0 } = findAllAssignedRolesQueryInput;
     const { companyUuid } = findAllAssignedRolesParamInput;
 
-    const rows = await this.assignedRoleRepository.createQueryBuilder('ar')
+    const data = await this.assignedRoleRepository.createQueryBuilder('ar')
     .select([
       'ar.id as id',
       'r.id as "roleId"',
@@ -114,7 +114,7 @@ export class AssignedRolesService {
     .skip(offset)
     .execute();
 
-    return rows;
+    return data;
   }
 
   /**

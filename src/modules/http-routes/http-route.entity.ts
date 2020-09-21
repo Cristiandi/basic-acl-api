@@ -1,7 +1,9 @@
-import { Column, CreateDateColumn, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 
 import { Project } from '../projects/project.entity';
 
+@Entity({ name: 'http_routes' })
+@Unique('uk_http_routes', ['method', 'path', 'project'])
 export class HttpRoute {
   @PrimaryGeneratedColumn()
   id: number;

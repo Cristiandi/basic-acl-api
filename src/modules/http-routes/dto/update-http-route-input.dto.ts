@@ -9,6 +9,11 @@ export class UpdateHttpRouteInput {
   @IsOptional()
   readonly method?: string;
 
+  @IsString()
+  @Length(5, 200)
+  @IsOptional()
+  readonly path?: string;
+
   @IsInt()
   @IsOptional()
   readonly projectId?: number;

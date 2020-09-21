@@ -8,6 +8,10 @@ export class CreateHttpRouteInput {
   @Length(3, 6)
   readonly method: string;
 
+  @IsString()
+  @Length(5, 200)
+  readonly path: string;
+
   @IsInt()
   readonly projectId: number;
 }
