@@ -5,6 +5,10 @@ export class CreateHttpRouteInput {
   readonly companyUuid: string;
 
   @IsString()
+  @Length(5, 100)
+  readonly name: string;
+
+  @IsString()
   @Length(3, 6)
   readonly method: string;
 

@@ -8,6 +8,9 @@ export class HttpRoute {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  name: string;
+
   @Column({ type: 'varchar', length: 6 })
   method: string;
 

@@ -42,10 +42,13 @@ export class HttpRoutesService {
       throw new HttpException('http route already exists for method, path and project.', HttpStatus.PRECONDITION_FAILED);
     }
 
+    const { name } = createHttpRouteInput;
+
     const created = this.httpRouteRepository.create({
-      project,
+      name,
       method,
-      path
+      path,
+      project
     });
 
     return this.httpRouteRepository.save(created);
@@ -62,6 +65,7 @@ export class HttpRoutesService {
     const data = await this.httpRouteRepository.createQueryBuilder('hr')
       .select([
         'hr.id as "id"',
+        'hr.name as "name"',
         'hr.method as "method"',
         'hr.path as "path"',
         'p.id as "projectId"',
@@ -72,6 +76,7 @@ export class HttpRoutesService {
       .where('c.uuid = :companyUuid', { companyUuid })
       .take(limit || undefined)
       .skip(offset)
+      .orderBy('hr.id', 'DESC')
       .execute();
 
     return data;
@@ -80,21 +85,21 @@ export class HttpRoutesService {
   public async findOne(findOneHttpRouteInput: FindOneHttpRouteInput): Promise<HttpRoute> {
     const { companyUuid, id } = findOneHttpRouteInput;
 
-    const existing = await this.httpRouteRepository.createQueryBuilder('hr')
-      .select([
-        'hr.id',
-        'hr.method',
-        'hr.path'
-      ])
-      .innerJoinAndSelect('hr.project', 'p')
+    const count = await this.httpRouteRepository.createQueryBuilder('hr')
+      .select(['hr.id as "id"'])
+      .innerJoin('hr.project', 'p')
       .innerJoin('p.company', 'c')
       .where('c.uuid = :companyUuid', { companyUuid })
       .andWhere('hr.id = :id', { id })
-      .getOne();
+      .getCount();
 
-    if (!existing) {
+    if (!count) {
       throw new NotFoundException(`can not get the  httpe route ${id} for the company with uuid ${companyUuid}`);
     }
+
+    const existing = await this.httpRouteRepository.findOne(id, {
+      relations: ['project']
+    });
 
     return existing;
   }
@@ -118,10 +123,11 @@ export class HttpRoutesService {
       project = existing.project;
     }
 
-    const { method, path } = updateHttpRouteInput;
+    const { name, method, path } = updateHttpRouteInput;
 
     const existing = await this.httpRouteRepository.preload({
       id: +id,
+      name,
       method,
       path,
       project

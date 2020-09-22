@@ -5,6 +5,11 @@ export class UpdateHttpRouteInput {
   readonly companyUuid: string;
 
   @IsString()
+  @Length(5, 100)
+  @IsOptional()
+  readonly name?: string;
+
+  @IsString()
   @Length(3, 6)
   @IsOptional()
   readonly method?: string;
