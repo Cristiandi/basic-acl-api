@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import { Permission } from '../permisssions/permission.entity';
 
 import { Project } from '../projects/project.entity';
 
@@ -28,4 +29,7 @@ export class HttpRoute {
   @ManyToOne(type => Project, project => project.httpRoutes)
   @JoinColumn({ name: 'project_id' })
   project: Project;
+
+  @OneToMany(type => Permission, permission => permission.httpRoute)
+  permissions: Permission[];
 }

@@ -12,8 +12,8 @@ import appConfigSchema from '../../src/config/app.config.schema';
 import { CommonModule } from '../../src/common/common.module';
 
 import { CustomExceptionFilter } from '../../src/common/filters/cutstom-exception.filter';
-import { CreateCompanyInput } from 'src/modules/companies/dto/create-company-input.dto';
-import { UpdateCompanyInput } from 'src/modules/companies/dto/update-company-input.dto';
+import { CreateCompanyInput } from '../../src/modules/companies/dto/create-company-input.dto';
+import { UpdateCompanyInput } from '../../src/modules/companies/dto/update-company-input.dto';
 
 const NODE_ENV = process.env.NODE_ENV || 'local';
 const envPath = path.resolve(__dirname, `../../.env.${NODE_ENV}`);

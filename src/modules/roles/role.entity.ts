@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, Pri
 
 import { Company } from '../companies/company.entity';
 import { AssignedRole } from '../assigned-roles/assigned-role.entity';
+import { Permission } from '../permisssions/permission.entity';
 
 @Entity({ name: 'roles' })
 @Unique('uk_roles', ['code', 'company'])
@@ -29,4 +30,7 @@ export class Role {
 
     @OneToMany(type => AssignedRole, assignedRole => assignedRole.role)
     assignedRoles: AssignedRole[];
+
+    @OneToMany(type => Permission, permission => permission.role)
+    permissions: Permission[];
 }

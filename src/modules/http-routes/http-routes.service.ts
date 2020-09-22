@@ -153,9 +153,7 @@ export class HttpRoutesService {
       }
     }
 
-    const saved = await this.httpRouteRepository.save(existing);
-
-    return saved;
+    return this.httpRouteRepository.save(existing);
   }
 
   public async remove(findOneHttpRouteInput: FindOneHttpRouteInput): Promise<HttpRoute> {
