@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CompaniesModule } from '../companies/companies.module';
-import { FirebaseModule } from 'src/common/plugins/firebase/firebase.module';
+import { FirebaseModule } from '../../common/plugins/firebase/firebase.module';
 
 import { User } from './user.entitty';
 
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { FirebaseAdminModule } from 'src/common/plugins/firebase-admin/firebase-admin.module';
+import { FirebaseAdminModule } from '../../common/plugins/firebase-admin/firebase-admin.module';
 
 @Module({
   imports: [

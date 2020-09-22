@@ -1,9 +1,6 @@
-import { IsUUID, IsString, Length, IsInt, IsOptional } from 'class-validator';
+import { IsString, Length, IsInt, IsOptional } from 'class-validator';
 
 export class UpdateHttpRouteInput {
-  @IsUUID()
-  readonly companyUuid: string;
-
   @IsString()
   @Length(5, 100)
   @IsOptional()

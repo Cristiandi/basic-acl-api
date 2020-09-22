@@ -1,7 +1,7 @@
 import { Injectable, Scope } from '@nestjs/common';
 import firebase from 'firebase';
 
-import { CompaniesService } from 'src/modules/companies/companies.service';
+import { CompaniesService } from '../../../modules/companies/companies.service';
 
 import { InitFirebaseInput } from './dto/init-firebase-input.dto';
 import { LoginInput } from './dto/login-input.dto';

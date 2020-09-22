@@ -16,6 +16,7 @@ import { RolesModule } from './modules/roles/roles.module';
 import { ApiKeysModule } from './modules/api-keys/api-keys.module';
 import { AssignedRolesModule } from './modules/assigned-roles/assigned-roles.module';
 import { HttpRoutesModule } from './modules/http-routes/http-routes.module';
+import { PermissionsModule } from './modules/permisssions/permissions.module';
 
 import appConfig from './config/app.config';
 import appConfigSchema from './config/app.config.schema';
@@ -49,7 +50,8 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
     RolesModule,
     ApiKeysModule,
     AssignedRolesModule,
-    HttpRoutesModule
+    HttpRoutesModule,
+    PermissionsModule
   ],
   controllers: [AppController],
   providers: [AppService]

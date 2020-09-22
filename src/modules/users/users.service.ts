@@ -5,8 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entitty';
 
 import { CompaniesService } from '../companies/companies.service';
-import { FirebaseService } from 'src/common/plugins/firebase/firebase.service';
-import { FirebaseAdminService } from 'src/common/plugins/firebase-admin/firebase-admin.service';
+import { FirebaseService } from '../../common/plugins/firebase/firebase.service';
+import { FirebaseAdminService } from '../../common/plugins/firebase-admin/firebase-admin.service';
 
 import { LoginUserInput } from './dto/login-user-input-dto';
 import { CreateUsersFromFirebaseInput } from './dto/create-users-from-firebase-input.dto';

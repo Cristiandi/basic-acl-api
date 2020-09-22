@@ -2,7 +2,7 @@ import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus,
 
 import { UsersService } from './users.service';
 
-import { Public } from 'src/common/decorators/public.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 
 import { LoginUserInput } from './dto/login-user-input-dto';
 import { CreateUsersFromFirebaseInput } from './dto/create-users-from-firebase-input.dto';
@@ -12,7 +12,7 @@ import { CreateUserInput } from './dto/create-user-input.dto';
 import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
-import { HitsWatcher } from 'src/common/decorators/hits-watcher.decorator';
+import { HitsWatcher } from '../../common/decorators/hits-watcher.decorator';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
