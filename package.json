@@ -6,11 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "postinstall": "npm run prestart:prod",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "prestart:prod": "rimraf dist && npm run build",
     "start": "nest start",
     "start:dev": "cross-env NODE_ENV=local nest start --watch",
     "start:dev:pro": "cross-env NODE_ENV=production.local nest start --watch",
