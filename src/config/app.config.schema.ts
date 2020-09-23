@@ -1,0 +1,20 @@
+import * as Joi from '@hapi/joi';
+
+export default Joi.object({
+  /* DATABASE INFORMATION */
+  DATABASE_CLIENT: Joi.required(),
+  DATABASE_HOST: Joi.required(),
+  DATABASE_PORT: Joi.number().default(5432),
+  DATABASE_USER: Joi.required(),
+  DATABASE_PASSWORD: Joi.required(),
+  DATABASE_NAME: Joi.required(),
+  /* API INFORMATION */
+  API_KEY: Joi.required(),
+  MAX_HITS_ALLOWED: Joi.number().default(1),
+  MAX_HITS_TIME_RANGE: Joi.number().default(60),
+  /* REDIS INFORMATION */
+  REDIS_HOST: Joi.required(),
+  REDIS_PORT: Joi.required(),
+  REDIS_PASSWORD: Joi.required(),
+  REDIS_CLIENT_NAME: Joi.required()
+});
