@@ -11,6 +11,7 @@ import { FindAllProjectsParamInput } from './dto/find-all-projects-param-input.d
 import { FindAllProjectsQueryInput } from './dto/find-all-projects-query-input.dto';
 import { FindOneProjectInput } from './dto/find-one-project-input.dto';
 import { UpdateProjectInput } from './dto/update-project-input.dto';
+import { GetProjectByCompanyAndCodeInput } from './dto/get-project-by-company-and-code-input.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -197,5 +198,18 @@ export class ProjectsService {
         delete removed.company;
 
         return removed;
+    }
+
+    public async getProjectByCompanyAndCode(getProjectByCompanyAndCodeInput: GetProjectByCompanyAndCodeInput): Promise<Project> {
+        const { companyUuid, code } = getProjectByCompanyAndCodeInput;
+
+        const query = this.projectRepository.createQueryBuilder('p')
+        .innerJoin('p.company', 'c')
+        .where('c.uuid = :companyUuid', { companyUuid })
+        .andWhere('p.code = :code', { code });
+
+        const existing = await query.getOne();
+
+        return existing;
     }
 }

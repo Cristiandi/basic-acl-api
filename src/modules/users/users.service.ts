@@ -18,6 +18,7 @@ import { FindAllUsersParamInput } from './dto/find-all-users-param-input.dto';
 import { FindAllUsersQueryInput } from './dto/find-all-users-query-input.dto';
 import { CreateUserInput } from './dto/create-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
+import { GetUserByTokenInput } from './dto/get-user-by-token-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -385,5 +386,24 @@ export class UsersService {
     delete saved.company;
 
     return saved;
+  }
+
+  /**
+   * function to get the user by yhe token
+   *
+   * @param {GetUserByTokenInput} getUserByTokenInput
+   * @return {*}  {Promise<User>}
+   * @memberof UsersService
+   */
+  public async getUserByToken(getUserByTokenInput: GetUserByTokenInput): Promise<User> {
+    const { companyUuid, token } = getUserByTokenInput;
+
+    const decodedToken = await this.firebaseAdminService.verifyToken({ companyUuid, token });
+
+    const { uid } = decodedToken;
+
+    const user = await this.getUserByAuthUid({ authUid: uid });
+
+    return user;
   }
 }

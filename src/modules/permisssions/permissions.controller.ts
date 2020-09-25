@@ -1,10 +1,16 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+
+import { PermissionsService } from './permissions.service';
+
+import { Public } from 'src/common/decorators/public.decorator';
+
+import { CheckPermissionInput } from './dto/check-permission-input.dto';
 import { CreatePermissionInput } from './dto/create-permission-input.dto';
 import { FindAllPermissionsParamInput } from './dto/find-all-permissions-param-input.dto';
 import { FindAllPermissionsQueryInput } from './dto/find-all-permissions-query-input.dto';
 import { FindOnePermissionInput } from './dto/find-one-permission-input.dto';
 import { UpdatePermissionInput } from './dto/update-permission-input.dto';
-import { PermissionsService } from './permissions.service';
+import { HitsWatcher } from 'src/common/decorators/hits-watcher.decorator';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('permissions')
@@ -35,5 +41,12 @@ export class PermisssionsController {
   @Delete(':companyUuid/:id')
   remove(@Param() findOnePermissionInput: FindOnePermissionInput): Promise<any> {
     return this.permissionsService.remove(findOnePermissionInput);
+  }
+
+  @HitsWatcher(10, 60)
+  @Public()
+  @Post('/check')
+  check(@Body() checkPermissionInput: CheckPermissionInput): Promise<any> {
+    return this.permissionsService.checkPermission(checkPermissionInput);
   }
 }
