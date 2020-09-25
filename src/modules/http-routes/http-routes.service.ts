@@ -11,6 +11,7 @@ import { FindAllHttpRoutesParamInput } from './dto/find-all-http-routes-param-in
 import { FindAllHttpRoutesQueryInput } from './dto/find-all-http-routes-query-input-dto';
 import { FindOneHttpRouteInput } from './dto/find-one-http-route-input.dto';
 import { UpdateHttpRouteInput } from './dto/update-http-route-input.dto';
+import { GetUserRoutesInput } from './dto/get-user-routes-input.dto';
 
 @Injectable()
 export class HttpRoutesService {
@@ -164,5 +165,19 @@ export class HttpRoutesService {
     delete removed.project.company;
 
     return removed;
+  }
+
+  public async getUserRoutes(getUserRoutesInput: GetUserRoutesInput): Promise<HttpRoute[]> {
+    const { userId } = getUserRoutesInput;
+
+    const query = this.httpRouteRepository.createQueryBuilder('hr')
+      .innerJoin('hr.permissions', 'p')
+      .innerJoin('p.role', 'r')
+      .innerJoin('r.assignedRoles', 'ar')
+      .innerJoin('ar.user', 'u')
+      .where('u.id = :userId', { userId })
+      .orderBy('hr.path', 'DESC');
+
+    return query.getMany();
   }
 }

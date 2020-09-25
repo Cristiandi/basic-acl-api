@@ -9,12 +9,16 @@ import { PermisssionsController } from './permissions.controller';
 
 import { RolesModule } from '../roles/roles.module';
 import { HttpRoutesModule } from '../http-routes/http-routes.module';
+import { ProjectsModule } from '../projects/projects.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Permission]),
     RolesModule,
-    HttpRoutesModule
+    HttpRoutesModule,
+    ProjectsModule,
+    UsersModule
   ],
   providers: [PermissionsService],
   controllers: [PermisssionsController],

@@ -1,6 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { pathToRegexp } from 'path-to-regexp';
 
 import { Permission } from './permission.entity';
 
@@ -12,6 +13,10 @@ import { FindAllPermissionsParamInput } from './dto/find-all-permissions-param-i
 import { FindAllPermissionsQueryInput } from './dto/find-all-permissions-query-input.dto';
 import { FindOnePermissionInput } from './dto/find-one-permission-input.dto';
 import { UpdatePermissionInput } from './dto/update-permission-input.dto';
+import { CheckPermissionInput } from './dto/check-permission-input.dto';
+import { ProjectsService } from '../projects/projects.service';
+import { UsersService } from '../users/users.service';
+import { CheckPermissionOutput } from './dto/check-permission-output.dto';
 
 @Injectable()
 export class PermissionsService {
@@ -19,13 +24,15 @@ export class PermissionsService {
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
     private readonly rolesService: RolesService,
-    private readonly httpRoutesService: HttpRoutesService
-  ) {}
+    private readonly httpRoutesService: HttpRoutesService,
+    private readonly projectsService: ProjectsService,
+    private readonly usersService: UsersService
+  ) { }
 
   public async create(createPermissionInput: CreatePermissionInput): Promise<Permission> {
     const { companyUuid, roleId } = createPermissionInput;
 
-    const role = await this.rolesService.findOne({ companyUuid, id:  `${roleId}` });
+    const role = await this.rolesService.findOne({ companyUuid, id: `${roleId}` });
 
     delete role.company;
 
@@ -34,7 +41,7 @@ export class PermissionsService {
     const httpRoute = await this.httpRoutesService.findOne({ companyUuid, id: `${httpRouteId}` });
 
     const compareTo = await this.permissionRepository.find({
-      select: [ 'id' ],
+      select: ['id'],
       where: {
         role,
         httpRoute
@@ -42,7 +49,7 @@ export class PermissionsService {
     });
 
     if (compareTo.length) {
-      throw new HttpException(`already exists a permission for the role ${roleId} and the http route ${httpRouteId}.`,HttpStatus.PRECONDITION_FAILED);
+      throw new HttpException(`already exists a permission for the role ${roleId} and the http route ${httpRouteId}.`, HttpStatus.PRECONDITION_FAILED);
     }
 
     const { allowed } = createPermissionInput;
@@ -122,7 +129,7 @@ export class PermissionsService {
     const { roleId } = updatePermissionInput;
 
     let role;
-    if (roleId) {      
+    if (roleId) {
       role = await this.rolesService.findOne({ companyUuid, id: `${roleId}` });
       delete role.company;
     } else {
@@ -156,5 +163,68 @@ export class PermissionsService {
     const existing = await this.findOne(findOnePermissionInput);
 
     return this.permissionRepository.remove(existing);
+  }
+
+  public async checkPermission(checkPermissionInput: CheckPermissionInput): Promise<CheckPermissionOutput> {
+    const { companyUuid, projectCode } = checkPermissionInput;
+
+    const project = await this.projectsService.getProjectByCompanyAndCode({ companyUuid, code: projectCode });
+
+    if (!project) {
+      return {
+        allowed: false,
+        reason: `can't get a project for the company ${companyUuid} and code ${projectCode}.`
+      };
+    };
+
+    const { token } = checkPermissionInput;
+
+    const user = await this.usersService.getUserByToken({ companyUuid, token });
+
+    const httpRoutesForUser = await this.httpRoutesService.getUserRoutes({ userId: user.id });
+
+    if (!httpRoutesForUser.length) {
+      return {
+        allowed: false,
+        reason: 'the user does not have assigned routes.'
+      };
+    }
+
+    // try to get the allowed route
+    const opts = {
+      strict: true,
+      sensitive: true,
+      end: true,
+      decode: decodeURIComponent
+    };
+
+    const { requestedMethod, requestedRoute = 'get' } = checkPermissionInput;
+
+    let allowedRoute;
+
+    if (requestedMethod && requestedRoute) {
+      for (const httpRoute of httpRoutesForUser) {
+        const keys = [];
+        const regexp = pathToRegexp(httpRoute.path, keys, opts);
+
+        const result = regexp.exec(requestedRoute);
+        if (result && httpRoute.method.toLowerCase() === requestedMethod.toLowerCase()) {
+          allowedRoute = httpRoute;
+          break;
+        }
+      }
+    }
+
+    if (!allowedRoute) {
+      return {
+        allowed: false,
+        reason: 'the user does not have this routed as assigned.'
+      };
+    }
+
+    return {
+      allowed: true,
+      reason: 'so far, so good.'
+    };
   }
 }
