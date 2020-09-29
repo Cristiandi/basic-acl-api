@@ -4,6 +4,7 @@ import { User } from '../users/user.entitty';
 import { Project } from '../projects/project.entity';
 import { Role } from '../roles/role.entity';
 import { ApiKey } from '../api-keys/api-key.entity';
+import { ConfirmationEmailConfig } from '../confirmation-email-configs/confirmation-email-config.entity';
 
 @Entity({ name: 'companies' })
 @Unique('uk_companies_name', ['name'])
@@ -45,4 +46,7 @@ export class Company {
 
   @OneToMany(type => ApiKey, apiKey => apiKey.company)
   apiKeys: ApiKey[];
+
+  @OneToMany(type => ConfirmationEmailConfig, confirmationEmailConfig => confirmationEmailConfig.company)
+  confirmationEmailConfigs: ConfirmationEmailConfig[];
 }
