@@ -5,9 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ConfirmationEmailConfig } from './confirmation-email-config.entity';
 
+import { CompaniesModule } from '../companies/companies.module';
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ConfirmationEmailConfig])
+    TypeOrmModule.forFeature([ConfirmationEmailConfig]),
+    CompaniesModule
   ],
   providers: [ConfirmationEmailConfigsService],
   controllers: [ConfirmationEmailConfigsController]

@@ -13,7 +13,7 @@ export class ConfirmationEmailConfigsController {
 
   @Post()
   create (@Body() createConfirmationEmailCionfig: CreateConfirmationEmailCionfig): Promise<any> {
-    return Promise.resolve(createConfirmationEmailCionfig);
+    return this.confirmationEmailConfigsService.create(createConfirmationEmailCionfig);
   }
 
   @Get(':companyUuid')
@@ -21,10 +21,10 @@ export class ConfirmationEmailConfigsController {
     @Param() findAllConfirmationEmailConfigsParamInput: FindAllConfirmationEmailConfigsParamInput,
     @Query() findAllConfirmationEmailConfigsQueryInput: FindAllConfirmationEmailConfigsQueryInput
   ): Promise<any> {
-    return Promise.resolve({
-      ...findAllConfirmationEmailConfigsParamInput,
-      ...findAllConfirmationEmailConfigsQueryInput
-    });
+    return this.confirmationEmailConfigsService.findAll(
+      findAllConfirmationEmailConfigsParamInput,
+      findAllConfirmationEmailConfigsQueryInput
+    );
   }
 
   @Patch(':companyUuid/:id')

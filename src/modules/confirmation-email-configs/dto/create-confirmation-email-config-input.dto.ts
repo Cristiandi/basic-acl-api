@@ -1,10 +1,11 @@
-import { IsString, IsUUID, Length } from 'class-validator';
+import { IsEmail, IsString, IsUrl, IsUUID, Length } from 'class-validator';
 
 export class CreateConfirmationEmailCionfig {
   @IsUUID()
   readonly companyUuid: string;
 
   @IsString()
+  @IsEmail()
   @Length(5, 100)
   readonly from: string;
 
@@ -13,6 +14,7 @@ export class CreateConfirmationEmailCionfig {
   readonly subject: string;
 
   @IsString()
+  @IsUrl()
   @Length(10, 200)
   readonly redirectUrl: string;
 }
