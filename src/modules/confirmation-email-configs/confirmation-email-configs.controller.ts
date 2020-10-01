@@ -32,14 +32,11 @@ export class ConfirmationEmailConfigsController {
     @Param() findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput,
     @Body() updateConfirmationEmailConfigInput: UpdateConfirmationEmailConfigInput
   ): Promise<any> {
-    return Promise.resolve({
-      ...findOneConfirmationEmailConfigInput,
-      ...updateConfirmationEmailConfigInput
-    });
+    return this.confirmationEmailConfigsService.update(findOneConfirmationEmailConfigInput, updateConfirmationEmailConfigInput);
   }
 
   @Delete(':companyUuid/:id')
   remove(@Param() findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput): Promise<any> {
-    return Promise.resolve(findOneConfirmationEmailConfigInput);
+    return this.confirmationEmailConfigsService.remove(findOneConfirmationEmailConfigInput);
   }
 }
