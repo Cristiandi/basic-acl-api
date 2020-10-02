@@ -18,6 +18,9 @@ export class User {
   @Column({ name: 'is_admin', type: 'boolean' })
   isAdmin: boolean;
 
+  @Column({ name: 'email_verified', type: 'boolean', default: false })
+  emailVerified: boolean;
+
   // relations
 
   @ManyToOne(type => Company, company => company.users)

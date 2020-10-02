@@ -19,6 +19,7 @@ import { FindAllUsersQueryInput } from './dto/find-all-users-query-input.dto';
 import { CreateUserInput } from './dto/create-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { GetUserByTokenInput } from './dto/get-user-by-token-input.dto';
+import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -405,5 +406,39 @@ export class UsersService {
     const user = await this.getUserByAuthUid({ authUid: uid });
 
     return user;
+  }
+
+  public async sendConfirmationEmail(sendConfirmationEmailnput: SendConfirmationEmailnput) {
+    const { companyUuid, email } = sendConfirmationEmailnput;
+
+    const user = await this.usersRepository.createQueryBuilder('u')
+      .innerJoin('u.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.email = :email', { email })
+      .getOne();
+
+    if (!user) {
+      throw new NotFoundException(`can't get the user ${email} for the company ${companyUuid}.`);
+    }
+
+    const { emailVerified } = user;
+
+    if (emailVerified) {
+      throw new HttpException(`already verified email for the user ${email}.`, HttpStatus.PRECONDITION_FAILED);
+    }
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    const { confirmationEmailConfig: needConfirmationEmailConfig } = company;
+
+    let confirmationEmailConfigForCompany;
+
+    if (needConfirmationEmailConfig) {
+      // TODO: get the confirmation email config for the company
+    }
+
+    const paramsForTemplate = {
+      url: 'url with code to confirm the email'
+    };
   }
 }

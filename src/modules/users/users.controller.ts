@@ -13,6 +13,7 @@ import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { HitsWatcher } from '../../common/decorators/hits-watcher.decorator';
+import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
@@ -65,4 +66,9 @@ export class UsersController {
     return this.usersService.createCompanyAdmin(createCompanyAdminInput);
   }
 
+  @Public()
+  @Post('/confirmation-email')
+  sendConfirmationEmail(@Body() sendConfirmationEmailnput: SendConfirmationEmailnput): Promise<any> {
+    return Promise.resolve(sendConfirmationEmailnput);
+  }
 }

@@ -83,7 +83,9 @@ export class CompaniesService {
     const existing = await this.companiesRepository.preload({
       id: +id,
       ...updateCompanyInput,
-      serviceAccount: updateCompanyInput.serviceAccount ? updateCompanyInput.serviceAccount as any : undefined
+      serviceAccount: updateCompanyInput.serviceAccount ? updateCompanyInput.serviceAccount as any : undefined,
+      firebaseConfig: updateCompanyInput.firebaseConfig ? updateCompanyInput.firebaseConfig as any : undefined,
+      confirmationEmailConfig: updateCompanyInput.confirmationEmailConfig === undefined ? undefined : updateCompanyInput.confirmationEmailConfig
     });
 
     if (!existing) {

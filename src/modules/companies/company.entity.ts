@@ -28,6 +28,9 @@ export class Company {
   @Column({ name: 'firebase_config', type: 'json' })
   firebaseConfig: string;
 
+  @Column({ name: 'cofirmation_email_config', type: 'boolean', default: false })
+  confirmationEmailConfig: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

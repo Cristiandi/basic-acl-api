@@ -1,4 +1,4 @@
-import { IsString, IsDefined, ValidateNested, IsUUID, IsOptional } from 'class-validator';
+import { IsString, IsDefined, ValidateNested, IsUUID, IsOptional, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class ServiceAccount {
@@ -72,6 +72,10 @@ export class CreateCompanyInput {
   @ValidateNested()
   @Type(() => ServiceAccount)
   readonly serviceAccount: ServiceAccount;
+
+  @IsBoolean()
+  @IsOptional()
+  readonly confirmationEmailConfig?: boolean;
 
   @IsDefined()
   @ValidateNested()
