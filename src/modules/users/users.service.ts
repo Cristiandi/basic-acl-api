@@ -433,8 +433,13 @@ export class UsersService {
 
     let confirmationEmailConfigForCompany;
 
+    let subject;
+    let fromEmail;
+
     if (needConfirmationEmailConfig) {
       // TODO: get the confirmation email config for the company
+    } else {
+
     }
 
     const paramsForTemplate = {
