@@ -20,6 +20,8 @@ import { CreateUserInput } from './dto/create-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { GetUserByTokenInput } from './dto/get-user-by-token-input.dto';
 import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
+import { ParametersService } from '../parameters/parameters.service';
+import { TemplatesService } from 'src/common/templates/templates.service';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +30,9 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
     private readonly companiesService: CompaniesService,
     private readonly firebaseService: FirebaseService,
-    private readonly firebaseAdminService: FirebaseAdminService
+    private readonly firebaseAdminService: FirebaseAdminService,
+    private readonly parametersService: ParametersService,
+    private readonly templatesService: TemplatesService
   ) { }
 
   /**
@@ -439,11 +443,16 @@ export class UsersService {
     if (needConfirmationEmailConfig) {
       // TODO: get the confirmation email config for the company
     } else {
-
+      subject = await this.parametersService.getParameterValue({ name: 'CONFIRMATION_EMAIL_SUBJECT' });
+      fromEmail = await this.parametersService.getParameterValue({ name: 'FROM_EMAIL' });
     }
 
     const paramsForTemplate = {
-      url: 'url with code to confirm the email'
+      link: 'http://localhost:8080/users/confirmation-email-code'
     };
+
+    const html = this.templatesService.generateHtmlByTemplate('confirmation-email', paramsForTemplate, [], false);
+
+    return html;
   }
 }

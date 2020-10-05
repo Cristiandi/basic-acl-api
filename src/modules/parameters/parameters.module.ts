@@ -7,6 +7,7 @@ import { ParametersService } from './parameters.service';
   imports: [
     TypeOrmModule.forFeature([Parameter])
   ],
-  providers: [ParametersService]
+  providers: [ParametersService],
+  exports: [ParametersService]
 })
 export class ParametersModule {}

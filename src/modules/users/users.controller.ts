@@ -69,6 +69,6 @@ export class UsersController {
   @Public()
   @Post('/confirmation-email')
   sendConfirmationEmail(@Body() sendConfirmationEmailnput: SendConfirmationEmailnput): Promise<any> {
-    return Promise.resolve(sendConfirmationEmailnput);
+    return this.usersService.sendConfirmationEmail(sendConfirmationEmailnput);
   }
 }

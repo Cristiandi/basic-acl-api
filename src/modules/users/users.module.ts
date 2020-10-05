@@ -9,13 +9,17 @@ import { User } from './user.entitty';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { FirebaseAdminModule } from '../../common/plugins/firebase-admin/firebase-admin.module';
+import { ParametersModule } from '../parameters/parameters.module';
+import { TemplatesModule } from 'src/common/templates/templates.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     CompaniesModule,
     FirebaseModule,
-    FirebaseAdminModule
+    FirebaseAdminModule,
+    ParametersModule,
+    TemplatesModule
   ],
   providers: [UsersService],
   controllers: [UsersController],
