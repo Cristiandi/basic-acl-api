@@ -22,6 +22,7 @@ import { GetUserByTokenInput } from './dto/get-user-by-token-input.dto';
 import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
 import { ParametersService } from '../parameters/parameters.service';
 import { TemplatesService } from 'src/common/templates/templates.service';
+import { MailerService } from 'src/common/plugins/mailer/mailer.service';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +33,8 @@ export class UsersService {
     private readonly firebaseService: FirebaseService,
     private readonly firebaseAdminService: FirebaseAdminService,
     private readonly parametersService: ParametersService,
-    private readonly templatesService: TemplatesService
+    private readonly templatesService: TemplatesService,
+    private readonly mailerService: MailerService
   ) { }
 
   /**
@@ -412,7 +414,7 @@ export class UsersService {
     return user;
   }
 
-  public async sendConfirmationEmail(sendConfirmationEmailnput: SendConfirmationEmailnput) {
+  public async sendConfirmationEmail(sendConfirmationEmailnput: SendConfirmationEmailnput): Promise<void> {
     const { companyUuid, email } = sendConfirmationEmailnput;
 
     const user = await this.usersRepository.createQueryBuilder('u')
@@ -451,8 +453,16 @@ export class UsersService {
       link: 'http://localhost:8080/users/confirmation-email-code'
     };
 
-    const html = this.templatesService.generateHtmlByTemplate('confirmation-email', paramsForTemplate, [], false);
+    const html = await this.templatesService.generateHtmlByTemplate('confirmation-email', paramsForTemplate, [], false);
 
-    return html;
+    await this.mailerService.sendEmail(
+      false,
+      fromEmail,
+      ['cristiandavidippolito@gmail.com'],
+      html,
+      subject,
+      '',
+      []
+    );
   }
 }

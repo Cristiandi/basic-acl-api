@@ -16,5 +16,10 @@ export default Joi.object({
   REDIS_HOST: Joi.required(),
   REDIS_PORT: Joi.required(),
   REDIS_PASSWORD: Joi.required(),
-  REDIS_CLIENT_NAME: Joi.required()
+  REDIS_CLIENT_NAME: Joi.required(),
+  /* SMT */
+  SMTP_HOST: Joi.required(),
+  SMTP_PORT: Joi.number().default(587),
+  SMTP_USER: Joi.required(),
+  SMTP_PW: Joi.required()
 });

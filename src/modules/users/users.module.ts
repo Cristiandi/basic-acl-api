@@ -11,6 +11,7 @@ import { UsersController } from './users.controller';
 import { FirebaseAdminModule } from '../../common/plugins/firebase-admin/firebase-admin.module';
 import { ParametersModule } from '../parameters/parameters.module';
 import { TemplatesModule } from 'src/common/templates/templates.module';
+import { MailerModule } from 'src/common/plugins/mailer/mailer.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { TemplatesModule } from 'src/common/templates/templates.module';
     FirebaseModule,
     FirebaseAdminModule,
     ParametersModule,
-    TemplatesModule
+    TemplatesModule,
+    MailerModule
   ],
   providers: [UsersService],
   controllers: [UsersController],

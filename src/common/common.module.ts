@@ -12,6 +12,7 @@ import { FirebaseAdminModule } from './plugins/firebase-admin/firebase-admin.mod
 
 import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { TemplatesModule } from './templates/templates.module';
+import { MailerModule } from './plugins/mailer/mailer.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { TemplatesModule } from './templates/templates.module';
       })
     }),
     FirebaseAdminModule,
-    TemplatesModule
+    TemplatesModule,
+    MailerModule
   ],
   providers: [
     {
