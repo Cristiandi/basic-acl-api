@@ -7,6 +7,10 @@ import { User } from './user.entitty';
 import { CompaniesService } from '../companies/companies.service';
 import { FirebaseService } from '../../common/plugins/firebase/firebase.service';
 import { FirebaseAdminService } from '../../common/plugins/firebase-admin/firebase-admin.service';
+import { ParametersService } from '../parameters/parameters.service';
+import { TemplatesService } from 'src/common/templates/templates.service';
+import { MailerService } from 'src/common/plugins/mailer/mailer.service';
+import { ConfirmationEmailConfigsService } from '../confirmation-email-configs/confirmation-email-configs.service';
 
 import { LoginUserInput } from './dto/login-user-input-dto';
 import { CreateUsersFromFirebaseInput } from './dto/create-users-from-firebase-input.dto';
@@ -20,9 +24,8 @@ import { CreateUserInput } from './dto/create-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { GetUserByTokenInput } from './dto/get-user-by-token-input.dto';
 import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
-import { ParametersService } from '../parameters/parameters.service';
-import { TemplatesService } from 'src/common/templates/templates.service';
-import { MailerService } from 'src/common/plugins/mailer/mailer.service';
+import { VerificationCodesService } from '../verification-codes/verification-codes.service';
+import { addDaysToDate } from 'src/utils';
 
 @Injectable()
 export class UsersService {
@@ -34,7 +37,9 @@ export class UsersService {
     private readonly firebaseAdminService: FirebaseAdminService,
     private readonly parametersService: ParametersService,
     private readonly templatesService: TemplatesService,
-    private readonly mailerService: MailerService
+    private readonly mailerService: MailerService,
+    private readonly confirmationEmailConfigsService: ConfirmationEmailConfigsService,
+    private readonly verificationCodesService: VerificationCodesService
   ) { }
 
   /**
@@ -440,17 +445,32 @@ export class UsersService {
     let confirmationEmailConfigForCompany;
 
     let subject;
-    let fromEmail;
 
     if (needConfirmationEmailConfig) {
-      // TODO: get the confirmation email config for the company
+      confirmationEmailConfigForCompany = await this.confirmationEmailConfigsService.getOneByCompany({ companyUuid });
+
+      if (!confirmationEmailConfigForCompany) {
+        throw new NotFoundException(`can't get the confirmation email config for the company ${companyUuid}.`);
+      }
+
+      subject = confirmationEmailConfigForCompany.subject;
+      
     } else {
       subject = await this.parametersService.getParameterValue({ name: 'CONFIRMATION_EMAIL_SUBJECT' });
-      fromEmail = await this.parametersService.getParameterValue({ name: 'FROM_EMAIL' });
     }
 
+    const fromEmail = await this.parametersService.getParameterValue({ name: 'FROM_EMAIL' });
+
+    const selfApiUrl = await this.parametersService.getParameterValue({ name: 'SELF_API_URL' });
+
+    const verificationCode = await this.verificationCodesService.create({
+      expirationDate: addDaysToDate(new Date(), 1),
+      type: 'CONFIRMATION_EMAIL',
+      email: user.email
+    });
+
     const paramsForTemplate = {
-      link: 'http://localhost:8080/users/confirmation-email-code'
+      link: `${selfApiUrl}confirmation-email-code?code=${verificationCode.code}`
     };
 
     const html = await this.templatesService.generateHtmlByTemplate('confirmation-email', paramsForTemplate, [], false);
@@ -458,7 +478,7 @@ export class UsersService {
     await this.mailerService.sendEmail(
       false,
       fromEmail,
-      ['cristiandavidippolito@gmail.com'],
+      [user.email],
       html,
       subject,
       '',

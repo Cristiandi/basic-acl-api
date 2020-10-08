@@ -12,6 +12,8 @@ import { FirebaseAdminModule } from '../../common/plugins/firebase-admin/firebas
 import { ParametersModule } from '../parameters/parameters.module';
 import { TemplatesModule } from 'src/common/templates/templates.module';
 import { MailerModule } from 'src/common/plugins/mailer/mailer.module';
+import { ConfirmationEmailConfigsModule } from '../confirmation-email-configs/confirmation-email-configs.module';
+import { VerificationCodesModule } from '../verification-codes/verification-codes.module';
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { MailerModule } from 'src/common/plugins/mailer/mailer.module';
     FirebaseAdminModule,
     ParametersModule,
     TemplatesModule,
-    MailerModule
+    MailerModule,
+    ConfirmationEmailConfigsModule,
+    VerificationCodesModule
   ],
   providers: [UsersService],
   controllers: [UsersController],

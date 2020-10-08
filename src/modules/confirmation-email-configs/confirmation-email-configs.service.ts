@@ -12,6 +12,7 @@ import { CreateConfirmationEmailCionfig } from './dto/create-confirmation-email-
 import { FindAllConfirmationEmailConfigsParamInput } from './dto/find-all-confirmation-email-configs-param-input.dto';
 import { FindAllConfirmationEmailConfigsQueryInput } from './dto/find-all-confirmation-email-configs-query-input.dto';
 import { FindOneConfirmationEmailConfigInput } from './dto/find-one-confirmation-email-config-input.dto';
+import { GetOneByCompanyInput } from './dto/get-one-by-company-input.dto';
 import { UpdateConfirmationEmailConfigInput } from './dto/update-confirmation-email-config-input.dto';
 
 @Injectable()
@@ -144,9 +145,34 @@ export class ConfirmationEmailConfigsService {
       return this.confirmationEmailConfigRepository.save(existing);
   }
 
+  /**
+   *
+   *
+   * @param {FindOneConfirmationEmailConfigInput} findOneConfirmationEmailConfigInput
+   * @return {*}  {Promise<ConfirmationEmailConfig>}
+   * @memberof ConfirmationEmailConfigsService
+   */
   public async remove(findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput): Promise<ConfirmationEmailConfig> {
     const existing = await this.findOne(findOneConfirmationEmailConfigInput);
 
     return this.confirmationEmailConfigRepository.remove(existing);
+  }
+
+  /**
+   *
+   *
+   * @param {GetOneByCompanyInput} getOneByCompanyInput
+   * @return {*}  {Promise<ConfirmationEmailConfig>}
+   * @memberof ConfirmationEmailConfigsService
+   */
+  public async getOneByCompany(getOneByCompanyInput: GetOneByCompanyInput): Promise<ConfirmationEmailConfig | null> {
+    const { companyUuid } = getOneByCompanyInput;
+
+    const item = await this.confirmationEmailConfigRepository.createQueryBuilder('cec')
+    .innerJoin('cec.company', 'c')
+    .where('c.uuid = :companyUuid', { companyUuid })
+    .getOne();
+
+    return item || null;
   }
 }

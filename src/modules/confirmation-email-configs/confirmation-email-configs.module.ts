@@ -13,6 +13,7 @@ import { CompaniesModule } from '../companies/companies.module';
     CompaniesModule
   ],
   providers: [ConfirmationEmailConfigsService],
-  controllers: [ConfirmationEmailConfigsController]
+  controllers: [ConfirmationEmailConfigsController],
+  exports: [ConfirmationEmailConfigsService]
 })
 export class ConfirmationEmailConfigsModule {}

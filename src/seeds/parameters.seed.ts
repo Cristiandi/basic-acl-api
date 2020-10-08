@@ -6,7 +6,7 @@ export const ParameterFactory = {
     const items = [
       {
         name: 'SELF_API_URL',
-        value: 'value'
+        value: process.env.SELF_API_URL
       },
       {
         name: 'CONFIRMATION_EMAIL_SUBJECT',
@@ -14,7 +14,7 @@ export const ParameterFactory = {
       },
       {
         name: 'FROM_EMAIL',
-        value: 'no-reply@acl.co'
+        value: 'no-reply@basic-acl.com'
       }
     ];
 
