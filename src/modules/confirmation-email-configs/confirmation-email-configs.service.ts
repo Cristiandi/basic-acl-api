@@ -48,11 +48,10 @@ export class ConfirmationEmailConfigsService {
       throw new HttpException('the company already has a confirmation email config.', HttpStatus.PRECONDITION_FAILED);
     }
 
-    const { from, redirectUrl, subject } = createConfirmationEmailCionfig;
+    const { redirectUrl, subject } = createConfirmationEmailCionfig;
 
     const created = this.confirmationEmailConfigRepository.create({
       company,
-      from,
       redirectUrl,
       subject
     });
@@ -86,7 +85,7 @@ export class ConfirmationEmailConfigsService {
     }
 
     return this.confirmationEmailConfigRepository.find({
-      select: ['id', 'from', 'subject', 'redirectUrl', 'createdAt', 'updatedAt'],
+      select: ['id', 'subject', 'redirectUrl', 'createdAt', 'updatedAt'],
       where: {
         company
       },
