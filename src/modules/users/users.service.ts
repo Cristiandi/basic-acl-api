@@ -11,6 +11,9 @@ import { ParametersService } from '../parameters/parameters.service';
 import { TemplatesService } from 'src/common/templates/templates.service';
 import { MailerService } from 'src/common/plugins/mailer/mailer.service';
 import { ConfirmationEmailConfigsService } from '../confirmation-email-configs/confirmation-email-configs.service';
+import { VerificationCodesService } from '../verification-codes/verification-codes.service';
+
+import { addDaysToDate } from 'src/utils';
 
 import { LoginUserInput } from './dto/login-user-input-dto';
 import { CreateUsersFromFirebaseInput } from './dto/create-users-from-firebase-input.dto';
@@ -24,8 +27,7 @@ import { CreateUserInput } from './dto/create-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { GetUserByTokenInput } from './dto/get-user-by-token-input.dto';
 import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
-import { VerificationCodesService } from '../verification-codes/verification-codes.service';
-import { addDaysToDate } from 'src/utils';
+import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -419,6 +421,13 @@ export class UsersService {
     return user;
   }
 
+  /**
+   * function to send the mail to confirm the email address
+   *
+   * @param {SendConfirmationEmailnput} sendConfirmationEmailnput
+   * @return {*}  {Promise<void>}
+   * @memberof UsersService
+   */
   public async sendConfirmationEmail(sendConfirmationEmailnput: SendConfirmationEmailnput): Promise<void> {
     const { companyUuid, email } = sendConfirmationEmailnput;
 
@@ -470,7 +479,7 @@ export class UsersService {
     });
 
     const paramsForTemplate = {
-      link: `${selfApiUrl}confirmation-email-code?code=${verificationCode.code}`
+      link: `${selfApiUrl}users/confirmation-email-code?companyUuid=${companyUuid}&code=${verificationCode.code}`
     };
 
     const html = await this.templatesService.generateHtmlByTemplate('confirmation-email', paramsForTemplate, [], false);
@@ -484,5 +493,55 @@ export class UsersService {
       '',
       []
     );
+  }
+
+  /**
+   * function to confirm the email basen in the code
+   *
+   * @param {ConfirmEmailInput} confirmEmailInput
+   * @return {*} 
+   * @memberof UsersService
+   */
+  public async confirmEmail(confirmEmailInput: ConfirmEmailInput): Promise<{ url: string }> {
+    const { companyUuid, code } = confirmEmailInput;
+
+    const isTheCodeValid = await this.verificationCodesService.findOne({ code });
+
+    if (!isTheCodeValid) {
+      throw new HttpException(`the code ${code} is not valid.`, HttpStatus.PRECONDITION_FAILED);
+    }
+
+    const verificationCode = await this.verificationCodesService.findOne({ code });
+
+    const { email } = verificationCode;
+
+    const user = await this.usersRepository.createQueryBuilder('u')
+      .innerJoin('u.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.email = :email', { email })
+      .getOne();
+
+    if (!user) {
+      throw new NotFoundException(`can't get the user for the core ${code}.`);
+    }
+
+    user.emailVerified = true;
+
+    await this.usersRepository.save(user);
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    let redirectUrl = await this.parametersService.getParameterValue({ name: 'SELF_API_URL' });
+
+    if (company.confirmationEmailConfig) {
+      const confirmationEmailConfig = await this.confirmationEmailConfigsService.getOneByCompany({ companyUuid });
+      if (confirmationEmailConfig) {
+        redirectUrl = confirmationEmailConfig.redirectUrl;
+      }
+    }
+
+    return {
+      url: redirectUrl
+    };
   }
 }

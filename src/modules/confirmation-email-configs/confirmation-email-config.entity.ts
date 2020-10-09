@@ -6,9 +6,6 @@ export class ConfirmationEmailConfig {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 100 })
-  from: string;
-
   @Column({ type: 'varchar', length: 200 })
   subject: string;
 

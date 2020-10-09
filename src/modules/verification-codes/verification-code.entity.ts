@@ -8,7 +8,7 @@ export class VerificationCode {
   @Column({ type: 'varchar', length: 50 })
   code: string;
 
-  @Column({ name: 'expiration_date', type: 'date' })
+  @Column({ name: 'expiration_date', type: 'timestamp' })
   expirationDate: Date;
 
   @Column({ type: 'varchar', length: 50  })

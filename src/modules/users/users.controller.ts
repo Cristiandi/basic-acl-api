@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Patch, Get, Param, Query, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Patch, Get, Param, Query, Delete, Redirect } from '@nestjs/common';
 
 import { UsersService } from './users.service';
 
@@ -14,6 +14,7 @@ import { UpdateUserInput } from './dto/update-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { HitsWatcher } from '../../common/decorators/hits-watcher.decorator';
 import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
+import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
@@ -70,5 +71,12 @@ export class UsersController {
   @Post('/confirmation-email')
   sendConfirmationEmail(@Body() sendConfirmationEmailnput: SendConfirmationEmailnput): Promise<any> {
     return this.usersService.sendConfirmationEmail(sendConfirmationEmailnput);
+  }
+
+  @Public()
+  @Redirect('https://nestjs.com', 302)
+  @Get('/confirmation-email-code')
+  confirmEmail(@Query() confirmEmailInput: ConfirmEmailInput): Promise<any> {
+    return this.usersService.confirmEmail(confirmEmailInput);
   }
 }
