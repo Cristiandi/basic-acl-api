@@ -21,5 +21,11 @@ export default registerAs('config', () => ({
     port: process.env.REDIS_PORT,
     password: process.env.REDIS_PASSWORD,
     clientName: process.env.REDIS_CLIENT_NAME
+  },
+  smt: {
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    user: process.env.SMTP_USER,
+    password: process.env.SMTP_PW
   }
 }));

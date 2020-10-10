@@ -1,0 +1,45 @@
+l<mjml>
+
+  <mj-head>
+    <mj-style inline="inline">
+      body {
+        padding: 20px;
+      }
+
+      a {
+        color: #1C69D3
+      }
+    </mj-style>
+  </mj-head>
+
+  <mj-body background-color="#D8D8D8">
+
+    <mj-include path='./src/templates/emails/shared/header.mjml'></mj-include>
+
+    <mj-section background-color="#FFF" padding-top="0">
+      <mj-column>
+        <mj-text font-weight="bold">
+          Bienvenid@!
+        </mj-text>
+        <mj-text>
+          Hola
+        </mj-text>
+        <mj-text>
+          Gracias por crear una cuenta, esperamos puedas disfrutar la experiencia.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#FFF" padding-top="0">
+      <mj-column>
+        <mj-button background-color="#1C69D3" color="white" href="{{link}}">
+          Verifica tu email
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <mj-include path='./src/templates/emails/shared/footer.mjml'></mj-include>
+
+  </mj-body>
+
+</mjml>

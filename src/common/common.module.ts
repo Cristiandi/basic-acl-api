@@ -11,6 +11,8 @@ import { HitLimitGuard } from './guards/hit-limit.guard';
 import { FirebaseAdminModule } from './plugins/firebase-admin/firebase-admin.module';
 
 import { LoggingMiddleware } from './middlewares/logging.middleware';
+import { TemplatesModule } from './templates/templates.module';
+import { MailerModule } from './plugins/mailer/mailer.module';
 
 @Module({
   imports: [
@@ -23,7 +25,9 @@ import { LoggingMiddleware } from './middlewares/logging.middleware';
         name: process.env.REDIS_CLIENT_NAME
       })
     }),
-    FirebaseAdminModule
+    FirebaseAdminModule,
+    TemplatesModule,
+    MailerModule
   ],
   providers: [
     {

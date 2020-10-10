@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 import { Company } from '../companies/company.entity';
 import { AssignedRole } from '../assigned-roles/assigned-role.entity';
@@ -17,6 +17,15 @@ export class User {
 
   @Column({ name: 'is_admin', type: 'boolean' })
   isAdmin: boolean;
+
+  @Column({ name: 'email_verified', type: 'boolean', default: false })
+  emailVerified: boolean;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 
   // relations
 

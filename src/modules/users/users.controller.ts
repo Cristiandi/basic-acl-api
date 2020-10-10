@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Patch, Get, Param, Query, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Patch, Get, Param, Query, Delete, Redirect } from '@nestjs/common';
 
 import { UsersService } from './users.service';
 
@@ -13,6 +13,8 @@ import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { HitsWatcher } from '../../common/decorators/hits-watcher.decorator';
+import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
+import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
@@ -46,9 +48,9 @@ export class UsersController {
   }
 
   @Public()
-  @Post('/login')
-  loginUser(@Body() loginUserInput: LoginUserInput): Promise<any> {
-    return this.usersService.loginUser(loginUserInput);
+  @Post('/login-admin')
+  loginAdmin(@Body() loginUserInput: LoginUserInput): Promise<any> {
+    return this.usersService.loginAdmin(loginUserInput);
   }
 
   @HitsWatcher(1, 86400)
@@ -65,4 +67,16 @@ export class UsersController {
     return this.usersService.createCompanyAdmin(createCompanyAdminInput);
   }
 
+  @Public()
+  @Post('/confirmation-email')
+  sendConfirmationEmail(@Body() sendConfirmationEmailnput: SendConfirmationEmailnput): Promise<any> {
+    return this.usersService.sendConfirmationEmail(sendConfirmationEmailnput);
+  }
+
+  @Public()
+  @Redirect('https://nestjs.com', 302)
+  @Get('/confirmation-email-code')
+  confirmEmail(@Query() confirmEmailInput: ConfirmEmailInput): Promise<any> {
+    return this.usersService.confirmEmail(confirmEmailInput);
+  }
 }

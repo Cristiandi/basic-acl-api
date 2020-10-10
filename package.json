@@ -7,7 +7,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "nest build",
+    "build": "nest build && npm run copy-files",
+    "copy-files": "npx ts-node ./src/scripts/copy-files.ts",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "cross-env NODE_ENV=local nest start --watch",
@@ -22,7 +23,9 @@
     "pretest:e2e": "sudo docker-compose up -d test-db",
     "test:e2e": "NODE_ENV=test npx jest --config ./test/jest-e2e.json",
     "posttest:e2e": "sudo docker-compose stop test-db && sudo docker-compose rm -f test-db",
-    "cz": "git-cz"
+    "cz": "git-cz",
+    "seed:dev": "npx cross-env NODE_ENV=local ts-node ./src/seeds",
+    "seed:dev:pro": "npx cross-env NODE_ENV=production.local ts-node ./src/seeds"
   },
   "dependencies": {
     "@hapi/joi": "17.1.1",
@@ -43,8 +46,13 @@
     "fastify-swagger": "3.4.0",
     "firebase": "7.23.0",
     "firebase-admin": "9.2.0",
+    "handlebars": "^4.7.6",
     "md5": "2.3.0",
+    "mjml": "^4.7.1",
+    "nanoid": "^3.1.12",
+    "ncp": "^2.0.0",
     "nestjs-redis": "1.2.8",
+    "nodemailer": "^6.4.13",
     "path": "0.12.7",
     "path-to-regexp": "6.2.0",
     "pg": "8.4.1",
@@ -66,6 +74,8 @@
     "@types/hapi__joi": "17.1.6",
     "@types/jest": "26.0.14",
     "@types/node": "13.13.25",
+    "@types/ncp": "^2.0.4",
+    "@types/nodemailer": "^6.4.0",
     "@types/supertest": "2.0.10",
     "@typescript-eslint/eslint-plugin": "4.4.0",
     "@typescript-eslint/parser": "4.4.0",
