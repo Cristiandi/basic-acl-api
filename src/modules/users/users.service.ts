@@ -79,6 +79,10 @@ export class UsersService {
 
     const saved = await this.usersRepository.save(created);
 
+    if (company.confirmationEmailConfig) {
+      this.sendConfirmationEmail({ companyUuid, email: saved.email });
+    }
+
     delete saved.company;
 
     return saved;
@@ -220,7 +224,7 @@ export class UsersService {
    * @returns {Promise<any>}
    * @memberof UsersService
    */
-  public async loginUser(loginUserInput: LoginUserInput): Promise<any> {
+  public async loginAdmin(loginUserInput: LoginUserInput): Promise<any> {
     const { companyName } = loginUserInput;
 
     const company = await this.companiesService.getCompanyByName({ name: companyName });
@@ -242,7 +246,11 @@ export class UsersService {
     const user = await this.getUserByAuthUid({ authUid: firebaseUser.uid });
 
     if (!user) {
-      throw new HttpException('the firebase user does not exists in the ACL database.', HttpStatus.PRECONDITION_FAILED);
+      throw new NotFoundException('the firebase user does not exists in the ACL database.');
+    }
+
+    if (!user.emailVerified) {
+      throw new HttpException('the does not have the email verified.', HttpStatus.PRECONDITION_FAILED);
     }
 
     const idTokenResult = await firebaseUser.getIdTokenResult();
@@ -396,6 +404,8 @@ export class UsersService {
     });
 
     const saved = await this.usersRepository.save(existing);
+
+    this.sendConfirmationEmail({ companyUuid, email: saved.email });
 
     delete saved.company;
 

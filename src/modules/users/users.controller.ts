@@ -48,9 +48,9 @@ export class UsersController {
   }
 
   @Public()
-  @Post('/login')
-  loginUser(@Body() loginUserInput: LoginUserInput): Promise<any> {
-    return this.usersService.loginUser(loginUserInput);
+  @Post('/login-admin')
+  loginAdmin(@Body() loginUserInput: LoginUserInput): Promise<any> {
+    return this.usersService.loginAdmin(loginUserInput);
   }
 
   @HitsWatcher(1, 86400)
