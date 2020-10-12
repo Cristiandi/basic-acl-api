@@ -1,6 +1,6 @@
 <mj-section background-color="#FFF">
   <mj-column width="100%">
-    <mj-image align="center" width="200px" src="https://storage.googleapis.com/platturn-dev-bucket/public/platturn-logo.png">
+    <mj-image align="center" width="200px" src="{{companyLogoUrl}}">
     </mj-image>
   </mj-column>
 </mj-section>

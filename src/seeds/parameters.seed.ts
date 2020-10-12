@@ -15,6 +15,10 @@ export const ParameterFactory = {
       {
         name: 'FROM_EMAIL',
         value: 'no-reply@basic-acl.com'
+      },
+      {
+        name: 'DEFAULT_COMPANY_LOGO_URL',
+        value: 'http://basic-acl-web-dev.herokuapp.com/logo-512.png'
       }
     ];
 

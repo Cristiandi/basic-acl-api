@@ -482,6 +482,8 @@ export class UsersService {
       subject = await this.parametersService.getParameterValue({ name: 'CONFIRMATION_EMAIL_SUBJECT' });
     }
 
+    const companyLogoUrl = await this.parametersService.getParameterValue({ name: 'DEFAULT_COMPANY_LOGO_URL' });
+
     const fromEmail = await this.parametersService.getParameterValue({ name: 'FROM_EMAIL' });
 
     const selfApiUrl = await this.parametersService.getParameterValue({ name: 'SELF_API_URL' });
@@ -493,6 +495,7 @@ export class UsersService {
     });
 
     const paramsForTemplate = {
+      companyLogoUrl,
       link: `${selfApiUrl}users/confirmation-email-code?companyUuid=${companyUuid}&code=${verificationCode.code}`
     };
 
