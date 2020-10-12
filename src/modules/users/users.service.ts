@@ -250,7 +250,11 @@ export class UsersService {
     }
 
     if (!user.emailVerified) {
-      throw new HttpException('the does not have the email verified.', HttpStatus.PRECONDITION_FAILED);
+      throw new HttpException('the user does not have the email verified.', HttpStatus.PRECONDITION_FAILED);
+    }
+
+    if (!user.isAdmin) {
+      throw new HttpException('the user is not an admin.', HttpStatus.PRECONDITION_FAILED);
     }
 
     const idTokenResult = await firebaseUser.getIdTokenResult();
