@@ -5,6 +5,7 @@ import { Project } from '../projects/project.entity';
 import { Role } from '../roles/role.entity';
 import { ApiKey } from '../api-keys/api-key.entity';
 import { ConfirmationEmailConfig } from '../confirmation-email-configs/confirmation-email-config.entity';
+import { ForgottenPasswordConfig } from '../forgotten-password-configs/forgotten-password-config.entity';
 
 @Entity({ name: 'companies' })
 @Unique('uk_companies_name', ['name'])
@@ -31,6 +32,9 @@ export class Company {
   @Column({ name: 'cofirmation_email_config', type: 'boolean', default: false })
   confirmationEmailConfig: boolean;
 
+  @Column({ name: 'forgotten_password_config', type: 'boolean', default: false })
+  forgottenPasswordConfig: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
@@ -52,4 +56,7 @@ export class Company {
 
   @OneToMany(type => ConfirmationEmailConfig, confirmationEmailConfig => confirmationEmailConfig.company)
   confirmationEmailConfigs: ConfirmationEmailConfig[];
+
+  @OneToMany(type => ForgottenPasswordConfig, forgottenPasswordConfig => forgottenPasswordConfig.company)
+  forgottenPasswordConfigs: ForgottenPasswordConfig[];
 }

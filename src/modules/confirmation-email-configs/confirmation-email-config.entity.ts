@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Company } from '../companies/company.entity';
 
-@Entity({ name: 'confirmation_email_config' })
+@Entity({ name: 'confirmation_email_configs' })
 export class ConfirmationEmailConfig {
   @PrimaryGeneratedColumn()
   id: number;
