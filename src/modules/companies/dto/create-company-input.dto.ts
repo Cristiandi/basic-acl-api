@@ -77,6 +77,10 @@ export class CreateCompanyInput {
   @IsOptional()
   readonly confirmationEmailConfig?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  readonly forgottenPasswordConfig?: boolean;
+
   @IsDefined()
   @ValidateNested()
   @Type(() => FireBaseConfig)

@@ -58,6 +58,8 @@ export class ConfirmationEmailConfigsService {
 
     const saved = await this.confirmationEmailConfigRepository.save(created);
 
+    this.companiesService.setConfirmationEmailConfigFlag({ uuid: companyUuid, confirmationEmailConfig: true });
+
     delete saved.company;
 
     return saved;
@@ -153,6 +155,10 @@ export class ConfirmationEmailConfigsService {
    */
   public async remove(findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput): Promise<ConfirmationEmailConfig> {
     const existing = await this.findOne(findOneConfirmationEmailConfigInput);
+
+    const { companyUuid } = findOneConfirmationEmailConfigInput;
+
+    this.companiesService.setConfirmationEmailConfigFlag({ uuid: companyUuid, confirmationEmailConfig: false });
 
     return this.confirmationEmailConfigRepository.remove(existing);
   }

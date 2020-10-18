@@ -32,6 +32,9 @@ export class Company {
   @Column({ name: 'cofirmation_email_config', type: 'boolean', default: false })
   confirmationEmailConfig: boolean;
 
+  @Column({ name: 'forgotten_password_config', type: 'boolean', default: false })
+  forgottenPasswordConfig: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

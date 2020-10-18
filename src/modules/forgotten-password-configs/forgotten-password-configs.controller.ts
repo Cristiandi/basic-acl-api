@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { ForgottenPasswordConfigsService } from './forgotten-password-configs.service';
 
@@ -8,6 +8,7 @@ import { FindAllQueryInput } from './dto/find-alll-query-input.dto';
 import { FindOneInput } from './dto/find-one-input.dto';
 import { UpdateInput } from './dto/update-input.dto';
 
+@UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('forgotten-password-configs')
 export class ForgottenPasswordConfigsController {
   constructor(private readonly forgottenPasswordConfigsService: ForgottenPasswordConfigsService) {}
@@ -22,10 +23,7 @@ export class ForgottenPasswordConfigsController {
     @Param() findAllParamInput: FindAllParamInput,
     @Query() findAllQueryInput: FindAllQueryInput
   ): Promise<any> {
-    return Promise.resolve({
-      ...findAllParamInput,
-      ...findAllQueryInput
-    });
+    return this.forgottenPasswordConfigsService.findAll(findAllParamInput, findAllQueryInput);
   }
 
   @Patch(':companyUuid/:id')
@@ -33,14 +31,11 @@ export class ForgottenPasswordConfigsController {
     @Param() findOneInput: FindOneInput,
     @Body() updateInput: UpdateInput 
   ): Promise<any> {
-    return Promise.resolve({
-      ...findOneInput,
-      ...updateInput
-    });
+    return this.forgottenPasswordConfigsService.update(findOneInput, updateInput);
   }
 
   @Delete(':companyUuid/:id')
   remove(@Param() findOneInput: FindOneInput): Promise<any> {
-    return Promise.resolve(findOneInput);
+    return this.forgottenPasswordConfigsService.remove(findOneInput);
   }
 }
