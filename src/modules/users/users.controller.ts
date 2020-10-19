@@ -15,6 +15,7 @@ import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { HitsWatcher } from '../../common/decorators/hits-watcher.decorator';
 import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
 import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
+import { SendForgottenPasswordEmailInput } from './dto/send-forgotten-password-email-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
@@ -78,5 +79,11 @@ export class UsersController {
   @Get('/confirmation-email-code')
   confirmEmail(@Query() confirmEmailInput: ConfirmEmailInput): Promise<any> {
     return this.usersService.confirmEmail(confirmEmailInput);
+  }
+
+  @Public()
+  @Post('/forgotten-password')
+  sendForgottentPasswordEmail(@Body() sendForgottenPasswordEmailInput: SendForgottenPasswordEmailInput): Promise<any> {
+    return this.usersService.sendForgottentPasswordEmail(sendForgottenPasswordEmailInput);
   }
 }

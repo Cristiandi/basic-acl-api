@@ -18,7 +18,11 @@ export const ParameterFactory = {
       },
       {
         name: 'DEFAULT_COMPANY_LOGO_URL',
-        value: 'http://basic-acl-web-dev.herokuapp.com/logo-512.png'
+        value: 'https://basic-acl-web-dev.herokuapp.com/logo-512.png'
+      },
+      {
+        name: 'FORGOTTEN_PASSOWRD_EMAIL_SUBJECT',
+        value: 'did you forget your password?'
       }
     ];
 

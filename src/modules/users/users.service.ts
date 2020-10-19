@@ -28,6 +28,8 @@ import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { GetUserByTokenInput } from './dto/get-user-by-token-input.dto';
 import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
 import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
+import { SendForgottenPasswordEmailInput } from './dto/send-forgotten-password-email-input.dto';
+import { ForgottenPasswordConfigsService } from '../forgotten-password-configs/forgotten-password-configs.service';
 
 @Injectable()
 export class UsersService {
@@ -41,7 +43,8 @@ export class UsersService {
     private readonly templatesService: TemplatesService,
     private readonly mailerService: MailerService,
     private readonly confirmationEmailConfigsService: ConfirmationEmailConfigsService,
-    private readonly verificationCodesService: VerificationCodesService
+    private readonly verificationCodesService: VerificationCodesService,
+    private readonly forgottenPasswordConfigsService: ForgottenPasswordConfigsService
   ) { }
 
   /**
@@ -225,9 +228,13 @@ export class UsersService {
    * @memberof UsersService
    */
   public async loginAdmin(loginUserInput: LoginUserInput): Promise<any> {
-    const { companyName } = loginUserInput;
+    const { companyUuid } = loginUserInput;
 
-    const company = await this.companiesService.getCompanyByName({ name: companyName });
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can't get the company with uuid ${companyUuid}.`);
+    }
 
     const { email, password } = loginUserInput;
 
@@ -477,7 +484,7 @@ export class UsersService {
       }
 
       subject = confirmationEmailConfigForCompany.subject;
-      
+
     } else {
       subject = await this.parametersService.getParameterValue({ name: 'CONFIRMATION_EMAIL_SUBJECT' });
     }
@@ -560,5 +567,75 @@ export class UsersService {
     return {
       url: redirectUrl
     };
+  }
+
+  /**
+   *
+   *
+   * @param {SendForgottenPasswordEmailInput} sendForgottenPasswordEmailInput
+   * @return {*}  {Promise<void>}
+   * @memberof UsersService
+   */
+  public async sendForgottentPasswordEmail(sendForgottenPasswordEmailInput: SendForgottenPasswordEmailInput): Promise<void> {
+    const { companyUuid, email } = sendForgottenPasswordEmailInput;
+
+    const user = await this.usersRepository.createQueryBuilder('u')
+      .innerJoin('u.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.email = :email', { email })
+      .getOne();
+
+    if (!user) {
+      throw new NotFoundException(`can't get the user ${email} for the company ${companyUuid}.`);
+    }
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    const { forgottenPasswordConfig } = company;
+
+    let forgottenPasswordConfigForCompany;
+
+    let subject;
+
+    if (forgottenPasswordConfig) {
+      forgottenPasswordConfigForCompany = await this.forgottenPasswordConfigsService.getOneByCompany({ companyUuid });
+
+      if (!forgottenPasswordConfigForCompany) {
+        throw new NotFoundException(`can't get the forgotten password config for the company ${companyUuid}.`);
+      }
+
+      subject = forgottenPasswordConfigForCompany.subject;
+    } else {
+      subject = this.parametersService.getParameterValue({ name: 'FORGOTTEN_PASSOWRD_EMAIL_SUBJECT' });
+    }
+
+    const companyLogoUrl = await this.parametersService.getParameterValue({ name: 'DEFAULT_COMPANY_LOGO_URL' });
+
+    const fromEmail = await this.parametersService.getParameterValue({ name: 'FROM_EMAIL' });
+
+    const selfApiUrl = await this.parametersService.getParameterValue({ name: 'SELF_API_URL' });
+
+    const verificationCode = await this.verificationCodesService.create({
+      expirationDate: addDaysToDate(new Date(), 1),
+      type: 'FORGOTTEN_PASSWORD_EMAIL',
+      email: user.email
+    });
+
+    const paramsForTemplate = {
+      companyLogoUrl,
+      link: `${selfApiUrl}users/forgotten-password-code?companyUuid=${companyUuid}&code=${verificationCode.code}`
+    };
+
+    const html = await this.templatesService.generateHtmlByTemplate('forgotten-password-email', paramsForTemplate, [], false);
+
+    await this.mailerService.sendEmail(
+      false,
+      fromEmail,
+      [user.email],
+      html,
+      subject,
+      '',
+      []
+    );
   }
 }

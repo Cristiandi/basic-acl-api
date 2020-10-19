@@ -11,6 +11,7 @@ import { FindAllParamInput } from './dto/find-all-param-input.dto';
 import { FindAllQueryInput } from './dto/find-alll-query-input.dto';
 import { FindOneInput } from './dto/find-one-input.dto';
 import { UpdateInput } from './dto/update-input.dto';
+import { GetOneByCompanyInput } from './dto/get-one-by-company-input.dto';
 
 @Injectable()
 export class ForgottenPasswordConfigsService {
@@ -158,5 +159,23 @@ export class ForgottenPasswordConfigsService {
     this.companiesService.setForgottenPasswordConfigFlag({ uuid: companyUuid, forgottenPasswordConfig: false });
 
     return this.forgottenPasswordConfigRepository.remove(existing);
+  }
+  
+  /**
+   *
+   *
+   * @param {GetOneByCompanyInput} getOneByCompanyInput
+   * @return {*}  {(Promise<ForgottenPasswordConfig | null>)}
+   * @memberof ForgottenPasswordConfigsService
+   */
+  public async getOneByCompany(getOneByCompanyInput: GetOneByCompanyInput): Promise<ForgottenPasswordConfig | null> {
+    const { companyUuid } = getOneByCompanyInput;
+
+    const item = await this.forgottenPasswordConfigRepository.createQueryBuilder('fpc')
+      .innerJoin('fpc.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .getOne();
+
+    return item || null;
   }
 }
