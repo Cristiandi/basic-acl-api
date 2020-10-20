@@ -10,7 +10,7 @@ export const ParameterFactory = {
       },
       {
         name: 'CONFIRMATION_EMAIL_SUBJECT',
-        value: 'Confirma tu email!'
+        value: 'Confirm your email!'
       },
       {
         name: 'FROM_EMAIL',
@@ -23,6 +23,14 @@ export const ParameterFactory = {
       {
         name: 'FORGOTTEN_PASSOWRD_EMAIL_SUBJECT',
         value: 'did you forget your password?'
+      },
+      {
+        name: 'SELF_WEB_URL',
+        value: process.env.SELF_WEB_URL
+      },
+      {
+        name: 'UPDATED_PASSWORD_NOTIFICATION_EMAIL_SUBJECT',
+        value: 'Updated password!'
       }
     ];
 

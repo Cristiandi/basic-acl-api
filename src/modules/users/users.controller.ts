@@ -16,6 +16,7 @@ import { HitsWatcher } from '../../common/decorators/hits-watcher.decorator';
 import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
 import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
 import { SendForgottenPasswordEmailInput } from './dto/send-forgotten-password-email-input.dto';
+import { ChangeForgottenPasswordInput } from './dto/change-forgotten-password-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
@@ -85,5 +86,11 @@ export class UsersController {
   @Post('/forgotten-password')
   sendForgottentPasswordEmail(@Body() sendForgottenPasswordEmailInput: SendForgottenPasswordEmailInput): Promise<any> {
     return this.usersService.sendForgottentPasswordEmail(sendForgottenPasswordEmailInput);
+  }
+
+  @Public()
+  @Post('/forgotten-password-code')
+  changeForgottenPassword(@Body() changeForgottenPasswordInput: ChangeForgottenPasswordInput): Promise<any> {
+    return this.usersService.changeForgottenPassword(changeForgottenPasswordInput);
   }
 }

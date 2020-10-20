@@ -10,6 +10,7 @@ export default Joi.object({
   DATABASE_NAME: Joi.required(),
   /* API INFORMATION */
   API_KEY: Joi.required(),
+  SELF_API_URL: Joi.required(),
   MAX_HITS_ALLOWED: Joi.number().default(1),
   MAX_HITS_TIME_RANGE: Joi.number().default(60),
   /* REDIS INFORMATION */
@@ -21,5 +22,7 @@ export default Joi.object({
   SMTP_HOST: Joi.required(),
   SMTP_PORT: Joi.number().default(587),
   SMTP_USER: Joi.required(),
-  SMTP_PW: Joi.required()
+  SMTP_PW: Joi.required(),
+  /* WEB */
+  SELF_WEB_URL: Joi.required()
 });

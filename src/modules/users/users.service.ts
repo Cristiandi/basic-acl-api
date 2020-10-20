@@ -30,6 +30,8 @@ import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.d
 import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
 import { SendForgottenPasswordEmailInput } from './dto/send-forgotten-password-email-input.dto';
 import { ForgottenPasswordConfigsService } from '../forgotten-password-configs/forgotten-password-configs.service';
+import { ChangeForgottenPasswordInput } from './dto/change-forgotten-password-input.dto';
+import { SendUpdatedPasswordNotificationEmailInput } from './dto/send-updated-password-notification-email-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -613,7 +615,7 @@ export class UsersService {
 
     const fromEmail = await this.parametersService.getParameterValue({ name: 'FROM_EMAIL' });
 
-    const selfApiUrl = await this.parametersService.getParameterValue({ name: 'SELF_API_URL' });
+    const selfWebUrl = await this.parametersService.getParameterValue({ name: 'SELF_WEB_URL' });
 
     const verificationCode = await this.verificationCodesService.create({
       expirationDate: addDaysToDate(new Date(), 1),
@@ -623,7 +625,7 @@ export class UsersService {
 
     const paramsForTemplate = {
       companyLogoUrl,
-      link: `${selfApiUrl}users/forgotten-password-code?companyUuid=${companyUuid}&code=${verificationCode.code}`
+      link: `${selfWebUrl}change-forgotten-password?companyUuid=${companyUuid}&code=${verificationCode.code}`
     };
 
     const html = await this.templatesService.generateHtmlByTemplate('forgotten-password-email', paramsForTemplate, [], false);
@@ -637,5 +639,102 @@ export class UsersService {
       '',
       []
     );
+  }
+
+  private async sendUpdatedPasswordNotificationEmail(
+    sendUpdatedPasswordNotificationEmailInput: SendUpdatedPasswordNotificationEmailInput
+  ) {
+    const { companyUuid } = sendUpdatedPasswordNotificationEmailInput;
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can't get the compant with uuid ${companyUuid}.`);
+    }
+
+    const companyLogoUrl = await this.parametersService.getParameterValue({ name: 'DEFAULT_COMPANY_LOGO_URL' });
+
+    const paramsForTemplate = {
+      companyLogoUrl
+    };
+
+    const html = await this.templatesService.generateHtmlByTemplate('updated-password-notification', paramsForTemplate, [], false);
+
+    const fromEmail = await this.parametersService.getParameterValue({ name: 'FROM_EMAIL' });
+
+    const subject = await this.parametersService.getParameterValue({ name: 'UPDATED_PASSWORD_NOTIFICATION_EMAIL_SUBJECT' });
+
+    const { email } = sendUpdatedPasswordNotificationEmailInput;
+
+    await this.mailerService.sendEmail(
+      false,
+      fromEmail,
+      [email],
+      html,
+      subject,
+      '',
+      []
+    );
+  }
+
+  public async changeForgottenPassword(changeForgottenPasswordInput: ChangeForgottenPasswordInput): Promise<any> {
+    const { password, confirmedPassword } = changeForgottenPasswordInput;
+
+    if (password !== confirmedPassword) {
+      throw new HttpException('the passwords does not match.', HttpStatus.BAD_REQUEST);
+    }
+
+    const { companyUuid } = changeForgottenPasswordInput;
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can't get the compant with uuid ${companyUuid}.`);
+    }
+
+    const { code } = changeForgottenPasswordInput;
+
+    const isTheCodeValid = await this.verificationCodesService.findOne({ code });
+
+    if (!isTheCodeValid) {
+      throw new HttpException(`the code ${code} is not valid.`, HttpStatus.PRECONDITION_FAILED);
+    }
+
+    const verificationCode = await this.verificationCodesService.findOne({ code });
+
+    let redirectUrl = await this.parametersService.getParameterValue({ name: 'SELF_WEB_URL' });
+
+    const { forgottenPasswordConfig } = company;
+
+    if (forgottenPasswordConfig) {
+      const forgottenPasswordConfigForCompany = await this.forgottenPasswordConfigsService.getOneByCompany({ companyUuid });
+
+      if (!forgottenPasswordConfigForCompany) {
+        throw new NotFoundException(`can't get the forgotten password config for the company ${companyUuid}.`);
+      }
+
+      redirectUrl = forgottenPasswordConfigForCompany.redirectUrl;
+    }
+
+    const { email } = verificationCode;
+
+    const user = await this.usersRepository.createQueryBuilder('u')
+    .innerJoin('u.company', 'c')
+    .where('c.uuid = :companyUuid', { companyUuid })
+    .andWhere('u.email = :email', { email })
+    .getOne();
+
+    this.firebaseAdminService.updateUser({
+      companyUuid,
+      countryCode: company.countryCode,
+      uid: user.authUid,
+      password
+    });
+
+    this.sendUpdatedPasswordNotificationEmail({ companyUuid, email: user.email });
+
+    return {
+      url: redirectUrl
+    };
   }
 }
