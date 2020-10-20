@@ -1,8 +1,9 @@
-import { IsString } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 
 export class LoginUserInput {
+  @IsUUID()
   @IsString()
-  companyName: string;
+  companyUuid: string;
 
   @IsString()
   email: string;

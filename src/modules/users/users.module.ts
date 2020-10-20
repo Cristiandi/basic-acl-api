@@ -14,6 +14,7 @@ import { TemplatesModule } from 'src/common/templates/templates.module';
 import { MailerModule } from 'src/common/plugins/mailer/mailer.module';
 import { ConfirmationEmailConfigsModule } from '../confirmation-email-configs/confirmation-email-configs.module';
 import { VerificationCodesModule } from '../verification-codes/verification-codes.module';
+import { ForgottenPasswordConfigsModule } from '../forgotten-password-configs/forgotten-password-configs.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { VerificationCodesModule } from '../verification-codes/verification-code
     TemplatesModule,
     MailerModule,
     ConfirmationEmailConfigsModule,
-    VerificationCodesModule
+    VerificationCodesModule,
+    ForgottenPasswordConfigsModule
   ],
   providers: [UsersService],
   controllers: [UsersController],
