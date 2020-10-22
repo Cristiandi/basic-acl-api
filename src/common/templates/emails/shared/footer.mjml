@@ -1,0 +1,27 @@
+<mj-section background-color="#FFF" padding-top="0" padding-bottom="0">
+  <mj-column>
+    <mj-text line-height="5px">
+      <p>Best regards,</p>
+      <p>Basic ACL team</p>
+      <br/>
+      <p><a href="mailto:info@basic-acl.com">info@basic-acl.com</a></p>
+      <!-- <p><a href="tel:1-888-433-6456">1-888-433-6456</a> (MILO)</p> -->
+    </mj-text>
+  </mj-column>
+</mj-section>
+<mj-section background-color="#FFF" padding-top="0">
+  <mj-column vertical-align="middle">
+    <mj-social icon-size="30px" mode="horizontal" inner-padding="15px">
+      <mj-social-element src="https://storage.googleapis.com/platturn-dev-bucket/public/instagram.jpg" href="https://www.instagram.com/basic-acl"></mj-social-element>
+      <mj-social-element src="https://storage.googleapis.com/platturn-dev-bucket/public/twitter.jpg" href="https://twitter.com/basic-acl"></mj-social-element>
+      <!-- <mj-social-element src="https://storage.googleapis.com/platturn-dev-bucket/public/facebook.jpg" href="https://www.facebook.com/awork-team"></mj-social-element> -->
+      <mj-social-element src="https://storage.googleapis.com/platturn-dev-bucket/public/linkedin.jpg" href="https://www.linkedin.com/company/basic-acl"></mj-social-element>
+    </mj-social>
+  </mj-column>
+  <mj-column vertical-align="middle">
+    <mj-button  font-weight="bold" font-size="16px" width="180px" background-color="#000000"
+                color="#FFF" href="https://www.basic-acl.com/">
+      Basic ACL
+    </mj-button>
+  </mj-column>
+</mj-section>

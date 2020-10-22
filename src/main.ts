@@ -10,7 +10,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
 
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { CustomExceptionFilter } from './common/filters/cutstom-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -22,13 +22,31 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   
   // enabling for cors policy
-  // app.enableCors();
+  app.enableCors();
 
   // use helmet
-  await app.register(helmet, { hidePoweredBy: false });
+  // await app.register(helmet, { hidePoweredBy: false });
+
+  /*
+  app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ['self'],
+        styleSrc: ['self', 'unsafe-inline'],
+        imgSrc: ['self', 'data:', 'validator.swagger.io'],
+        scriptSrc: ['self', 'https: \'unsafe-inline\'']
+      }
+    }
+  });
+  */
+
+  app.register(helmet, {
+    hidePoweredBy: false,
+    contentSecurityPolicy: false
+  });
   
   // using the filters
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new CustomExceptionFilter());
 
   // Setting up Swagger document 
   const options = new DocumentBuilder()
