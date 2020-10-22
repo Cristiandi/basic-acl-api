@@ -1,5 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { HttpRoute } from './http-route.entity';
 
 import { HttpRoutesService } from './http-routes.service';
 
@@ -15,29 +17,49 @@ import { FindOneHttpRouteInput } from './dto/find-one-http-route-input.dto';
 export class HttpRoutesController {
   constructor(private readonly httpRoutesService: HttpRoutesService) {}
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: HttpRoute
+  })
   @Post()
-  create (@Body() createHttpRouteInput: CreateHttpRouteInput): Promise<any> {
+  create (@Body() createHttpRouteInput: CreateHttpRouteInput): Promise<HttpRoute> {
     return this.httpRoutesService.create(createHttpRouteInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the items.',
+    type: [HttpRoute]
+  })
   @Get(':companyUuid')
   findAll (
     @Param() findAllHttpRoutesParamInput: FindAllHttpRoutesParamInput,
     @Query() findAllHttpRoutesQueryInput: FindAllHttpRoutesQueryInput
-  ): Promise<any> {
+  ): Promise<HttpRoute[]> {
     return this.httpRoutesService.findAll(findAllHttpRoutesParamInput, findAllHttpRoutesQueryInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: HttpRoute
+  })
   @Patch(':companyUuid/:id')
   update (
     @Param() findOneHttpRouteInput: FindOneHttpRouteInput,
     @Body() updateHttpRouteInput: UpdateHttpRouteInput
-  ): Promise<any> {
+  ): Promise<HttpRoute> {
     return this.httpRoutesService.update(findOneHttpRouteInput, updateHttpRouteInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: HttpRoute
+  })
   @Delete(':companyUuid/:id')
-  remove (@Param() findOneHttpRouteInput: FindOneHttpRouteInput): Promise<any> {
+  remove (@Param() findOneHttpRouteInput: FindOneHttpRouteInput): Promise<HttpRoute> {
     return this.httpRoutesService.remove(findOneHttpRouteInput);
   }
 }

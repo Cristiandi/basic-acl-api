@@ -1,5 +1,7 @@
 import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Patch, Get, Param, Query, Delete, Redirect } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { User } from './user.entity';
 
 import { UsersService } from './users.service';
 
@@ -18,26 +20,42 @@ import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.d
 import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
 import { SendForgottenPasswordEmailInput } from './dto/send-forgotten-password-email-input.dto';
 import { ChangeForgottenPasswordInput } from './dto/change-forgotten-password-input.dto';
+import { LoginAdminOutPut } from './dto/login-admin-output.dto';
 
 @ApiTags('users')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-  
+  constructor(private readonly usersService: UsersService) { }
+
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: User
+  })
   @Post()
-  create(@Body() createUserInput: CreateUserInput): Promise<any> {
+  create(@Body() createUserInput: CreateUserInput): Promise<User> {
     return this.usersService.create(createUserInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the items.',
+    type: [User]
+  })
   @Get(':companyUuid')
   findAll(
     @Param() findAllUsersParamInput: FindAllUsersParamInput,
     @Query() findAllUsersQueryInput: FindAllUsersQueryInput
-  ): Promise<any> {
+  ): Promise<User[]> {
     return this.usersService.findAll(findAllUsersParamInput, findAllUsersQueryInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: User
+  })
   @Patch(':companyUuid/:id')
   update(
     @Param() findOneUserInput: FindOneUserInput,
@@ -46,14 +64,24 @@ export class UsersController {
     return this.usersService.update(findOneUserInput, updateUserInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: User
+  })
   @Delete(':companyUuid/:id')
   remove(@Param() findOneUserInput: FindOneUserInput): Promise<any> {
     return this.usersService.remove(findOneUserInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'response.',
+    type: LoginAdminOutPut
+  })
   @Public()
   @Post('/login-admin')
-  loginAdmin(@Body() loginUserInput: LoginUserInput): Promise<any> {
+  loginAdmin(@Body() loginUserInput: LoginUserInput): Promise<LoginAdminOutPut> {
     return this.usersService.loginAdmin(loginUserInput);
   }
 
@@ -65,9 +93,14 @@ export class UsersController {
     return this.usersService.createUsersFromFirebase(createUsersFromFirebaseInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'response.',
+    type: User
+  })
   @Public()
   @Post('/company-admin')
-  createCompanyAdmin(@Body() createCompanyAdminInput: CreateCompanyAdminInput): Promise<any> {
+  createCompanyAdmin(@Body() createCompanyAdminInput: CreateCompanyAdminInput): Promise<User> {
     return this.usersService.createCompanyAdmin(createCompanyAdminInput);
   }
 

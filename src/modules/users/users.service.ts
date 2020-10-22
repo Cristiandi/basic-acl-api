@@ -32,6 +32,7 @@ import { SendForgottenPasswordEmailInput } from './dto/send-forgotten-password-e
 import { ForgottenPasswordConfigsService } from '../forgotten-password-configs/forgotten-password-configs.service';
 import { ChangeForgottenPasswordInput } from './dto/change-forgotten-password-input.dto';
 import { SendUpdatedPasswordNotificationEmailInput } from './dto/send-updated-password-notification-email-input.dto';
+import { LoginAdminOutPut } from './dto/login-admin-output.dto';
 
 @Injectable()
 export class UsersService {
@@ -229,7 +230,7 @@ export class UsersService {
    * @returns {Promise<any>}
    * @memberof UsersService
    */
-  public async loginAdmin(loginUserInput: LoginUserInput): Promise<any> {
+  public async loginAdmin(loginUserInput: LoginUserInput): Promise<LoginAdminOutPut> {
     const { companyUuid } = loginUserInput;
 
     const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
