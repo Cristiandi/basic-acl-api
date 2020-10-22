@@ -3,7 +3,7 @@ import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { ApiKey } from '../api-keys/api-key.entity';
 import { Role } from '../roles/role.entity';
-import { User } from '../users/user.entitty';
+import { User } from '../users/user.entity';
 
 @Entity({ name: 'assigned_roles' })
 export class AssignedRole {

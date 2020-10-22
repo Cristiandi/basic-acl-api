@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus, Logger, NotFoundException } from
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { User } from './user.entitty';
+import { User } from './user.entity';
 
 import { CompaniesService } from '../companies/companies.service';
 import { FirebaseService } from '../../common/plugins/firebase/firebase.service';
@@ -13,7 +13,7 @@ import { MailerService } from 'src/common/plugins/mailer/mailer.service';
 import { ConfirmationEmailConfigsService } from '../confirmation-email-configs/confirmation-email-configs.service';
 import { VerificationCodesService } from '../verification-codes/verification-codes.service';
 
-import { addDaysToDate } from 'src/utils';
+import { addDaysToDate } from '../../utils';
 
 import { LoginUserInput } from './dto/login-user-input-dto';
 import { CreateUsersFromFirebaseInput } from './dto/create-users-from-firebase-input.dto';

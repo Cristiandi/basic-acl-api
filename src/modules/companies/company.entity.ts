@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { User } from '../users/user.entitty';
+import { User } from '../users/user.entity';
 import { Project } from '../projects/project.entity';
 import { Role } from '../roles/role.entity';
 import { ApiKey } from '../api-keys/api-key.entity';

@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompaniesModule } from '../companies/companies.module';
 import { FirebaseModule } from '../../common/plugins/firebase/firebase.module';
 
-import { User } from './user.entitty';
+import { User } from './user.entity';
 
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
