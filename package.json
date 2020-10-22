@@ -49,7 +49,7 @@
     "handlebars": "4.7.6",
     "md5": "2.3.0",
     "mjml": "4.7.1",
-    "nanoid": "3.1.12",
+    "nanoid": "3.1.13",
     "ncp": "2.0.0",
     "nestjs-redis": "1.2.8",
     "nodemailer": "6.4.14",
