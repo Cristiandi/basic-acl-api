@@ -73,7 +73,7 @@
     "@types/faker": "5.1.2",
     "@types/hapi__joi": "17.1.6",
     "@types/jest": "26.0.15",
-    "@types/node": "13.13.26",
+    "@types/node": "13.13.28",
     "@types/ncp": "2.0.4",
     "@types/nodemailer": "6.4.0",
     "@types/supertest": "2.0.10",
