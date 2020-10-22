@@ -1,5 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { ForgottenPasswordConfig } from './forgotten-password-config.entity';
 
 import { ForgottenPasswordConfigsService } from './forgotten-password-configs.service';
 
@@ -15,19 +17,34 @@ import { UpdateInput } from './dto/update-input.dto';
 export class ForgottenPasswordConfigsController {
   constructor(private readonly forgottenPasswordConfigsService: ForgottenPasswordConfigsService) {}
 
+  @ApiResponse({
+    status: 200,
+    description: 'the created item.',
+    type: ForgottenPasswordConfig
+  })
   @Post()
-  create(@Body() createInput: CreateInput): Promise<any> {
+  create(@Body() createInput: CreateInput): Promise<ForgottenPasswordConfig> {
     return this.forgottenPasswordConfigsService.create(createInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the items.',
+    type: [ForgottenPasswordConfig]
+  })
   @Get(':companyUuid')
   findAll(
     @Param() findAllParamInput: FindAllParamInput,
     @Query() findAllQueryInput: FindAllQueryInput
-  ): Promise<any> {
+  ): Promise<ForgottenPasswordConfig[]> {
     return this.forgottenPasswordConfigsService.findAll(findAllParamInput, findAllQueryInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: ForgottenPasswordConfig
+  })
   @Patch(':companyUuid/:id')
   update(
     @Param() findOneInput: FindOneInput,
@@ -36,6 +53,11 @@ export class ForgottenPasswordConfigsController {
     return this.forgottenPasswordConfigsService.update(findOneInput, updateInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: ForgottenPasswordConfig
+  })
   @Delete(':companyUuid/:id')
   remove(@Param() findOneInput: FindOneInput): Promise<any> {
     return this.forgottenPasswordConfigsService.remove(findOneInput);

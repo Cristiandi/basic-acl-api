@@ -1,5 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { ConfirmationEmailConfig } from './confirmation-email-config.entity';
 
 import { ConfirmationEmailConfigsService } from './confirmation-email-configs.service';
 
@@ -15,32 +17,52 @@ import { UpdateConfirmationEmailConfigInput } from './dto/update-confirmation-em
 export class ConfirmationEmailConfigsController {
   constructor(private readonly confirmationEmailConfigsService: ConfirmationEmailConfigsService) {}
 
+  @ApiResponse({
+    status: 200,
+    description: 'the created item.',
+    type: ConfirmationEmailConfig
+  })
   @Post()
-  create (@Body() createConfirmationEmailCionfig: CreateConfirmationEmailCionfig): Promise<any> {
+  create (@Body() createConfirmationEmailCionfig: CreateConfirmationEmailCionfig): Promise<ConfirmationEmailConfig> {
     return this.confirmationEmailConfigsService.create(createConfirmationEmailCionfig);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: ConfirmationEmailConfig
+  })
   @Get(':companyUuid')
   findAll(
     @Param() findAllConfirmationEmailConfigsParamInput: FindAllConfirmationEmailConfigsParamInput,
     @Query() findAllConfirmationEmailConfigsQueryInput: FindAllConfirmationEmailConfigsQueryInput
-  ): Promise<any> {
+  ): Promise<ConfirmationEmailConfig[]> {
     return this.confirmationEmailConfigsService.findAll(
       findAllConfirmationEmailConfigsParamInput,
       findAllConfirmationEmailConfigsQueryInput
     );
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: ConfirmationEmailConfig
+  })
   @Patch(':companyUuid/:id')
   update(
     @Param() findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput,
     @Body() updateConfirmationEmailConfigInput: UpdateConfirmationEmailConfigInput
-  ): Promise<any> {
+  ): Promise<ConfirmationEmailConfig> {
     return this.confirmationEmailConfigsService.update(findOneConfirmationEmailConfigInput, updateConfirmationEmailConfigInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: ConfirmationEmailConfig
+  })
   @Delete(':companyUuid/:id')
-  remove(@Param() findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput): Promise<any> {
+  remove(@Param() findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput): Promise<ConfirmationEmailConfig> {
     return this.confirmationEmailConfigsService.remove(findOneConfirmationEmailConfigInput);
   }
 }

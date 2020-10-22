@@ -53,21 +53,27 @@ export class Company {
   updatedAt: Date;
 
   // relations
+  @ApiProperty({ type: () => [User] })
   @OneToMany(type => User, user => user.company)
   users: User[];
 
+  @ApiProperty({ type: () => [Project] })
   @OneToMany(type => Project, project => project.company)
   projects: Project[];
 
+  @ApiProperty({ type: () => [Role] })
   @OneToMany(type => Role, role => role.company)
   roles: Role[]
 
+  @ApiProperty({ type: () => [ApiKey] })
   @OneToMany(type => ApiKey, apiKey => apiKey.company)
   apiKeys: ApiKey[];
 
+  @ApiProperty({ type: () => [ConfirmationEmailConfig] })
   @OneToMany(type => ConfirmationEmailConfig, confirmationEmailConfig => confirmationEmailConfig.company)
   confirmationEmailConfigs: ConfirmationEmailConfig[];
 
+  @ApiProperty({ type: () => [ForgottenPasswordConfig] })
   @OneToMany(type => ForgottenPasswordConfig, forgottenPasswordConfig => forgottenPasswordConfig.company)
   forgottenPasswordConfigs: ForgottenPasswordConfig[];
 }

@@ -29,10 +29,12 @@ export class ApiKey {
 
     // relations
 
+    @ApiProperty({ type: () => Company })
     @ManyToOne(type => Company, company => company.apiKeys)
     @JoinColumn({ name: 'company_id' })
     company: Company;
 
+    @ApiProperty({ type: () => [AssignedRole] })
     @OneToMany(type => AssignedRole, assignedRole => assignedRole.apiKey)
     assignedRoles: AssignedRole[];
 }
