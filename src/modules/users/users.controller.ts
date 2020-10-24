@@ -33,6 +33,7 @@ export class UsersController {
     description: 'the item.',
     type: User
   })
+  @Public()
   @Post()
   create(@Body() createUserInput: CreateUserInput): Promise<User> {
     return this.usersService.create(createUserInput);

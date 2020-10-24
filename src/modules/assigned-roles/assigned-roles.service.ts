@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -12,12 +12,14 @@ import { CreateAssignedRoleInput } from './dto/create-assigned-role-input.dto';
 import { FindAllAssignedRolesParamInput } from './dto/find-all-assigned-roles-param-input.dto';
 import { FindAllAssignedRolesQueryInput } from './dto/find-alll-assigned-roles-query-input.dto';
 import { FindOneAssignedRoleInput } from './dto/find-one-assigned-role-input.dto';
+import { AssignInput } from './dto/assign-input.dto';
 
 @Injectable()
 export class AssignedRolesService {
   constructor(
     @InjectRepository(AssignedRole)
     private readonly assignedRoleRepository: Repository<AssignedRole>,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     private readonly rolesService: RolesService,
     private readonly apiKeysService: ApiKeysService
@@ -157,5 +159,34 @@ export class AssignedRolesService {
     const removed = await this.assignedRoleRepository.remove(existing);
 
     return removed;
+  }
+
+  /**
+   *
+   *
+   * @param {AssignInput} assignInput
+   * @return {*}  {Promise<AssignedRole>}
+   * @memberof AssignedRolesService
+   */
+  public async assign(assignInput: AssignInput): Promise<AssignedRole> {
+    const { companyUuid, userEmail } = assignInput;
+
+    const user = await this.usersService.getCompanyUserByEmail({ companyUuid, email: userEmail });
+
+    if (!user) {
+      throw new NotFoundException(`can't get the user with email ${userEmail} for the company ${companyUuid}.`);
+    }
+
+    const { roleCode } = assignInput;
+
+    const role = await this.rolesService.getCompanyRoleByCode({ companyUuid, code: roleCode });
+
+    if (!role) {
+      throw new NotFoundException(`cant get the role with code ${roleCode} for the company ${companyUuid}.`);
+    }
+
+    const createdAssignedRole = await this.create({ companyUuid, roleId: role.id, userId: user.id });
+
+    return createdAssignedRole;
   }
 }

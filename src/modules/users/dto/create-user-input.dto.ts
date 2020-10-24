@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsUUID, IsString, IsBoolean, IsEmail, IsOptional, Length } from 'class-validator';
 
 export class CreateUserInput {
@@ -20,8 +20,13 @@ export class CreateUserInput {
   @Length(10, 10)
   readonly phone: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   readonly isAdmin?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  readonly roleCode?: string;
 }

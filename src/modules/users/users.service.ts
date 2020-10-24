@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject, PreconditionFailedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -12,6 +12,7 @@ import { TemplatesService } from 'src/common/templates/templates.service';
 import { MailerService } from 'src/common/plugins/mailer/mailer.service';
 import { ConfirmationEmailConfigsService } from '../confirmation-email-configs/confirmation-email-configs.service';
 import { VerificationCodesService } from '../verification-codes/verification-codes.service';
+import { RolesService } from '../roles/roles.service';
 
 import { addDaysToDate } from '../../utils';
 
@@ -33,6 +34,8 @@ import { ForgottenPasswordConfigsService } from '../forgotten-password-configs/f
 import { ChangeForgottenPasswordInput } from './dto/change-forgotten-password-input.dto';
 import { SendUpdatedPasswordNotificationEmailInput } from './dto/send-updated-password-notification-email-input.dto';
 import { LoginAdminOutPut } from './dto/login-admin-output.dto';
+import { GetCompanyUserByEmailInput } from './dto/get-company-user-by-email-input.dto';
+import { AssignedRolesService } from '../assigned-roles/assigned-roles.service';
 
 @Injectable()
 export class UsersService {
@@ -47,7 +50,10 @@ export class UsersService {
     private readonly mailerService: MailerService,
     private readonly confirmationEmailConfigsService: ConfirmationEmailConfigsService,
     private readonly verificationCodesService: VerificationCodesService,
-    private readonly forgottenPasswordConfigsService: ForgottenPasswordConfigsService
+    private readonly forgottenPasswordConfigsService: ForgottenPasswordConfigsService,
+    private readonly rolesService: RolesService,
+    @Inject(forwardRef(() => AssignedRolesService))
+    private readonly assignedRolesService: AssignedRolesService
   ) { }
 
   /**
@@ -64,6 +70,16 @@ export class UsersService {
 
     if (!company) {
       throw new NotFoundException(`can not get the company with uuid ${company}`);
+    }
+
+    const { roleCode } = createUserInput;
+
+    if (roleCode) {
+      const existingRole = await this.rolesService.getCompanyRoleByCode({ companyUuid, code: roleCode });
+
+      if (!existingRole) {
+        throw new NotFoundException(`can't get the role with code ${roleCode} for the company ${companyUuid}.`);
+      }
     }
 
     const { email, password, phone } = createUserInput;
@@ -87,6 +103,11 @@ export class UsersService {
 
     if (company.confirmationEmailConfig) {
       this.sendConfirmationEmail({ companyUuid, email: saved.email });
+    }
+
+    if (roleCode) {
+      this.assignedRolesService.assign({ companyUuid, roleCode, userEmail: saved.email })
+        .catch(err => console.error(err));
     }
 
     delete saved.company;
@@ -737,5 +758,28 @@ export class UsersService {
     return {
       url: redirectUrl
     };
+  }
+
+  /**
+   *
+   *
+   * @param {GetCompanyUserByEmailInput} getCompanyUserByEmailInput
+   * @return {*}  {Promise<User>}
+   * @memberof UsersService
+   */
+  public async getCompanyUserByEmail(getCompanyUserByEmailInput: GetCompanyUserByEmailInput): Promise<User | null> {
+    const { companyUuid, email } = getCompanyUserByEmailInput;
+
+    const user = await this.usersRepository.createQueryBuilder('u')
+      .innerJoin('u.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.email = :email', { email })
+      .getOne();
+    
+    if (!user) {
+      return null;
+    }
+
+    return user;
   }
 }

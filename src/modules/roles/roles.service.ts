@@ -11,6 +11,7 @@ import { FindAllRolesParamInput } from './dto/find-all-roles-param-input.dto';
 import { FindAllRolesQueryInput } from './dto/find-all-roles-query-input.dto';
 import { FindOneRoleInput } from './dto/find-one-role-input.dto';
 import { UpdateRoleInput } from './dto/update-role-input.dto';
+import { GetCompanyRoleByCodeInput } from './dto/get-company-role-by-code-input.dto';
 
 @Injectable()
 export class RolesService {
@@ -197,5 +198,28 @@ export class RolesService {
         delete removed.company;
 
         return removed;
+    }
+
+    /**
+     *
+     *
+     * @param {GetCompanyRoleByCodeInput} getCompanyRoleByCodeInput
+     * @return {*}  {Promise<Role>}
+     * @memberof RolesService
+     */
+    public async getCompanyRoleByCode(getCompanyRoleByCodeInput: GetCompanyRoleByCodeInput): Promise<Role | null> {
+        const { companyUuid, code } = getCompanyRoleByCodeInput;
+
+        const role = await this.roleRepository.createQueryBuilder('r')
+            .innerJoin('r.company', 'c')
+            .where('c.uuid = :companyUuid', { companyUuid })
+            .where('r.code = :code', { code })
+            .getOne();
+
+        if (!role) {
+            return null;
+        }
+
+        return role;
     }
 }
