@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CompaniesModule } from '../companies/companies.module';
 import { FirebaseModule } from '../../common/plugins/firebase/firebase.module';
 
-import { User } from './user.entitty';
+import { User } from './user.entity';
 
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
@@ -15,6 +15,8 @@ import { MailerModule } from 'src/common/plugins/mailer/mailer.module';
 import { ConfirmationEmailConfigsModule } from '../confirmation-email-configs/confirmation-email-configs.module';
 import { VerificationCodesModule } from '../verification-codes/verification-codes.module';
 import { ForgottenPasswordConfigsModule } from '../forgotten-password-configs/forgotten-password-configs.module';
+import { RolesModule } from '../roles/roles.module';
+import { AssignedRolesModule } from '../assigned-roles/assigned-roles.module';
 
 @Module({
   imports: [
@@ -27,7 +29,9 @@ import { ForgottenPasswordConfigsModule } from '../forgotten-password-configs/fo
     MailerModule,
     ConfirmationEmailConfigsModule,
     VerificationCodesModule,
-    ForgottenPasswordConfigsModule
+    ForgottenPasswordConfigsModule,
+    RolesModule,
+    forwardRef(() => AssignedRolesModule)    
   ],
   providers: [UsersService],
   controllers: [UsersController],
