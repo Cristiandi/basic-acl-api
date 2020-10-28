@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { User } from '../users/user.entity';
 import { Project } from '../projects/project.entity';
@@ -43,6 +43,10 @@ export class Company {
   @ApiProperty()
   @Column({ name: 'forgotten_password_config', type: 'boolean', default: false })
   forgottenPasswordConfig: boolean;
+
+  @ApiPropertyOptional()
+  @Column({ name: 'logo_url', type: 'varchar', length: 200, nullable: true })
+  logoUrl: string;
 
   @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })

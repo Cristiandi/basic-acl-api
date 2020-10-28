@@ -86,8 +86,7 @@ export class CompaniesService {
       id: +id,
       ...updateCompanyInput,
       serviceAccount: updateCompanyInput.serviceAccount ? updateCompanyInput.serviceAccount as any : undefined,
-      firebaseConfig: updateCompanyInput.firebaseConfig ? updateCompanyInput.firebaseConfig as any : undefined,
-      confirmationEmailConfig: updateCompanyInput.confirmationEmailConfig === undefined ? undefined : updateCompanyInput.confirmationEmailConfig
+      firebaseConfig: updateCompanyInput.firebaseConfig ? updateCompanyInput.firebaseConfig as any : undefined
     });
 
     if (!existing) {
