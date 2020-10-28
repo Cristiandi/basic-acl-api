@@ -33,7 +33,6 @@ export class UsersController {
     description: 'the item.',
     type: User
   })
-  @Public()
   @Post()
   create(@Body() createUserInput: CreateUserInput): Promise<User> {
     return this.usersService.create(createUserInput);
@@ -80,6 +79,7 @@ export class UsersController {
     description: 'response.',
     type: LoginAdminOutPut
   })
+  @HitsWatcher(10, 60)
   @Public()
   @Post('/login-admin')
   loginAdmin(@Body() loginUserInput: LoginUserInput): Promise<LoginAdminOutPut> {

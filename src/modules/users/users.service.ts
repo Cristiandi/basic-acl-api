@@ -1,6 +1,11 @@
-import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject, PreconditionFailedException } from '@nestjs/common';
+import * as md5 from 'md5';
+import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedisService } from 'nestjs-redis';
+import { ConfigType } from '@nestjs/config';
+
+import appConfig from '../../config/app.config';
 
 import { User } from './user.entity';
 
@@ -13,6 +18,7 @@ import { MailerService } from 'src/common/plugins/mailer/mailer.service';
 import { ConfirmationEmailConfigsService } from '../confirmation-email-configs/confirmation-email-configs.service';
 import { VerificationCodesService } from '../verification-codes/verification-codes.service';
 import { RolesService } from '../roles/roles.service';
+import { AssignedRolesService } from '../assigned-roles/assigned-roles.service';
 
 import { addDaysToDate } from '../../utils';
 
@@ -35,11 +41,12 @@ import { ChangeForgottenPasswordInput } from './dto/change-forgotten-password-in
 import { SendUpdatedPasswordNotificationEmailInput } from './dto/send-updated-password-notification-email-input.dto';
 import { LoginAdminOutPut } from './dto/login-admin-output.dto';
 import { GetCompanyUserByEmailInput } from './dto/get-company-user-by-email-input.dto';
-import { AssignedRolesService } from '../assigned-roles/assigned-roles.service';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(appConfig.KEY)
+    private readonly appConfiguration: ConfigType<typeof appConfig>,
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
     private readonly companiesService: CompaniesService,
@@ -53,7 +60,8 @@ export class UsersService {
     private readonly forgottenPasswordConfigsService: ForgottenPasswordConfigsService,
     private readonly rolesService: RolesService,
     @Inject(forwardRef(() => AssignedRolesService))
-    private readonly assignedRolesService: AssignedRolesService
+    private readonly assignedRolesService: AssignedRolesService,
+    private readonly redisService: RedisService
   ) { }
 
   /**
@@ -253,14 +261,35 @@ export class UsersService {
    */
   public async loginAdmin(loginUserInput: LoginUserInput): Promise<LoginAdminOutPut> {
     const { companyUuid } = loginUserInput;
+    const { email, password } = loginUserInput;
+
+    // get the client name
+    const {
+      redis: { clientName }
+    } = this.appConfiguration;
+
+    // get the redis client
+    const redisClient = await this.redisService.getClient(clientName);
+
+    // define the key
+    const key = md5(`${companyUuid}|${email}|${password}`);
+
+    // try to get the key value
+    const unParsedKeyValue = await redisClient.get(key);
+
+    // if i get some value
+    if (unParsedKeyValue) {
+      // try to parse
+      const parsedKeyValue = JSON.parse(unParsedKeyValue);
+
+      return parsedKeyValue;
+    }
 
     const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
 
     if (!company) {
       throw new NotFoundException(`can't get the company with uuid ${companyUuid}.`);
     }
-
-    const { email, password } = loginUserInput;
 
     let firebaseUser;
 
@@ -300,6 +329,10 @@ export class UsersService {
       authTime: new Date(idTokenResult.authTime).getTime(),
       expirationTime: new Date(idTokenResult.expirationTime).getTime()
     };
+
+    if (!unParsedKeyValue) {
+      redisClient.set(key, JSON.stringify(response), 'EX', 3599);
+    }
 
     return response;
   }

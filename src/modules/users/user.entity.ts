@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique, OneToMany, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Company } from '../companies/company.entity';
@@ -13,9 +13,11 @@ export class User {
 
   @ApiProperty()
   @Column({ name: 'auth_uid', type: 'varchar', length: 100 })
+  @Index('auth_uid-idx')
   authUid: string;
 
   @ApiProperty()
+  @Index('email-idx')
   @Column({ type: 'varchar', length: 100 })
   email: string;
 

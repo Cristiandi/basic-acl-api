@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { User } from '../users/user.entity';
@@ -22,6 +22,7 @@ export class Company {
 
   @ApiProperty()
   @Column({ type: 'uuid' })
+  @Index('uuid-idx')
   uuid: string;
 
   @ApiProperty()
