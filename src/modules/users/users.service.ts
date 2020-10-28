@@ -1,5 +1,5 @@
 import * as md5 from 'md5';
-import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject, ForbiddenException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'nestjs-redis';
@@ -240,6 +240,10 @@ export class UsersService {
    */
   public async remove(findOneUserInput: FindOneUserInput): Promise<User> {
     const existing = await this.findOne(findOneUserInput);
+
+    if (existing.isAdmin) {
+      throw new ForbiddenException('can\'t delete an admin user.');
+    }
 
     const { authUid: uid, company: { uuid: companyUuid } } = existing;
 
