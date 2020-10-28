@@ -1,6 +1,6 @@
-import { IsString, IsDefined, ValidateNested, IsUUID, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsDefined, ValidateNested, IsUUID, IsOptional, IsBoolean, IsUrl } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 class ServiceAccount {
   @ApiProperty()
@@ -83,7 +83,7 @@ export class CreateCompanyInput {
   @IsString()
   readonly name: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @IsUUID()
@@ -95,12 +95,12 @@ export class CreateCompanyInput {
   @Type(() => ServiceAccount)
   readonly serviceAccount: ServiceAccount;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
   readonly confirmationEmailConfig?: boolean;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
   readonly forgottenPasswordConfig?: boolean;
@@ -114,4 +114,10 @@ export class CreateCompanyInput {
   @ApiProperty()
   @IsString()
   readonly countryCode: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUrl()
+  @IsString()
+  readonly logoUrl: string;
 }
