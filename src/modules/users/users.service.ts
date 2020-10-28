@@ -41,6 +41,7 @@ import { ChangeForgottenPasswordInput } from './dto/change-forgotten-password-in
 import { SendUpdatedPasswordNotificationEmailInput } from './dto/send-updated-password-notification-email-input.dto';
 import { LoginAdminOutPut } from './dto/login-admin-output.dto';
 import { GetCompanyUserByEmailInput } from './dto/get-company-user-by-email-input.dto';
+import { ChangePasswordInput } from './dto/change-password-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -818,5 +819,49 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  /**
+   *
+   *
+   * @param {ChangePasswordInput} changePasswordInput
+   * @return {*}  {Promise<void>}
+   * @memberof UsersService
+   */
+  public async changePassword(changePasswordInput: ChangePasswordInput): Promise<void> {
+    const { companyUuid, email } = changePasswordInput;
+
+    const existing = await this.usersRepository.createQueryBuilder('u')
+      .innerJoinAndSelect('u.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.email = :email', { email })
+      .getOne();
+
+    if (!existing) {
+      throw new NotFoundException(`can't get the user with email ${email} for the company ${companyUuid}.`);
+    }
+
+    const { oldPassword } = changePasswordInput;
+
+    try {
+      this.firebaseService.login({ companyUuid, email, password: oldPassword });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
+
+    const { company: { countryCode } } = existing;
+    const { newPassword } = changePasswordInput;
+
+    await this.firebaseAdminService.updateUser({
+      companyUuid,
+      countryCode,
+      uid: existing.authUid,
+      password: newPassword
+    });
+
+    this.sendUpdatedPasswordNotificationEmail({
+      companyUuid,
+      email
+    });
   }
 }
