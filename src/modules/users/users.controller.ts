@@ -21,6 +21,7 @@ import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
 import { SendForgottenPasswordEmailInput } from './dto/send-forgotten-password-email-input.dto';
 import { ChangeForgottenPasswordInput } from './dto/change-forgotten-password-input.dto';
 import { LoginAdminOutPut } from './dto/login-admin-output.dto';
+import { ChangePasswordInput } from './dto/change-password-input.dto';
 
 @ApiTags('users')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -128,5 +129,10 @@ export class UsersController {
   @Post('/forgotten-password-code')
   changeForgottenPassword(@Body() changeForgottenPasswordInput: ChangeForgottenPasswordInput): Promise<any> {
     return this.usersService.changeForgottenPassword(changeForgottenPasswordInput);
+  }
+
+  @Post('/change-password')
+  changePassword(@Body() changePasswordInput: ChangePasswordInput): Promise<any> {
+    return this.usersService.changePassword(changePasswordInput);
   }
 }
