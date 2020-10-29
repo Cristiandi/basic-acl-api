@@ -1,5 +1,5 @@
 import * as md5 from 'md5';
-import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject, ForbiddenException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'nestjs-redis';
@@ -494,8 +494,13 @@ export class UsersService {
    */
   public async getUserByToken(getUserByTokenInput: GetUserByTokenInput): Promise<User> {
     const { companyUuid, token } = getUserByTokenInput;
-
-    const decodedToken = await this.firebaseAdminService.verifyToken({ companyUuid, token });
+    
+    let decodedToken;
+    try {
+      decodedToken = await this.firebaseAdminService.verifyToken({ companyUuid, token }); 
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
 
     const { uid } = decodedToken;
 
@@ -862,6 +867,6 @@ export class UsersService {
     this.sendUpdatedPasswordNotificationEmail({
       companyUuid,
       email
-    });
+    }).catch(err => console.error(err));
   }
 }
