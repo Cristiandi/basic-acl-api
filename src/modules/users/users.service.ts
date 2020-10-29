@@ -844,7 +844,7 @@ export class UsersService {
     const { oldPassword } = changePasswordInput;
 
     try {
-      this.firebaseService.login({ companyUuid, email, password: oldPassword });
+      await this.firebaseService.login({ companyUuid, email, password: oldPassword });
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
     }
