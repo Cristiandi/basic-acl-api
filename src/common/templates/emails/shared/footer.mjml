@@ -12,10 +12,10 @@
 <mj-section background-color="#FFF" padding-top="0">
   <mj-column vertical-align="middle">
     <mj-social icon-size="30px" mode="horizontal" inner-padding="15px">
-      <mj-social-element src="https://storage.googleapis.com/platturn-dev-bucket/public/instagram.jpg" href="https://www.instagram.com/basic-acl"></mj-social-element>
-      <mj-social-element src="https://storage.googleapis.com/platturn-dev-bucket/public/twitter.jpg" href="https://twitter.com/basic-acl"></mj-social-element>
-      <!-- <mj-social-element src="https://storage.googleapis.com/platturn-dev-bucket/public/facebook.jpg" href="https://www.facebook.com/awork-team"></mj-social-element> -->
-      <mj-social-element src="https://storage.googleapis.com/platturn-dev-bucket/public/linkedin.jpg" href="https://www.linkedin.com/company/basic-acl"></mj-social-element>
+      <mj-social-element src="https://storage.googleapis.com/comodin-cristiandi-bucket/instagram.jpg" href="https://www.instagram.com/basic-acl"></mj-social-element>
+      <mj-social-element src="https://storage.googleapis.com/comodin-cristiandi-bucket/public/twitter.jpg" href="https://twitter.com/basic-acl"></mj-social-element>
+      <!-- <mj-social-element src="https://storage.googleapis.com/comodin-cristiandi-bucket/public/facebook.jpg" href="https://www.facebook.com/awork-team"></mj-social-element> -->
+      <mj-social-element src="https://storage.googleapis.com/comodin-cristiandi-bucket/linkedin.jpg" href="https://www.linkedin.com/company/basic-acl"></mj-social-element>
     </mj-social>
   </mj-column>
   <mj-column vertical-align="middle">
