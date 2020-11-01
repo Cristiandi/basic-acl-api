@@ -15,7 +15,7 @@ export class MailerService {
     @Inject(appConfig.KEY)
     private readonly appConfiguration: ConfigType<typeof appConfig>,
     private readonly parametersService: ParametersService
-    ) {}
+  ) {}
 
 
   private async createAccount(): Promise<nodemailer.TestAccount> {

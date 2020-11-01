@@ -133,17 +133,17 @@ export class ConfirmationEmailConfigsService {
   public async update(
     findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput,
     updateConfirmationEmailConfigInput: UpdateConfirmationEmailConfigInput
-    ): Promise<ConfirmationEmailConfig> {
-      await this.findOne(findOneConfirmationEmailConfigInput);
+  ): Promise<ConfirmationEmailConfig> {
+    await this.findOne(findOneConfirmationEmailConfigInput);
 
-      const { id } = findOneConfirmationEmailConfigInput;
+    const { id } = findOneConfirmationEmailConfigInput;
 
-      const existing = await this.confirmationEmailConfigRepository.preload({
-        id: +id,
-        ...updateConfirmationEmailConfigInput
-      });
+    const existing = await this.confirmationEmailConfigRepository.preload({
+      id: +id,
+      ...updateConfirmationEmailConfigInput
+    });
 
-      return this.confirmationEmailConfigRepository.save(existing);
+    return this.confirmationEmailConfigRepository.save(existing);
   }
 
   /**
@@ -174,9 +174,9 @@ export class ConfirmationEmailConfigsService {
     const { companyUuid } = getOneByCompanyInput;
 
     const item = await this.confirmationEmailConfigRepository.createQueryBuilder('cec')
-    .innerJoin('cec.company', 'c')
-    .where('c.uuid = :companyUuid', { companyUuid })
-    .getOne();
+      .innerJoin('cec.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .getOne();
 
     return item || null;
   }

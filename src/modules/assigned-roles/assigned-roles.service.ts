@@ -98,23 +98,23 @@ export class AssignedRolesService {
     const { companyUuid } = findAllAssignedRolesParamInput;
 
     const data = await this.assignedRoleRepository.createQueryBuilder('ar')
-    .select([
-      'ar.id as id',
-      'r.id as "roleId"',
-      'r.code as "roleCode"',
-      'u.id as "userId"',
-      'u.email as "userEmail"',
-      'ak.id as "apikeyId"',
-      'ak.value as "apikeyValue"'
-    ])
-    .innerJoin('ar.role', 'r')
-    .innerJoin('r.company', 'c')
-    .leftJoin('ar.user', 'u')
-    .leftJoin('ar.apiKey', 'ak')
-    .where('c.uuid = :companyUuid', { companyUuid })
-    .take(limit || undefined)
-    .skip(offset)
-    .execute();
+      .select([
+        'ar.id as id',
+        'r.id as "roleId"',
+        'r.code as "roleCode"',
+        'u.id as "userId"',
+        'u.email as "userEmail"',
+        'ak.id as "apikeyId"',
+        'ak.value as "apikeyValue"'
+      ])
+      .innerJoin('ar.role', 'r')
+      .innerJoin('r.company', 'c')
+      .leftJoin('ar.user', 'u')
+      .leftJoin('ar.apiKey', 'ak')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .take(limit || undefined)
+      .skip(offset)
+      .execute();
 
     return data;
   }
@@ -130,14 +130,14 @@ export class AssignedRolesService {
     const { companyUuid, id } = findOneAssignedRoleInput;
 
     const existing = await this.assignedRoleRepository.createQueryBuilder('ar')
-    .select(['ar.id', 'ar.role'])
-    .innerJoinAndSelect('ar.role', 'r')
-    .innerJoin('r.company', 'c')
-    .leftJoinAndSelect('ar.user', 'u')
-    .leftJoinAndSelect('ar.apiKey', 'ak')
-    .where('c.uuid = :companyUuid', { companyUuid })
-    .andWhere('ar.id = :id', { id })
-    .getOne();
+      .select(['ar.id', 'ar.role'])
+      .innerJoinAndSelect('ar.role', 'r')
+      .innerJoin('r.company', 'c')
+      .leftJoinAndSelect('ar.user', 'u')
+      .leftJoinAndSelect('ar.apiKey', 'ak')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('ar.id = :id', { id })
+      .getOne();
 
     if (!existing) {
       throw new NotFoundException(`can not get the assigned role ${id} for the company with uuid ${companyUuid}`);

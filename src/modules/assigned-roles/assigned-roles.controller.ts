@@ -35,7 +35,7 @@ export class AssignedRolesController {
   findAll(
     @Param() findAllAssignedRolesParamInput: FindAllAssignedRolesParamInput,
     @Query() findAllAssignedRolesQueryInput: FindAllAssignedRolesQueryInput
-    ): Promise<AssignedRole[]> {
+  ): Promise<AssignedRole[]> {
     return this.assignedRolesService.findAll(findAllAssignedRolesParamInput, findAllAssignedRolesQueryInput);
   }
 

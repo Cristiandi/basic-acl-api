@@ -14,51 +14,51 @@ import { UpdateProjectInput } from './dto/update-project-input.dto';
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('projects')
 export class ProjectsController {
-    constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService) {}
 
     @ApiResponse({
-        status: 200,
-        description: 'the item.',
-        type: Project
-      })
+      status: 200,
+      description: 'the item.',
+      type: Project
+    })
     @Post()
-    create(@Body() createProjectInput: CreateProjectInput): Promise<Project> {
-        return this.projectsService.create(createProjectInput);
-    }
+  create(@Body() createProjectInput: CreateProjectInput): Promise<Project> {
+    return this.projectsService.create(createProjectInput);
+  }
 
     @ApiResponse({
-        status: 200,
-        description: 'the items.',
-        type: [Project]
-      })
+      status: 200,
+      description: 'the items.',
+      type: [Project]
+    })
     @Get(':companyUuid')
     findAll(
         @Param() findAllProjectsParamInput: FindAllProjectsParamInput,
         @Query() FindAllProjectsQueryInput: FindAllProjectsQueryInput
     ): Promise<Project[]>  {
-        return this.projectsService.findAll(findAllProjectsParamInput, FindAllProjectsQueryInput);
+      return this.projectsService.findAll(findAllProjectsParamInput, FindAllProjectsQueryInput);
     }
 
     @ApiResponse({
-        status: 200,
-        description: 'the item.',
-        type: Project
-      })
+      status: 200,
+      description: 'the item.',
+      type: Project
+    })
     @Patch(':companyUuid/:id')
     update(
         @Param() findOneProjectInput: FindOneProjectInput,
         @Body() updateProjectInput: UpdateProjectInput
     ): Promise<Project> {
-        return this.projectsService.update(findOneProjectInput, updateProjectInput);
+      return this.projectsService.update(findOneProjectInput, updateProjectInput);
     }
 
     @ApiResponse({
-        status: 200,
-        description: 'the item.',
-        type: Project
-      })
+      status: 200,
+      description: 'the item.',
+      type: Project
+    })
     @Delete(':companyUuid/:id')
     remove(@Param() findOneProjectInput: FindOneProjectInput): Promise<Project> {
-        return this.projectsService.remove(findOneProjectInput);
+      return this.projectsService.remove(findOneProjectInput);
     }
 }

@@ -784,10 +784,10 @@ export class UsersService {
     const { email } = verificationCode;
 
     const user = await this.usersRepository.createQueryBuilder('u')
-    .innerJoin('u.company', 'c')
-    .where('c.uuid = :companyUuid', { companyUuid })
-    .andWhere('u.email = :email', { email })
-    .getOne();
+      .innerJoin('u.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.email = :email', { email })
+      .getOne();
 
     this.firebaseAdminService.updateUser({
       companyUuid,

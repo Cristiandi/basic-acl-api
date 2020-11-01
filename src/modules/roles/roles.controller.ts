@@ -14,51 +14,51 @@ import { UpdateRoleInput } from './dto/update-role-input.dto';
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('roles')
 export class RolesController {
-    constructor(private readonly rolesService: RolesService) { }
+  constructor(private readonly rolesService: RolesService) { }
 
     @ApiResponse({
-        status: 200,
-        description: 'the item.',
-        type: Role
+      status: 200,
+      description: 'the item.',
+      type: Role
     })
     @Post()
-    create(@Body() createRoleInput: CreateRoleInput): Promise<Role> {
-        return this.rolesService.create(createRoleInput);
-    }
+  create(@Body() createRoleInput: CreateRoleInput): Promise<Role> {
+    return this.rolesService.create(createRoleInput);
+  }
 
     @ApiResponse({
-        status: 200,
-        description: 'the items.',
-        type: [Role]
+      status: 200,
+      description: 'the items.',
+      type: [Role]
     })
     @Get(':companyUuid')
     findAll(
         @Param() findAllRolesParamInput: FindAllRolesParamInput,
         @Query() findAllRolesQueryInput: FindAllRolesQueryInput
     ): Promise<Role[]> {
-        return this.rolesService.findAll(findAllRolesParamInput, findAllRolesQueryInput);
+      return this.rolesService.findAll(findAllRolesParamInput, findAllRolesQueryInput);
     }
 
     @ApiResponse({
-        status: 200,
-        description: 'the item.',
-        type: Role
+      status: 200,
+      description: 'the item.',
+      type: Role
     })
     @Patch(':companyUuid/:id')
     update(
         @Param() findOneRoleInput: FindOneRoleInput,
         @Body() updateRoleInput: UpdateRoleInput
     ): Promise<Role> {
-        return this.rolesService.update(findOneRoleInput, updateRoleInput);
+      return this.rolesService.update(findOneRoleInput, updateRoleInput);
     }
 
     @ApiResponse({
-        status: 200,
-        description: 'the item.',
-        type: Role
+      status: 200,
+      description: 'the item.',
+      type: Role
     })
     @Delete(':companyUuid/:id')
     remove(@Param() findOneRoleInput: FindOneRoleInput): Promise<Role> {
-        return this.rolesService.remove(findOneRoleInput);
+      return this.rolesService.remove(findOneRoleInput);
     }
 }

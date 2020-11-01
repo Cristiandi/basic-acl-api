@@ -16,8 +16,8 @@ export class ParametersService {
     const { name } = getParameterValueInput;
 
     const parameter = await this.parameterRepository.createQueryBuilder('p')
-    .where('p.name = :name',{ name })
-    .getOne();
+      .where('p.name = :name',{ name })
+      .getOne();
 
     if (!parameter) {
       throw new NotFoundException(`can't get the parameter ${name}.`);
