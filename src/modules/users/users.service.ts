@@ -42,6 +42,7 @@ import { SendUpdatedPasswordNotificationEmailInput } from './dto/send-updated-pa
 import { LoginAdminOutPut } from './dto/login-admin-output.dto';
 import { GetCompanyUserByEmailInput } from './dto/get-company-user-by-email-input.dto';
 import { ChangePasswordInput } from './dto/change-password-input.dto';
+import { ChangePhoneInput } from './dto/change-phone-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -868,5 +869,38 @@ export class UsersService {
       companyUuid,
       email
     }).catch(err => console.error(err));
+  }
+
+  /**
+   *
+   *
+   * @param {ChangePhoneInput} changePhoneInput
+   * @return {*}  {Promise<User>}
+   * @memberof UsersService
+   */
+  public async changePhone(changePhoneInput: ChangePhoneInput): Promise<User> {
+    const { companyUuid, email } = changePhoneInput;
+
+    const existing = await this.usersRepository.createQueryBuilder('u')
+      .innerJoinAndSelect('u.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.email = :email', { email })
+      .getOne();
+
+    if (!existing) {
+      throw new NotFoundException(`can't get the user with email ${email} for the company ${companyUuid}.`);
+    }
+
+    const { company: { countryCode }, authUid } = existing;
+    const { phone } = changePhoneInput;
+
+    await this.firebaseAdminService.updateUser({
+      companyUuid,
+      countryCode,
+      uid: authUid,
+      phone
+    });
+
+    return existing;
   }
 }
