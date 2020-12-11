@@ -52,7 +52,7 @@
     "nanoid": "3.1.20",
     "ncp": "2.0.0",
     "nestjs-redis": "1.2.8",
-    "nodemailer": "6.4.16",
+    "nodemailer": "6.4.17",
     "path": "0.12.7",
     "path-to-regexp": "6.2.0",
     "pg": "8.5.1",
