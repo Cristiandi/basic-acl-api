@@ -48,7 +48,7 @@
     "firebase-admin": "9.4.2",
     "handlebars": "4.7.6",
     "md5": "2.3.0",
-    "mjml": "4.7.1",
+    "mjml": "4.8.1",
     "nanoid": "3.1.20",
     "ncp": "2.0.0",
     "nestjs-redis": "1.2.8",
