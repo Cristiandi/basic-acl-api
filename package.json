@@ -41,7 +41,7 @@
     "class-validator": "0.13.1",
     "cross-env": "7.0.3",
     "dotenv": "8.2.0",
-    "faker": "5.1.0",
+    "faker": "5.2.0",
     "fastify-helmet": "5.1.0",
     "fastify-swagger": "3.5.0",
     "firebase": "8.2.4",
