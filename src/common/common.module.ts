@@ -14,6 +14,7 @@ import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { TemplatesModule } from './templates/templates.module';
 import { MailerModule } from './plugins/mailer/mailer.module';
 import { UsersModule } from 'src/modules/users/users.module';
+import { MailgunModule } from './plugins/mailgun/mailgun.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { UsersModule } from 'src/modules/users/users.module';
     FirebaseAdminModule,
     TemplatesModule,
     MailerModule,
-    UsersModule
+    UsersModule,
+    MailgunModule
   ],
   providers: [
     {
