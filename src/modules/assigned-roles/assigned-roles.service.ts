@@ -36,6 +36,10 @@ export class AssignedRolesService {
     const { companyUuid, roleId } = createAssignedRoleInput;
 
     const role = await this.rolesService.findOne({ companyUuid, id: `${roleId}` });
+
+    if (!role) {
+      throw new NotFoundException(`can't get the role ${roleId} for the company with uuid ${companyUuid}.`);
+    }
     delete role.company;
 
     const { userId, apiKeyId } = createAssignedRoleInput;
@@ -51,12 +55,22 @@ export class AssignedRolesService {
     let user;
     if (userId) {
       user = await this.usersService.findOne({ companyUuid, id: `${userId}` });
+
+      if (!user) {
+        throw new NotFoundException(`can't get the user ${userId} for the company with uuid ${companyUuid}.`);
+      }
+
       delete user.company;
     }
 
     let apiKey;
     if (apiKeyId) {
       apiKey = await this.apiKeysService.findOne({ companyUuid, id: `${apiKeyId}` });
+
+      if (!apiKey) {
+        throw new NotFoundException(`can't get the api key ${apiKeyId} for the company with uuid ${companyUuid}.`);
+      }
+
       delete apiKey.company;
     }
 
@@ -126,7 +140,7 @@ export class AssignedRolesService {
    * @return {*}  {Promise<AssignedRole>}
    * @memberof AssignedRolesService
    */
-  public async findOne(findOneAssignedRoleInput: FindOneAssignedRoleInput): Promise<AssignedRole> {
+  public async findOne(findOneAssignedRoleInput: FindOneAssignedRoleInput): Promise<AssignedRole | null> {
     const { companyUuid, id } = findOneAssignedRoleInput;
 
     const existing = await this.assignedRoleRepository.createQueryBuilder('ar')
@@ -140,7 +154,7 @@ export class AssignedRolesService {
       .getOne();
 
     if (!existing) {
-      throw new NotFoundException(`can not get the assigned role ${id} for the company with uuid ${companyUuid}`);
+      return null;
     }
 
     return existing;
@@ -155,6 +169,11 @@ export class AssignedRolesService {
    */
   public async remove(findOneAssignedRoleInput: FindOneAssignedRoleInput): Promise<AssignedRole> {
     const existing = await this.findOne(findOneAssignedRoleInput);
+
+    if (!existing) {
+      const { id, companyUuid } = findOneAssignedRoleInput;
+      throw new NotFoundException(`can't get the assigned role ${id} for the company with uuid ${companyUuid}.`);
+    }
 
     const removed = await this.assignedRoleRepository.remove(existing);
 

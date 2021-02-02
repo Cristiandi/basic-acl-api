@@ -73,24 +73,16 @@ export class ApiKeysService {
     });
   }
 
-  public async findOne(findOneApiKeyInput: FindOneApiKeyInput): Promise<ApiKey> {
-    const { companyUuid } = findOneApiKeyInput;
-
-    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
-
-    if (!company) {
-      throw new NotFoundException(`can't get the company with uuid ${companyUuid}.`);
-    }
-
-    const { id } = findOneApiKeyInput;
-    const existing = await this.apiKeyRepository.findOne(id, {
-      where: {
-        company
-      }
-    });
+  public async findOne(findOneApiKeyInput: FindOneApiKeyInput): Promise<ApiKey | null> {
+    const { id, companyUuid } = findOneApiKeyInput;
+    const existing = await this.apiKeyRepository.createQueryBuilder('ak')
+      .innerJoin('ak.company', 'c')
+      .where('ak.id = :id', { id })
+      .andWhere('c.uuid = :companyUuid', { companyUuid })
+      .getOne();
 
     if (!existing) {
-      throw new NotFoundException(`api key ${id} not found`);
+      return null;
     }
 
     return existing;
@@ -127,6 +119,10 @@ export class ApiKeysService {
 
   public async remove(findOneApiKeyInput: FindOneApiKeyInput): Promise<ApiKey> {
     const existing = await this.findOne(findOneApiKeyInput);
+
+    if (!existing) {
+      throw new NotFoundException(`can't get the api key ${findOneApiKeyInput.id} for the company with uuid ${findOneApiKeyInput.companyUuid}.`);
+    }
 
     const removed = await this.apiKeyRepository.remove(existing);
 

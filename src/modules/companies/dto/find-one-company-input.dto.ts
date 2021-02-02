@@ -1,3 +1,8 @@
-import { FindOneInput } from '../../../common/dto/find-one-input.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsUUID } from 'class-validator';
 
-export class FindOneCompanyInput extends FindOneInput {}
+export class FindOneCompanyInput {
+  @ApiProperty()
+  @IsUUID()
+  readonly companyUuid: string;
+}

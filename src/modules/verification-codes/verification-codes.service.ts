@@ -29,7 +29,7 @@ export class VerificationCodesService {
     return this.verificationCodeRepository.save(created);
   }
 
-  public async findOne(findOneVerificationCode: FindOneVerificationCode): Promise<VerificationCode> {
+  public async findOne(findOneVerificationCode: FindOneVerificationCode): Promise<VerificationCode | null> {
     const { code } = findOneVerificationCode;
 
     const existing = await this.verificationCodeRepository.createQueryBuilder('vc')

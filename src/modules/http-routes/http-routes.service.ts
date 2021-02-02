@@ -26,6 +26,10 @@ export class HttpRoutesService {
 
     const project = await this.projectsService.findOne({ companyUuid, id: `${projectId}` });
 
+    if (!project) {
+      throw new NotFoundException(`can't get the project ${projectId} for the compant with uuid ${companyUuid}.`);
+    }
+
     delete project.company;
 
     const { method, path } = createHttpRouteInput;
@@ -83,24 +87,19 @@ export class HttpRoutesService {
     return data;
   }
 
-  public async findOne(findOneHttpRouteInput: FindOneHttpRouteInput): Promise<HttpRoute> {
+  public async findOne(findOneHttpRouteInput: FindOneHttpRouteInput): Promise<HttpRoute | null> {
     const { companyUuid, id } = findOneHttpRouteInput;
 
-    const count = await this.httpRouteRepository.createQueryBuilder('hr')
-      .select(['hr.id as "id"'])
-      .innerJoin('hr.project', 'p')
+    const existing = await this.httpRouteRepository.createQueryBuilder('hr')
+      .innerJoinAndSelect('hr.project', 'p')
       .innerJoin('p.company', 'c')
       .where('c.uuid = :companyUuid', { companyUuid })
       .andWhere('hr.id = :id', { id })
-      .getCount();
+      .getOne();
 
-    if (!count) {
-      throw new NotFoundException(`can not get the  httpe route ${id} for the company with uuid ${companyUuid}`);
+    if (!existing) {
+      return null;
     }
-
-    const existing = await this.httpRouteRepository.findOne(id, {
-      relations: ['project']
-    });
 
     return existing;
   }
@@ -117,10 +116,20 @@ export class HttpRoutesService {
     if (projectId) {
       const { companyUuid } = findOneHttpRouteInput;
       project = await this.projectsService.findOne({ companyUuid, id: `${projectId}` });
+
+      if (!project) {
+        throw new NotFoundException(`can not get the project ${projectId} for the company with uuid ${companyUuid}`);
+      }
+
       delete project.company;
     } else {
       const { companyUuid } = findOneHttpRouteInput;
       const existing = await this.findOne({ companyUuid, id });
+
+      if (!existing) {
+        throw new NotFoundException(`can not get the  httpe route ${id} for the company with uuid ${companyUuid}`);
+      }
+
       project = existing.project;
     }
 
@@ -159,6 +168,11 @@ export class HttpRoutesService {
 
   public async remove(findOneHttpRouteInput: FindOneHttpRouteInput): Promise<HttpRoute> {
     const existing = await this.findOne(findOneHttpRouteInput);
+
+    if (!existing) {
+      const { id, companyUuid } = findOneHttpRouteInput;
+      throw new NotFoundException(`can not get the  httpe route ${id} for the company with uuid ${companyUuid}`);
+    }
 
     const removed = await this.httpRouteRepository.remove(existing);
 

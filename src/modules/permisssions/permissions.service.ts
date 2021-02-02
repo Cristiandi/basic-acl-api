@@ -34,11 +34,19 @@ export class PermissionsService {
 
     const role = await this.rolesService.findOne({ companyUuid, id: `${roleId}` });
 
+    if (!role) {
+      throw new NotFoundException(`can't get the role ${roleId} for the company with uuid ${companyUuid}.`);
+    }
+
     delete role.company;
 
     const { httpRouteId } = createPermissionInput;
 
     const httpRoute = await this.httpRoutesService.findOne({ companyUuid, id: `${httpRouteId}` });
+
+    if (!httpRoute) {
+      throw new NotFoundException(`can't get the http route ${httpRouteId} for the company with uuid ${companyUuid}.`);
+    }
 
     const compareTo = await this.permissionRepository.find({
       select: ['id'],
@@ -94,24 +102,21 @@ export class PermissionsService {
     return data;
   }
 
-  public async findOne(findOnePermissionInput: FindOnePermissionInput): Promise<Permission> {
+  public async findOne(findOnePermissionInput: FindOnePermissionInput): Promise<Permission | null> {
     const { companyUuid, id } = findOnePermissionInput;
 
-    const count = await this.permissionRepository.createQueryBuilder('p')
-      .select(['p.id as "id"'])
+    const existing = await this.permissionRepository.createQueryBuilder('p')
+      .innerJoinAndSelect('p.role', 'r')
+      .innerJoinAndSelect('p.httpRoute', 'hr')
       .innerJoin('p.role', 'r')
       .innerJoin('r.company', 'c')
       .where('c.uuid = :companyUuid', { companyUuid })
       .andWhere('p.id = :id', { id })
-      .getCount();
+      .getOne();
 
-    if (!count) {
-      throw new NotFoundException(`can not get the  httpe route ${id} for the company with uuid ${companyUuid}`);
+    if (!existing) {
+      return null;
     }
-
-    const existing = await this.permissionRepository.findOne(id, {
-      relations: ['role', 'httpRoute']
-    });
 
     return existing;
   }
@@ -120,6 +125,7 @@ export class PermissionsService {
     findOnePermissionInput: FindOnePermissionInput,
     updatePermissionInput: UpdatePermissionInput
   ): Promise<Permission> {
+    // TODO: improve this code
     const { companyUuid, id } = findOnePermissionInput;
 
     if (!updatePermissionInput) {
@@ -131,9 +137,19 @@ export class PermissionsService {
     let role;
     if (roleId) {
       role = await this.rolesService.findOne({ companyUuid, id: `${roleId}` });
+
+      if (!role) {
+        throw new NotFoundException(`can't get the role ${roleId} for the company with uuid ${companyUuid}.`);
+      }
+
       delete role.company;
     } else {
       const existing = await this.findOne({ companyUuid, id });
+
+      if (!existing) {
+        throw new NotFoundException(`can't get the permission ${id} for the company with uuid ${companyUuid}.`);
+      }
+
       role = existing.role;
     }
 
@@ -142,8 +158,18 @@ export class PermissionsService {
     let httpRoute;
     if (httpRouteId) {
       httpRoute = await this.httpRoutesService.findOne({ companyUuid, id: `${httpRouteId}` });
+
+      if (!httpRoute) {
+        throw new NotFoundException(`can't get the http route ${httpRouteId} for the company with uuid ${companyUuid}.`);
+      }
+
     } else {
       const existing = await this.findOne({ companyUuid, id });
+
+      if (!existing) {
+        throw new NotFoundException(`can't get the permission ${id} for the company with uuid ${companyUuid}.`);
+      }
+
       httpRoute = existing.httpRoute;
     }
 
@@ -161,6 +187,12 @@ export class PermissionsService {
 
   public async remove(findOnePermissionInput: FindOnePermissionInput): Promise<Permission> {
     const existing = await this.findOne(findOnePermissionInput);
+
+    if (!existing) {
+      const { id, companyUuid } = findOnePermissionInput;
+
+      throw new NotFoundException(`can't get the permission ${id} for the company with uuid ${companyUuid}.`);
+    }
 
     return this.permissionRepository.remove(existing);
   }

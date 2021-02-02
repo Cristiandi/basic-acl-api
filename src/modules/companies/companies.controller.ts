@@ -45,7 +45,7 @@ export class CompaniesController {
     description: 'the item.',
     type: Company
   })
-  @Get(':id')
+  @Get(':companyUuid')
   findOne(@Param() findOneCompanyInput: FindOneCompanyInput ): Promise<Company> {
     return this.companiesService.findOne(findOneCompanyInput);
   }
@@ -55,7 +55,7 @@ export class CompaniesController {
     description: 'the updated item.',
     type: Company
   })
-  @Patch(':id')
+  @Patch(':companyUuid')
   update(
     @Param() findOneCompanyInput: FindOneCompanyInput,
     @Body() updateCompanyInput: UpdateCompanyInput
@@ -68,7 +68,7 @@ export class CompaniesController {
     description: 'the removed item.',
     type: Company
   })
-  @Delete(':id')
+  @Delete(':companyUuid')
   remove(@Param() findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
     return this.companiesService.remove(findOneCompanyInput);
   }

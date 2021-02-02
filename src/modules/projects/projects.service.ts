@@ -107,25 +107,17 @@ export class ProjectsService {
      * @returns {Promise<Project>}
      * @memberof ProjectsService
      */
-  public async findOne(findOneProjectInput: FindOneProjectInput): Promise<Project> {
-    const { companyUuid } = findOneProjectInput;
-
-    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
-
-    if (!company) {
-      throw new NotFoundException(`can not get the company with uuid ${companyUuid}.`);
-    }
-
-    const { id } = findOneProjectInput;
-    const existing = await this.projectRepository.findOne(id, {
-      where: {
-        company
-      },
-      relations: ['company']
-    });
+  public async findOne(findOneProjectInput: FindOneProjectInput): Promise<Project | null> {
+    const { id, companyUuid} = findOneProjectInput;
+    
+    const existing = await this.projectRepository.createQueryBuilder('p')
+      .innerJoinAndSelect('p.company', 'c')
+      .where('p.id = :id', { id })
+      .andWhere('c.uuid = :companyUuid', { companyUuid })
+      .getOne();
 
     if (!existing) {
-      throw new NotFoundException(`project ${id} not found`);
+      return null;
     }
 
     return existing;
@@ -192,6 +184,11 @@ export class ProjectsService {
      */
   public async remove(findOneProjectInput: FindOneProjectInput): Promise<Project> {
     const existing = await this.findOne(findOneProjectInput);
+
+    if (!existing) {
+      const { id, companyUuid } = findOneProjectInput;
+      throw new NotFoundException(`can't get the project ${id} for company with uuid ${companyUuid}.`);
+    }
 
     const removed = await this.projectRepository.remove(existing);
 

@@ -106,7 +106,7 @@ export class ConfirmationEmailConfigsService {
    * @return {*}  {Promise<ConfirmationEmailConfig>}
    * @memberof ConfirmationEmailConfigsService
    */
-  public async findOne(findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput): Promise<ConfirmationEmailConfig> {
+  public async findOne(findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput): Promise<ConfirmationEmailConfig | null> {
     const { companyUuid, id } = findOneConfirmationEmailConfigInput;
 
     const existing = await this.confirmationEmailConfigRepository.createQueryBuilder('cec')
@@ -116,7 +116,7 @@ export class ConfirmationEmailConfigsService {
       .getOne();
 
     if (!existing) {
-      throw new NotFoundException(`can't get the confirmation email config ${id} for the company ${companyUuid}.`);
+      return null;
     }
 
     return existing;
@@ -134,16 +134,21 @@ export class ConfirmationEmailConfigsService {
     findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput,
     updateConfirmationEmailConfigInput: UpdateConfirmationEmailConfigInput
   ): Promise<ConfirmationEmailConfig> {
-    await this.findOne(findOneConfirmationEmailConfigInput);
 
-    const { id } = findOneConfirmationEmailConfigInput;
+    const existing = await this.findOne(findOneConfirmationEmailConfigInput);
 
-    const existing = await this.confirmationEmailConfigRepository.preload({
-      id: +id,
+    if (!existing) {
+      const { companyUuid, id } = findOneConfirmationEmailConfigInput;
+
+      throw new NotFoundException(`can't get the confirmation email config ${id} for the company with uuid ${companyUuid}.`);
+    }
+
+    const preloaded = await this.confirmationEmailConfigRepository.preload({
+      id: existing.id,
       ...updateConfirmationEmailConfigInput
     });
 
-    return this.confirmationEmailConfigRepository.save(existing);
+    return this.confirmationEmailConfigRepository.save(preloaded);
   }
 
   /**
@@ -155,6 +160,12 @@ export class ConfirmationEmailConfigsService {
    */
   public async remove(findOneConfirmationEmailConfigInput: FindOneConfirmationEmailConfigInput): Promise<ConfirmationEmailConfig> {
     const existing = await this.findOne(findOneConfirmationEmailConfigInput);
+
+    if (!existing) {
+      const { companyUuid, id } = findOneConfirmationEmailConfigInput;
+
+      throw new NotFoundException(`can't get the confirmation email config ${id} for the company with uuid ${companyUuid}.`);
+    }
 
     const { companyUuid } = findOneConfirmationEmailConfigInput;
 

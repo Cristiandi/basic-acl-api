@@ -107,24 +107,16 @@ export class RolesService {
      * @memberof RolesService
      */
   public async findOne(findOneRoleInput: FindOneRoleInput): Promise<Role> {
-    const { companyUuid } = findOneRoleInput;
+    const { companyUuid, id } = findOneRoleInput;
 
-    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
-
-    if (!company) {
-      throw new NotFoundException(`can not get the company with uuid ${companyUuid}.`);
-    }
-
-    const { id } = findOneRoleInput;
-    const existing = await this.roleRepository.findOne(id, {
-      where: {
-        company
-      },
-      relations: ['company']
-    });
+    const existing = await this.roleRepository.createQueryBuilder('r')
+      .innerJoinAndSelect('r.company', 'c')
+      .where('r.id = :id', { id })
+      .andWhere('c.uuid = :companyUuid', { companyUuid })
+      .getOne();
 
     if (!existing) {
-      throw new NotFoundException(`role ${id} not found`);
+      return null;
     }
 
     return existing;
@@ -192,6 +184,11 @@ export class RolesService {
      */
   public async remove(findOneRoleInput: FindOneRoleInput): Promise<Role> {
     const existing = await this.findOne(findOneRoleInput);
+
+    if (!existing) {
+      const { id, companyUuid } = findOneRoleInput;
+      throw new NotFoundException(`can't get the role ${id} for the company with uuid ${companyUuid}.`);
+    }
 
     const removed = await this.roleRepository.remove(existing);
 

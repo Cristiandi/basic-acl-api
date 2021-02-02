@@ -104,7 +104,7 @@ export class ForgottenPasswordConfigsService {
    * @return {*}  {Promise<ForgottenPasswordConfig>}
    * @memberof ForgottenPasswordConfigsService
    */
-  public async findOne(findOneInput: FindOneInput): Promise<ForgottenPasswordConfig> {
+  public async findOne(findOneInput: FindOneInput): Promise<ForgottenPasswordConfig | null> {
     const { companyUuid, id } = findOneInput;
 
     const existing = await this.forgottenPasswordConfigRepository.createQueryBuilder('fpc')
@@ -114,7 +114,7 @@ export class ForgottenPasswordConfigsService {
       .getOne();
 
     if (!existing) {
-      throw new NotFoundException(`can't get the forgotten password config ${id} for the company ${companyUuid}.`);
+      return null;
     }
 
     return existing;
@@ -132,12 +132,16 @@ export class ForgottenPasswordConfigsService {
     findOneInput: FindOneInput,
     updateInput: UpdateInput
   ): Promise<ForgottenPasswordConfig> {
-    await this.findOne(findOneInput);
+    const existing = await this.findOne(findOneInput);
 
-    const { id } = findOneInput;
+    if (!existing) {
+      const { id, companyUuid } = findOneInput;
+
+      throw new NotFoundException(`can't get the forgotten password config ${id} for the company ${companyUuid}.`);
+    }
 
     const preloaded = await this.forgottenPasswordConfigRepository.preload({
-      id: +id,
+      id: existing.id,
       ...updateInput
     });
 
@@ -153,6 +157,12 @@ export class ForgottenPasswordConfigsService {
    */
   public async remove(findOneInput: FindOneInput): Promise<ForgottenPasswordConfig> {
     const existing = await this.findOne(findOneInput);
+
+    if (!existing) {
+      const { id, companyUuid } = findOneInput;
+
+      throw new NotFoundException(`can't get the forgotten password config ${id} for the company ${companyUuid}.`);
+    }
 
     const { companyUuid } = findOneInput;
 

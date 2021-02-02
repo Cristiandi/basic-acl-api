@@ -1,5 +1,5 @@
 import * as md5 from 'md5';
-import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject, ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject, ForbiddenException, UnauthorizedException, PreconditionFailedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'nestjs-redis';
@@ -166,25 +166,17 @@ export class UsersService {
    * @returns {Promise<User>}
    * @memberof UsersService
    */
-  public async findOne(findOneUserInput: FindOneUserInput): Promise<User> {
-    const { companyUuid } = findOneUserInput;
+  public async findOne(findOneUserInput: FindOneUserInput): Promise<User | null> {
+    const { id, companyUuid } = findOneUserInput;
 
-    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
-
-    if (!company) {
-      throw new NotFoundException(`can not get the company with uuid ${companyUuid}.`);
-    }
-
-    const { id } = findOneUserInput;
-    const existing = await this.usersRepository.findOne(id, {
-      where: {
-        company
-      },
-      relations: ['company']
-    });
+    const existing = await this.usersRepository.createQueryBuilder('u')
+      .innerJoinAndSelect('u.company', 'c')
+      .where('u.id = :id', { id })
+      .andWhere('c.uuid = :companyUuid', { companyUuid })
+      .getOne();
 
     if (!existing) {
-      throw new NotFoundException(`user ${id} not found`);
+      return null;
     }
 
     return existing;
@@ -242,6 +234,12 @@ export class UsersService {
    */
   public async remove(findOneUserInput: FindOneUserInput): Promise<User> {
     const existing = await this.findOne(findOneUserInput);
+
+    if (!existing) {
+      const { id, companyUuid } = findOneUserInput;
+
+      throw new NotFoundException(`can't get the user ${id} for the company with uuid ${companyUuid}.`);
+    }
 
     if (existing.isAdmin) {
       throw new ForbiddenException('can\'t delete an admin user.');
@@ -603,13 +601,11 @@ export class UsersService {
   public async confirmEmail(confirmEmailInput: ConfirmEmailInput): Promise<{ url: string }> {
     const { companyUuid, code } = confirmEmailInput;
 
-    const isTheCodeValid = await this.verificationCodesService.findOne({ code });
-
-    if (!isTheCodeValid) {
-      throw new HttpException(`the code ${code} is not valid.`, HttpStatus.PRECONDITION_FAILED);
-    }
-
     const verificationCode = await this.verificationCodesService.findOne({ code });
+
+    if (!verificationCode) {
+      throw new PreconditionFailedException(`the code ${code} is not valid.`);
+    }
 
     const { email } = verificationCode;
 
@@ -766,13 +762,11 @@ export class UsersService {
 
     const { code } = changeForgottenPasswordInput;
 
-    const isTheCodeValid = await this.verificationCodesService.findOne({ code });
-
-    if (!isTheCodeValid) {
-      throw new HttpException(`the code ${code} is not valid.`, HttpStatus.PRECONDITION_FAILED);
-    }
-
     const verificationCode = await this.verificationCodesService.findOne({ code });
+
+    if (!verificationCode) {
+      throw new PreconditionFailedException(`the code ${code} is not valid.`);
+    }
 
     let redirectUrl = await this.parametersService.getParameterValue({ name: 'SELF_WEB_URL' });
 

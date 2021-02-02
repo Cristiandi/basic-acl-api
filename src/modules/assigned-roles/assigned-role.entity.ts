@@ -12,7 +12,7 @@ export class AssignedRole {
   id: number;
   
   @ApiProperty({ type: () => User })
-  @ManyToOne(type => User, user => user.assignedRoles, { nullable: true })
+  @ManyToOne(type => User, user => user.assignedRoles, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 

@@ -33,7 +33,7 @@ export class GraphqlActionsService {
     const existingProject = await this.projectsService.findOne({ id: '' + projectId, companyUuid });
 
     if (!existingProject) {
-      throw new NotFoundException(`can't get the project ${projectId}.`);
+      throw new NotFoundException(`can't get the project ${projectId} for the company with uuid ${companyUuid}.`);
     }
 
     const { name } = createInput;
@@ -141,10 +141,20 @@ export class GraphqlActionsService {
     if (projectId) {
       const { companyUuid } = findOneInput;
       project = await this.projectsService.findOne({ companyUuid, id: `${projectId}` });
+
+      if (!project) {
+        throw new NotFoundException(`can't get the project ${projectId} for the compant with uuid ${companyUuid}.`);
+      }
+
       delete project.company;
     } else {
       const { companyUuid } = findOneInput;
       const existing = await this.findOne({ companyUuid, id });
+
+      if (!existing) {
+        throw new NotFoundException(`can't get the graphql action ${id} for the company with uuid ${companyUuid}.`);
+      }
+
       project = existing.project;
     }
 
@@ -180,5 +190,20 @@ export class GraphqlActionsService {
     const updated = await this.graphqlActionRepository.save(existing);
 
     return updated;
+  }
+
+  public async delete(findOneInput: FindOneInput): Promise<GraphqlAction> {
+    const existingItem = await this.findOne(findOneInput);
+
+    if (!existingItem) {
+      const { id, companyUuid } = findOneInput;
+      throw new NotFoundException(`can't get the graphql action ${id} for the company ${companyUuid}.`);
+    }
+
+    const removed = await this.graphqlActionRepository.remove(existingItem);
+
+    delete removed.project;
+
+    return removed;
   }
 }

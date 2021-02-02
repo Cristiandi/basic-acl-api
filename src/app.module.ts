@@ -45,7 +45,8 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
         autoLoadEntities: true,
-        synchronize: process.env.NODE_ENV !== 'production'
+        synchronize: process.env.NODE_ENV !== 'production',
+        logging: true
       })
     }),
     CommonModule,
