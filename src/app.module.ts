@@ -21,6 +21,7 @@ import { VerificationCodesModule } from './modules/verification-codes/verificati
 import { ConfirmationEmailConfigsModule } from './modules/confirmation-email-configs/confirmation-email-configs.module';
 import { ParametersModule } from './modules/parameters/parameters.module';
 import { ForgottenPasswordConfigsModule } from './modules/forgotten-password-configs/forgotten-password-configs.module';
+import { GraphqlActionsModule } from './modules/graphql-actions/graphql-actions.module';
 
 import appConfig from './config/app.config';
 import appConfigSchema from './config/app.config.schema';
@@ -59,7 +60,8 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
     VerificationCodesModule,
     ConfirmationEmailConfigsModule,
     ParametersModule,
-    ForgottenPasswordConfigsModule
+    ForgottenPasswordConfigsModule,
+    GraphqlActionsModule
   ],
   controllers: [AppController],
   providers: [AppService]
