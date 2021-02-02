@@ -106,7 +106,7 @@ export class RolesService {
      * @return {*}  {Promise<Role>}
      * @memberof RolesService
      */
-  public async findOne(findOneRoleInput: FindOneRoleInput): Promise<Role> {
+  public async findOne(findOneRoleInput: FindOneRoleInput): Promise<Role | null> {
     const { companyUuid, id } = findOneRoleInput;
 
     const existing = await this.roleRepository.createQueryBuilder('r')
