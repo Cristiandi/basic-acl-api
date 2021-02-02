@@ -213,7 +213,7 @@ export class RolesService {
     const role = await this.roleRepository.createQueryBuilder('r')
       .innerJoin('r.company', 'c')
       .where('c.uuid = :companyUuid', { companyUuid })
-      .where('r.code = :code', { code })
+      .andWhere('r.code = :code', { code })
       .getOne();
 
     if (!role) {

@@ -255,6 +255,8 @@ export class UsersService {
       Logger.error(`Error deleting an user in firebase: ${error.message}`);
     }
 
+    // TODO: delete all assigned roles for the user
+
     const removed = await this.usersRepository.remove(existing);
 
     delete removed.company;
