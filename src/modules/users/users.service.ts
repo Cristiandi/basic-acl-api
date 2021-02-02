@@ -249,7 +249,11 @@ export class UsersService {
 
     const { authUid: uid, company: { uuid: companyUuid } } = existing;
 
-    await this.firebaseAdminService.deleteUser({ companyUuid, uid });
+    try {
+      await this.firebaseAdminService.deleteUser({ companyUuid, uid });  
+    } catch (error) {
+      Logger.error(`Error deleting an user in firebase: ${error.message}`);
+    }
 
     const removed = await this.usersRepository.remove(existing);
 
