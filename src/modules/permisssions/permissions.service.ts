@@ -84,14 +84,19 @@ export class PermissionsService {
         'p.allowed as "allowed"',
         'r.id as "roleId"',
         'r.name as "roleName"',
-        'p2.name as "projectName"',
+        'p2.name as "httpRouteProject"',
         'hr.id as "httpRouteId"',
-        'hr.name as "httpRouteName"'
+        'hr.name as "httpRouteName"',
+        'p3.name as "graphqlActionProject"',
+        'ga.id as "graphqlActionId"',
+        'ga.name as "graphqlActionName"'
       ])
       .innerJoin('p.role', 'r')
-      .innerJoin('p.httpRoute', 'hr')
       .innerJoin('r.company', 'c')
-      .innerJoin('hr.project', 'p2')
+      .leftJoin('p.httpRoute', 'hr')
+      .leftJoin('hr.project', 'p2')
+      .leftJoin('p.graphqlAction', 'ga')
+      .leftJoin('ga.project', 'p3')
       .where('c.uuid = :companyUuid', { companyUuid })
       .take(limit || undefined)
       .skip(offset)
