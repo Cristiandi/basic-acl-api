@@ -103,6 +103,7 @@ export class GraphqlActionsService {
     const data = await this.graphqlActionRepository.createQueryBuilder('ga')
       .select([
         'ga.id as "id"',
+        'ga.name as "name"',
         'ga.is_query as "isQuery"',
         'ga.is_mutation as "isMutation"',
         'p.id as "projectId"',
