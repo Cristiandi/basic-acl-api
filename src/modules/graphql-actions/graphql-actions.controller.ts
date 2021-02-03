@@ -24,12 +24,12 @@ export class GraphqlActionsController {
   }
 
   @Patch(':companyUuid/:id')
-  public update(findOne: FindOneInput, updateInput: UpdateInput): Promise<any> {
-    return this.service.update(findOne, updateInput);
+  public update(@Param() findOneInput: FindOneInput,@Body() updateInput: UpdateInput): Promise<any> {
+    return this.service.update(findOneInput, updateInput);
   }
 
   @Delete(':companyUuid/:id')
-  public delete(findOneInput: FindOneInput): Promise<any> {
+  public delete(@Param() findOneInput: FindOneInput): Promise<any> {
     return this.service.delete(findOneInput);
   }
 }

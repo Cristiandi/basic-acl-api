@@ -62,6 +62,8 @@ export class GraphqlActionsService {
 
     const saved = await this.graphqlActionRepository.save(created);
 
+    delete saved.project;
+
     return saved;
   }
 
@@ -75,22 +77,14 @@ export class GraphqlActionsService {
   public async findOne(findOneInput: FindOneInput): Promise<GraphqlAction | null> {
     const { companyUuid, id } = findOneInput;
 
-    const count = await this.graphqlActionRepository.createQueryBuilder('ga')
-      .select(['ga.id as "id"'])
-      .innerJoin('hr.project', 'p')
+    const existing = await this.graphqlActionRepository.createQueryBuilder('ga')
+      .innerJoin('ga.project', 'p')
       .innerJoin('p.company', 'c')
       .where('c.uuid = :companyUuid', { companyUuid })
       .andWhere('ga.id = :id', { id })
-      .getCount();
-
-    if (!count) return null;
-
-    const existing = await this.graphqlActionRepository.createQueryBuilder('ga')
-      .innerJoinAndSelect('ga.project', 'p')
-      .where('ga.id = :id', { id })
       .getOne();
 
-    return existing;
+    return existing || null;
   }
 
   /**
@@ -114,12 +108,12 @@ export class GraphqlActionsService {
         'p.id as "projectId"',
         'p.name as "projectName"'
       ])
-      .innerJoin('hr.project', 'p')
+      .innerJoin('ga.project', 'p')
       .innerJoin('p.company', 'c')
       .where('c.uuid = :companyUuid', { companyUuid })
       .take(limit || undefined)
       .skip(offset)
-      .orderBy('hr.id', 'DESC')
+      .orderBy('ga.id', 'DESC')
       .execute();
 
     return data;
@@ -133,7 +127,20 @@ export class GraphqlActionsService {
    * @memberof GraphqlActionsService
    */
   public async update(findOneInput: FindOneInput, updateInput: UpdateInput): Promise<GraphqlAction> {
-    const { id } = findOneInput;
+    const { id, companyUuid } = findOneInput;
+
+    const existing = await this.findOne({ id, companyUuid });
+
+    if (!existing) {
+      throw new NotFoundException(`can't get the graphql action ${id} for the company with uuid ${companyUuid}.`);
+    }
+
+    if (!updateInput) {
+      delete existing.project;
+
+      return existing;
+    }
+
     const { projectId } = updateInput;
 
     let project;
@@ -148,29 +155,18 @@ export class GraphqlActionsService {
 
       delete project.company;
     } else {
-      const { companyUuid } = findOneInput;
-      const existing = await this.findOne({ companyUuid, id });
-
-      if (!existing) {
-        throw new NotFoundException(`can't get the graphql action ${id} for the company with uuid ${companyUuid}.`);
-      }
-
       project = existing.project;
     }
 
     const { name, isQuery, isMutation } = updateInput;
 
-    const existing = await this.graphqlActionRepository.preload({
-      id: +id,
+    const preloaded = await this.graphqlActionRepository.preload({
+      id: existing.id,
       name,
       isMutation,
       isQuery,
       project
     });
-
-    if (!existing) {
-      throw new NotFoundException(`graphql action ${id} not found.`);
-    }
 
     const compareTo = await this.graphqlActionRepository.find({
       where: {
@@ -182,12 +178,14 @@ export class GraphqlActionsService {
     if (compareTo.length) {
       const [graphqlToCompare] = compareTo;
 
-      if (graphqlToCompare.id !== existing.id) {
+      if (graphqlToCompare.id !== preloaded.id) {
         throw new PreconditionFailedException('other graphql action already exists for the project.');
       }
     }
 
-    const updated = await this.graphqlActionRepository.save(existing);
+    const updated = await this.graphqlActionRepository.save(preloaded);
+
+    delete updated.project;
 
     return updated;
   }
