@@ -190,6 +190,7 @@ export class HttpRoutesService {
       .innerJoin('r.assignedRoles', 'ar')
       .innerJoin('ar.user', 'u')
       .where('u.id = :userId', { userId })
+      .andWhere('p.allowed = true')
       .orderBy('hr.path', 'DESC');
 
     return query.getMany();

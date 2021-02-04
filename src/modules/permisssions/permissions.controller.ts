@@ -15,12 +15,14 @@ import { FindAllPermissionsQueryInput } from './dto/find-all-permissions-query-i
 import { FindOnePermissionInput } from './dto/find-one-permission-input.dto';
 import { UpdatePermissionInput } from './dto/update-permission-input.dto';
 import { CheckPermissionOutput } from './dto/check-permission-output.dto';
+import { CheckPermissionGraphqlInput } from './dto/check-permission-graphql-input.dto';
+import { CheckPermissionGraphqlOutput } from './dto/check-permission-graphql.-output.dto';
 
 @ApiTags('permissions')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('permissions')
 export class PermisssionsController {
-  constructor (private  readonly permissionsService: PermissionsService) {}
+  constructor(private readonly permissionsService: PermissionsService) { }
 
   @ApiResponse({
     status: 200,
@@ -78,5 +80,17 @@ export class PermisssionsController {
   @Post('/check')
   check(@Body() checkPermissionInput: CheckPermissionInput): Promise<CheckPermissionOutput> {
     return this.permissionsService.checkPermission(checkPermissionInput);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'object',
+    type: CheckPermissionGraphqlOutput
+  })
+  @HitsWatcher(10, 60)
+  @Public()
+  @Post('/check-graphql')
+  public checkPermissionGraphql(@Body() checkPermissionGraphqlInput: CheckPermissionGraphqlInput): Promise<CheckPermissionGraphqlOutput> {
+    return this.permissionsService.checkPermissionGraphql(checkPermissionGraphqlInput);
   }
 }

@@ -18,6 +18,8 @@ import { FindOnePermissionInput } from './dto/find-one-permission-input.dto';
 import { UpdatePermissionInput } from './dto/update-permission-input.dto';
 import { CheckPermissionInput } from './dto/check-permission-input.dto';
 import { CheckPermissionOutput } from './dto/check-permission-output.dto';
+import { CheckPermissionGraphqlInput } from './dto/check-permission-graphql-input.dto';
+import { CheckPermissionGraphqlOutput } from './dto/check-permission-graphql.-output.dto';
 
 @Injectable()
 export class PermissionsService {
@@ -291,7 +293,67 @@ export class PermissionsService {
     if (!allowedRoute) {
       return {
         allowed: false,
-        reason: 'the user does not have this routed as assigned.'
+        reason: 'the user does not have this routed as assigned and allowed.'
+      };
+    }
+
+    return {
+      allowed: true,
+      reason: 'so far, so good.'
+    };
+  }
+
+  /**
+   *
+   *
+   * @param {CheckPermissionGraphqlInput} checkPermissionGraphqlInput
+   * @return {*}  {Promise<CheckPermissionGraphqlOutput>}
+   * @memberof PermissionsService
+   */
+  public async checkPermissionGraphql(checkPermissionGraphqlInput: CheckPermissionGraphqlInput) : Promise<CheckPermissionGraphqlOutput>{
+    const { companyUuid, projectCode } = checkPermissionGraphqlInput;
+
+    const project = await this.projectsService.getProjectByCompanyAndCode({ companyUuid, code: projectCode });
+
+    if (!project) {
+      return {
+        allowed: false,
+        reason: `can't get a project for the company ${companyUuid} and code ${projectCode}.`
+      };
+    };
+
+    const { graphqlActionName } = checkPermissionGraphqlInput;
+
+    const graphqlAction = await this.graphqlActionsService.getByNameAndProject({
+      name: graphqlActionName,
+      projectId: project.id
+    });
+
+    if (!graphqlAction) {
+      return {
+        allowed: false,
+        reason: `can't get a graphql action with name ${graphqlActionName} and for the project with code ${projectCode}.`
+      };
+    }
+
+    const { token } = checkPermissionGraphqlInput;
+
+    const user = await this.usersService.getUserByToken({ companyUuid, token });
+
+    const permission = await this.permissionRepository.createQueryBuilder('p')
+      .innerJoin('p.graphqlAction', 'ga')
+      .innerJoin('p.role', 'r')
+      .innerJoin('r.assignedRoles', 'ar')
+      .innerJoin('ar.user', 'u')
+      .where('u.id = :userId', { userId: user.id })
+      .andWhere('ga.id = :graphqlActionId', { graphqlActionId: graphqlAction.id })
+      .andWhere('p.allowed = true')
+      .getOne();
+
+    if (!permission) {
+      return {
+        allowed: false,
+        reason: 'the user does not have this graphql action as assigned and allowed.'
       };
     }
 

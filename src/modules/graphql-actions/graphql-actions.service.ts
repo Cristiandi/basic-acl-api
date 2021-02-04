@@ -11,6 +11,7 @@ import { FindOneInput } from './dto/find-one-input.dto';
 import { ListParamInput } from './dto/list-param-input.dto';
 import { ListQueryInput } from './dto/list-query-input.dto';
 import { UpdateInput } from './dto/update-input.dto';
+import { GetByNameAndProjectInput } from './dto/get-by-name-and-project-input.dto';
 
 @Injectable()
 export class GraphqlActionsService {
@@ -204,5 +205,16 @@ export class GraphqlActionsService {
     delete removed.project;
 
     return removed;
+  }
+
+  public async getByNameAndProject(getByNameAndProjectInput: GetByNameAndProjectInput): Promise<GraphqlAction | null> {
+    const { name, projectId } = getByNameAndProjectInput;
+
+    const existing = await this.graphqlActionRepository.createQueryBuilder('ga')
+      .where('ga.name = :name', { name })
+      .andWhere('ga.project_id = :projectId', { projectId })
+      .getOne();
+
+    return existing || null;
   }
 }

@@ -709,6 +709,13 @@ export class UsersService {
     );
   }
 
+  /**
+   *
+   *
+   * @private
+   * @param {SendUpdatedPasswordNotificationEmailInput} sendUpdatedPasswordNotificationEmailInput
+   * @memberof UsersService
+   */
   private async sendUpdatedPasswordNotificationEmail(
     sendUpdatedPasswordNotificationEmailInput: SendUpdatedPasswordNotificationEmailInput
   ) {
@@ -745,6 +752,13 @@ export class UsersService {
     );
   }
 
+  /**
+   *
+   *
+   * @param {ChangeForgottenPasswordInput} changeForgottenPasswordInput
+   * @return {*}  {Promise<any>}
+   * @memberof UsersService
+   */
   public async changeForgottenPassword(changeForgottenPasswordInput: ChangeForgottenPasswordInput): Promise<any> {
     const { password, confirmedPassword } = changeForgottenPasswordInput;
 
