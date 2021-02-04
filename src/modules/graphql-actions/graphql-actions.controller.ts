@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { GraphqlActionsService } from './graphql-actions.service';
 
@@ -8,6 +9,7 @@ import { ListQueryInput } from './dto/list-query-input.dto';
 import { FindOneInput } from './dto/find-one-input.dto';
 import { UpdateInput } from './dto/update-input.dto';
 
+@ApiTags('graphql-actions')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('graphql-actions')
 export class GraphqlActionsController {
