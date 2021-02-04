@@ -13,6 +13,7 @@ import { ProjectsModule } from '../projects/projects.module';
     ProjectsModule
   ],
   providers: [GraphqlActionsService],
-  controllers: [GraphqlActionsController]
+  controllers: [GraphqlActionsController],
+  exports: [GraphqlActionsService]
 })
 export class GraphqlActionsModule {}

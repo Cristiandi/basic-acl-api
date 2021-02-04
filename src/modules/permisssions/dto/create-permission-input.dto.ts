@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsInt, IsUUID } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsUUID } from 'class-validator';
 
 export class CreatePermissionInput {
   @ApiProperty()
@@ -15,6 +15,12 @@ export class CreatePermissionInput {
   readonly roleId: number;
 
   @ApiProperty()
+  @IsOptional()
   @IsInt()
-  readonly httpRouteId: number;
+  readonly httpRouteId?: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsInt()
+  readonly graphqlActionId?: number;
 }

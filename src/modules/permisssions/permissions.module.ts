@@ -11,6 +11,7 @@ import { RolesModule } from '../roles/roles.module';
 import { HttpRoutesModule } from '../http-routes/http-routes.module';
 import { ProjectsModule } from '../projects/projects.module';
 import { UsersModule } from '../users/users.module';
+import { GraphqlActionsModule } from '../graphql-actions/graphql-actions.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { UsersModule } from '../users/users.module';
     RolesModule,
     HttpRoutesModule,
     ProjectsModule,
-    UsersModule
+    UsersModule,
+    GraphqlActionsModule
   ],
   providers: [PermissionsService],
   controllers: [PermisssionsController],

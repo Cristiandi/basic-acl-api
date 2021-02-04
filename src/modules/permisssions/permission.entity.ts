@@ -6,7 +6,7 @@ import { HttpRoute } from '../http-routes/http-route.entity';
 import { Role } from '../roles/role.entity';
 
 @Entity({ name: 'permissions' })
-@Unique('uk_permissions', ['role', 'httpRoute'])
+@Unique('uk_permissions', ['role', 'httpRoute', 'graphqlAction'])
 export class Permission {
   @ApiProperty()
   @PrimaryGeneratedColumn()

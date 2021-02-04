@@ -16,4 +16,9 @@ export class UpdatePermissionInput {
   @IsInt()
   @IsOptional()
   readonly httpRouteId?: number;
+
+  @ApiPropertyOptional()
+  @IsInt()
+  @IsOptional()
+  readonly graphqlActionId?: number;
 }

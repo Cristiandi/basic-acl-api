@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException, PreconditionFailedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { pathToRegexp } from 'path-to-regexp';
@@ -7,6 +7,9 @@ import { Permission } from './permission.entity';
 
 import { HttpRoutesService } from '../http-routes/http-routes.service';
 import { RolesService } from '../roles/roles.service';
+import { GraphqlActionsService } from '../graphql-actions/graphql-actions.service';
+import { ProjectsService } from '../projects/projects.service';
+import { UsersService } from '../users/users.service';
 
 import { CreatePermissionInput } from './dto/create-permission-input.dto';
 import { FindAllPermissionsParamInput } from './dto/find-all-permissions-param-input.dto';
@@ -14,8 +17,6 @@ import { FindAllPermissionsQueryInput } from './dto/find-all-permissions-query-i
 import { FindOnePermissionInput } from './dto/find-one-permission-input.dto';
 import { UpdatePermissionInput } from './dto/update-permission-input.dto';
 import { CheckPermissionInput } from './dto/check-permission-input.dto';
-import { ProjectsService } from '../projects/projects.service';
-import { UsersService } from '../users/users.service';
 import { CheckPermissionOutput } from './dto/check-permission-output.dto';
 
 @Injectable()
@@ -26,7 +27,8 @@ export class PermissionsService {
     private readonly rolesService: RolesService,
     private readonly httpRoutesService: HttpRoutesService,
     private readonly projectsService: ProjectsService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly graphqlActionsService: GraphqlActionsService
   ) { }
 
   public async create(createPermissionInput: CreatePermissionInput): Promise<Permission> {
@@ -40,34 +42,60 @@ export class PermissionsService {
 
     delete role.company;
 
-    const { httpRouteId } = createPermissionInput;
+    const { httpRouteId = null, graphqlActionId = null } = createPermissionInput;
 
-    const httpRoute = await this.httpRoutesService.findOne({ companyUuid, id: `${httpRouteId}` });
-
-    if (!httpRoute) {
-      throw new NotFoundException(`can't get the http route ${httpRouteId} for the company with uuid ${companyUuid}.`);
+    if (!httpRouteId && !graphqlActionId) {
+      throw new PreconditionFailedException('at leat httpRouteId or graphqlActionId needs to have a value.');
     }
 
-    const compareTo = await this.permissionRepository.find({
+    if (httpRouteId && graphqlActionId) {
+      throw new PreconditionFailedException('httpRouteId and graphqlActionId can\'t have value at same time.');
+    }
+
+    let httpRoute = null;
+
+    if (httpRouteId) {
+      httpRoute = await this.httpRoutesService.findOne({ companyUuid, id: `${httpRouteId}` });
+
+      if (!httpRoute) {
+        throw new NotFoundException(`can't get the http route ${httpRouteId} for the company with uuid ${companyUuid}.`);
+      }
+    }
+
+    let graphqlAction = null;
+
+    if (graphqlActionId) {
+      graphqlAction = await this.graphqlActionsService.findOne({ companyUuid, id: '' + graphqlActionId });
+
+      if (!graphqlAction) {
+        throw new NotFoundException(`can't get the graphql action ${graphqlActionId} for the company with uuid ${companyUuid}.`);
+      }
+    }
+
+    const existing = await this.permissionRepository.findOne({
       select: ['id'],
       where: {
         role,
-        httpRoute
+        httpRoute,
+        graphqlAction
       }
     });
 
-    if (compareTo.length) {
-      throw new HttpException(`already exists a permission for the role ${roleId} and the http route ${httpRouteId}.`, HttpStatus.PRECONDITION_FAILED);
+    if (existing) {
+      throw new PreconditionFailedException(`already exists a permission for the role ${roleId}, the http route ${httpRouteId} and graphql action ${graphqlActionId}.`);
     }
 
     const { allowed } = createPermissionInput;
     const created = this.permissionRepository.create({
       allowed,
       role,
-      httpRoute
+      httpRoute,
+      graphqlAction
     });
 
-    return this.permissionRepository.save(created);
+    const saved = this.permissionRepository.save(created);
+
+    return saved;
   }
 
   public async findAll(
@@ -112,9 +140,9 @@ export class PermissionsService {
 
     const existing = await this.permissionRepository.createQueryBuilder('p')
       .innerJoinAndSelect('p.role', 'r')
-      .innerJoinAndSelect('p.httpRoute', 'hr')
-      .innerJoin('p.role', 'r')
       .innerJoin('r.company', 'c')
+      .leftJoinAndSelect('p.httpRoute', 'hr')
+      .leftJoinAndSelect('p.graphqlAction', 'ga')
       .where('c.uuid = :companyUuid', { companyUuid })
       .andWhere('p.id = :id', { id })
       .getOne();
@@ -133,8 +161,14 @@ export class PermissionsService {
     // TODO: improve this code
     const { companyUuid, id } = findOnePermissionInput;
 
+    const existing = await this.findOne({ companyUuid, id });
+
+    if (!existing) {
+      throw new NotFoundException(`can't get the permission ${id} for the company with uuid ${companyUuid}.`);
+    }
+
     if (!updatePermissionInput) {
-      throw new BadRequestException('updatePermissionInput is empty');
+      return existing;
     }
 
     const { roleId } = updatePermissionInput;
@@ -149,12 +183,6 @@ export class PermissionsService {
 
       delete role.company;
     } else {
-      const existing = await this.findOne({ companyUuid, id });
-
-      if (!existing) {
-        throw new NotFoundException(`can't get the permission ${id} for the company with uuid ${companyUuid}.`);
-      }
-
       role = existing.role;
     }
 
@@ -169,25 +197,33 @@ export class PermissionsService {
       }
 
     } else {
-      const existing = await this.findOne({ companyUuid, id });
-
-      if (!existing) {
-        throw new NotFoundException(`can't get the permission ${id} for the company with uuid ${companyUuid}.`);
-      }
-
       httpRoute = existing.httpRoute;
+    }
+
+    const { graphqlActionId } = updatePermissionInput;
+    
+    let graphqlAction;
+    if (graphqlActionId) {
+      graphqlAction = await this.graphqlActionsService.findOne({ companyUuid, id: '' + graphqlActionId });
+
+      if (!graphqlAction) {
+        throw new NotFoundException(`can't get the graphql action ${graphqlActionId} for the company with uuid ${companyUuid}.`);
+      }
     }
 
     const { allowed } = updatePermissionInput;
 
-    const existing = await this.permissionRepository.preload({
-      id: +id,
+    const preloaded = await this.permissionRepository.preload({
+      id: existing.id,
       allowed,
       role,
-      httpRoute
+      httpRoute,
+      graphqlAction
     });
 
-    return this.permissionRepository.save(existing);
+    const saved = await this.permissionRepository.save(preloaded);
+
+    return saved;
   }
 
   public async remove(findOnePermissionInput: FindOnePermissionInput): Promise<Permission> {
