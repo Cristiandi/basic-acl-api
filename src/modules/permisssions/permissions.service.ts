@@ -33,6 +33,13 @@ export class PermissionsService {
     private readonly graphqlActionsService: GraphqlActionsService
   ) { }
 
+  /**
+   *
+   *
+   * @param {CreatePermissionInput} createPermissionInput
+   * @return {*}  {Promise<Permission>}
+   * @memberof PermissionsService
+   */
   public async create(createPermissionInput: CreatePermissionInput): Promise<Permission> {
     const { companyUuid, roleId } = createPermissionInput;
 
@@ -100,6 +107,14 @@ export class PermissionsService {
     return saved;
   }
 
+  /**
+   *
+   *
+   * @param {FindAllPermissionsParamInput} findAllPermissionsParamInput
+   * @param {FindAllPermissionsQueryInput} findAllPermissionsQueryInput
+   * @return {*}  {Promise<Permission[]>}
+   * @memberof PermissionsService
+   */
   public async findAll(
     findAllPermissionsParamInput: FindAllPermissionsParamInput,
     findAllPermissionsQueryInput: FindAllPermissionsQueryInput
@@ -137,6 +152,13 @@ export class PermissionsService {
     return data;
   }
 
+  /**
+   *
+   *
+   * @param {FindOnePermissionInput} findOnePermissionInput
+   * @return {*}  {(Promise<Permission | null>)}
+   * @memberof PermissionsService
+   */
   public async findOne(findOnePermissionInput: FindOnePermissionInput): Promise<Permission | null> {
     const { companyUuid, id } = findOnePermissionInput;
 
@@ -156,6 +178,14 @@ export class PermissionsService {
     return existing;
   }
 
+  /**
+   *
+   *
+   * @param {FindOnePermissionInput} findOnePermissionInput
+   * @param {UpdatePermissionInput} updatePermissionInput
+   * @return {*}  {Promise<Permission>}
+   * @memberof PermissionsService
+   */
   public async update(
     findOnePermissionInput: FindOnePermissionInput,
     updatePermissionInput: UpdatePermissionInput
@@ -228,6 +258,13 @@ export class PermissionsService {
     return saved;
   }
 
+  /**
+   *
+   *
+   * @param {FindOnePermissionInput} findOnePermissionInput
+   * @return {*}  {Promise<Permission>}
+   * @memberof PermissionsService
+   */
   public async remove(findOnePermissionInput: FindOnePermissionInput): Promise<Permission> {
     const existing = await this.findOne(findOnePermissionInput);
 
@@ -240,6 +277,13 @@ export class PermissionsService {
     return this.permissionRepository.remove(existing);
   }
 
+  /**
+   *
+   *
+   * @param {CheckPermissionInput} checkPermissionInput
+   * @return {*}  {Promise<CheckPermissionOutput>}
+   * @memberof PermissionsService
+   */
   public async checkPermission(checkPermissionInput: CheckPermissionInput): Promise<CheckPermissionOutput> {
     const { companyUuid, projectCode } = checkPermissionInput;
 
