@@ -13,6 +13,7 @@ import { FindAllAssignedRolesParamInput } from './dto/find-all-assigned-roles-pa
 import { FindAllAssignedRolesQueryInput } from './dto/find-alll-assigned-roles-query-input.dto';
 import { FindOneAssignedRoleInput } from './dto/find-one-assigned-role-input.dto';
 import { AssignInput } from './dto/assign-input.dto';
+import { GetUserAssignedRolesInput } from './dto/get-user-assigned-roles-input.dto';
 
 @Injectable()
 export class AssignedRolesService {
@@ -207,5 +208,26 @@ export class AssignedRolesService {
     const createdAssignedRole = await this.create({ companyUuid, roleId: role.id, userId: user.id });
 
     return createdAssignedRole;
+  }
+
+  /**
+   *
+   *
+   * @param {GetUserAssignedRolesInput} getUserAssignedRolesInput
+   * @return {*}  {Promise<AssignedRole[]>}
+   * @memberof AssignedRolesService
+   */
+  public async getUserAssignedRoles(getUserAssignedRolesInput: GetUserAssignedRolesInput): Promise<AssignedRole[]> {
+    const { authUid, companyUuid } = getUserAssignedRolesInput;
+
+    const userAssignedRoles = await this.assignedRoleRepository.createQueryBuilder('ar')
+      .innerJoinAndSelect('ar.role', 'r')
+      .innerJoin('r.company', 'c')
+      .innerJoin('ar.user', 'u')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.authUid = :authUid', { authUid })
+      .getMany();
+
+    return userAssignedRoles;
   }
 }

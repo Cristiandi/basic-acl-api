@@ -9,6 +9,7 @@ import { CreateAssignedRoleInput } from './dto/create-assigned-role-input.dto';
 import { FindAllAssignedRolesParamInput } from './dto/find-all-assigned-roles-param-input.dto';
 import { FindAllAssignedRolesQueryInput } from './dto/find-alll-assigned-roles-query-input.dto';
 import { FindOneAssignedRoleInput } from './dto/find-one-assigned-role-input.dto';
+import { GetUserAssignedRolesInput } from './dto/get-user-assigned-roles-input.dto';
 
 @ApiTags('assigned-roles')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -45,7 +46,17 @@ export class AssignedRolesController {
     type: AssignedRole
   })
   @Delete(':companyUuid/:id')
-  remove(@Param() findOneAssignedRoleInput: FindOneAssignedRoleInput): Promise<any> {
+  remove(@Param() findOneAssignedRoleInput: FindOneAssignedRoleInput): Promise<AssignedRole> {
     return this.assignedRolesService.remove(findOneAssignedRoleInput);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'the items.',
+    type: [AssignedRole]
+  })
+  @Get('/user/:companyUuid/:authUid')
+  getUserAssignedRoles(@Param() getUserAssignedRolesInput: GetUserAssignedRolesInput): Promise<any> {
+    return this.assignedRolesService.getUserAssignedRoles(getUserAssignedRolesInput);
   }
 }
