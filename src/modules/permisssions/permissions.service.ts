@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException, PreconditionFailedException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException, PreconditionFailedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { pathToRegexp } from 'path-to-regexp';
+import { ConfigType } from '@nestjs/config';
+import * as SparkMD5 from 'spark-md5';
+
+import appConfig from '../../config/app.config';
 
 import { Permission } from './permission.entity';
 
@@ -10,6 +14,7 @@ import { RolesService } from '../roles/roles.service';
 import { GraphqlActionsService } from '../graphql-actions/graphql-actions.service';
 import { ProjectsService } from '../projects/projects.service';
 import { UsersService } from '../users/users.service';
+import { RedisService } from 'nestjs-redis';
 
 import { CreatePermissionInput } from './dto/create-permission-input.dto';
 import { FindAllPermissionsParamInput } from './dto/find-all-permissions-param-input.dto';
@@ -24,13 +29,16 @@ import { CheckPermissionGraphqlOutput } from './dto/check-permission-graphql.-ou
 @Injectable()
 export class PermissionsService {
   constructor(
+    @Inject(appConfig.KEY)
+    private readonly appConfiguration: ConfigType<typeof appConfig>,
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
     private readonly rolesService: RolesService,
     private readonly httpRoutesService: HttpRoutesService,
     private readonly projectsService: ProjectsService,
     private readonly usersService: UsersService,
-    private readonly graphqlActionsService: GraphqlActionsService
+    private readonly graphqlActionsService: GraphqlActionsService,
+    private readonly redisService: RedisService
   ) { }
 
   /**
@@ -347,6 +355,10 @@ export class PermissionsService {
     };
   }
 
+  private async setValueInRedis(redisClient: any, key: string, value: any, ttl: number): Promise<any> {
+    await redisClient.set(key, JSON.stringify(value), 'EX', ttl);
+  }
+
   /**
    *
    *
@@ -355,18 +367,44 @@ export class PermissionsService {
    * @memberof PermissionsService
    */
   public async checkPermissionGraphql(checkPermissionGraphqlInput: CheckPermissionGraphqlInput) : Promise<CheckPermissionGraphqlOutput>{
-    const { companyUuid, projectCode } = checkPermissionGraphqlInput;
+    const { companyUuid, projectCode, token, graphqlActionName } = checkPermissionGraphqlInput;
+
+    // get the client name
+    const {
+      redis: { clientName }
+    } = this.appConfiguration;
+
+
+    // get the redis client
+    const redisClient = await this.redisService.getClient(clientName);
+
+    // define the key
+    const key = SparkMD5.hash(`${companyUuid}|${graphqlActionName}|${token}`);
+
+    // try to get the key value
+    const unParsedKeyValue = await redisClient.get(key);
+
+    // if i get some value
+    if (unParsedKeyValue) {
+      // try to parse
+      const parsedKeyValue = JSON.parse(unParsedKeyValue);
+
+      return parsedKeyValue;
+    }
 
     const project = await this.projectsService.getProjectByCompanyAndCode({ companyUuid, code: projectCode });
 
     if (!project) {
-      return {
+      const response = {
         allowed: false,
         reason: `can't get a project for the company ${companyUuid} and code ${projectCode}.`
       };
-    };
 
-    const { graphqlActionName } = checkPermissionGraphqlInput;
+      this.setValueInRedis(redisClient, key, response, 3599)
+        .catch(err => Logger.error(err));
+
+      return response;
+    };
 
     const graphqlAction = await this.graphqlActionsService.getByNameAndProject({
       name: graphqlActionName,
@@ -374,13 +412,16 @@ export class PermissionsService {
     });
 
     if (!graphqlAction) {
-      return {
+      const response = {
         allowed: false,
         reason: `can't get a graphql action with name ${graphqlActionName} and for the project with code ${projectCode}.`
       };
-    }
 
-    const { token } = checkPermissionGraphqlInput;
+      this.setValueInRedis(redisClient, key, response, 3599)
+        .catch(err => Logger.error(err));
+
+      return response;
+    }
 
     const user = await this.usersService.getUserByToken({ companyUuid, token });
 
@@ -395,15 +436,25 @@ export class PermissionsService {
       .getOne();
 
     if (!permission) {
-      return {
+      const response = {
         allowed: false,
         reason: 'the user does not have this graphql action as assigned and allowed.'
       };
+
+      this.setValueInRedis(redisClient, key, response, 3599)
+        .catch(err => Logger.error(err));
+
+      return response;
     }
 
-    return {
+    const response = {
       allowed: true,
       reason: 'so far, so good.'
     };
+
+    this.setValueInRedis(redisClient, key, response, 3599)
+      .catch(err => Logger.error(err));
+
+    return response;
   }
 }

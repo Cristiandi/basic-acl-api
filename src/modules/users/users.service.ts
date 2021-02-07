@@ -1,4 +1,4 @@
-import * as md5 from 'md5';
+import * as SparkMD5 from 'spark-md5';
 import { Injectable, HttpException, HttpStatus, Logger, NotFoundException, forwardRef, Inject, ForbiddenException, UnauthorizedException, PreconditionFailedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -282,7 +282,7 @@ export class UsersService {
     const redisClient = await this.redisService.getClient(clientName);
 
     // define the key
-    const key = md5(`${companyUuid}|${email}|${password}`);
+    const key = SparkMD5.hash(`${companyUuid}|${email}|${password}`);
 
     // try to get the key value
     const unParsedKeyValue = await redisClient.get(key);

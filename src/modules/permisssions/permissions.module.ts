@@ -1,5 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+import { RedisModule } from 'nestjs-redis';
+
+import appConfig from '../../config/app.config';
 
 import { Permission } from './permission.entity';
 
@@ -15,12 +19,21 @@ import { GraphqlActionsModule } from '../graphql-actions/graphql-actions.module'
 
 @Module({
   imports: [
+    ConfigModule.forFeature(appConfig),
     TypeOrmModule.forFeature([Permission]),
     RolesModule,
     HttpRoutesModule,
     ProjectsModule,
     UsersModule,
-    GraphqlActionsModule
+    GraphqlActionsModule,
+    RedisModule.forRootAsync({
+      useFactory: () => ({
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
+        password: process.env.REDIS_PASSWORD,
+        name: process.env.REDIS_CLIENT_NAME
+      })
+    })
   ],
   providers: [PermissionsService],
   controllers: [PermisssionsController],
