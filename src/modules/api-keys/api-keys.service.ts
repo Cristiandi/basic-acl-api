@@ -36,7 +36,7 @@ export class ApiKeysService {
     const created = this.apiKeyRepository.create({
       company,
       enable: true,
-      value: `${prefix}-${generateUuid()}`
+      value: `${prefix}-${generateUuid(10)}`
     });
 
     const saved = await this.apiKeyRepository.save(created);

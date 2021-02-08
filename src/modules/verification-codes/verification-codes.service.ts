@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { nanoid } from 'nanoid';
 
 import { VerificationCode } from './verification-code.entity';
+
+import { generateUuid } from './../../utils';
 
 import { CreateVerificationCodeInput } from './dto/create-verification-code-input.dto';
 import { ValidVerificationCode } from './dto/valid-verification-code-input.dto';
@@ -20,7 +21,7 @@ export class VerificationCodesService {
     const { expirationDate, type, email } = createVerificationCodeInput;
 
     const created = this.verificationCodeRepository.create({
-      code: nanoid(10),
+      code: generateUuid(10),
       expirationDate,
       type,
       email

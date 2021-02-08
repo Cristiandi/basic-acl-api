@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, NotFoundException, PreconditionFailedException } from '@nestjs/common';
+import { Injectable, HttpException, NotFoundException, PreconditionFailedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -48,7 +48,7 @@ export class CompaniesService {
     const created = this.companiesRepository.create({
       name: createCompanyInput.name,
       countryCode: createCompanyInput.countryCode,
-      uuid: createCompanyInput.uuid || generateUuid(),
+      uuid: createCompanyInput.uuid || generateUuid(10),
       serviceAccount: createCompanyInput.serviceAccount as any,
       firebaseConfig: createCompanyInput.firebaseConfig as any
     });
