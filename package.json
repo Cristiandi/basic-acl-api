@@ -25,7 +25,8 @@
     "posttest:e2e": "sudo docker-compose stop test-db && sudo docker-compose rm -f test-db",
     "cz": "git-cz",
     "seed:dev": "npx cross-env NODE_ENV=local ts-node ./src/seeds",
-    "seed:dev:pro": "npx cross-env NODE_ENV=production.local ts-node ./src/seeds"
+    "seed:dev:pro": "npx cross-env NODE_ENV=production.local ts-node ./src/seeds",
+    "postinstall": "husky install"
   },
   "dependencies": {
     "@nestjs/common": "7.6.11",
@@ -72,8 +73,8 @@
     "@types/express": "4.17.11",
     "@types/faker": "5.1.6",
     "@types/jest": "26.0.20",
-    "@types/node": "13.13.40",
     "@types/ncp": "2.0.4",
+    "@types/node": "13.13.40",
     "@types/nodemailer": "6.4.0",
     "@types/supertest": "2.0.10",
     "@typescript-eslint/eslint-plugin": "4.15.0",
@@ -82,7 +83,7 @@
     "eslint": "7.19.0",
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-import": "2.22.1",
-    "husky": "5.0.9",
+    "husky": "^5.0.9",
     "jest": "26.6.3",
     "lint-staged": "10.5.4",
     "prettier": "2.2.1",
@@ -119,11 +120,5 @@
     "*.ts": [
       "npm run lint"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   }
 }
