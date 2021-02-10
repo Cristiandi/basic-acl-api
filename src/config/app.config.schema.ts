@@ -24,5 +24,9 @@ export default Joi.object({
   SMTP_USER: Joi.required(),
   SMTP_PW: Joi.required(),
   /* WEB */
-  SELF_WEB_URL: Joi.required()
+  SELF_WEB_URL: Joi.required(),
+  /* MAILGUN */
+  MAILGUN_DOMAIN: Joi.required(),
+  MAILGUN_PRIVATE_KEY: Joi.required(),
+  MAILGUN_PUBLIC_KEY: Joi.required()
 });

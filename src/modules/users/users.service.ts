@@ -43,6 +43,7 @@ import { LoginAdminOutPut } from './dto/login-admin-output.dto';
 import { GetCompanyUserByEmailInput } from './dto/get-company-user-by-email-input.dto';
 import { ChangePasswordInput } from './dto/change-password-input.dto';
 import { ChangePhoneInput } from './dto/change-phone-input.dto';
+import { MailgunService } from 'src/common/plugins/mailgun/mailgun.service';
 
 @Injectable()
 export class UsersService {
@@ -57,6 +58,7 @@ export class UsersService {
     private readonly parametersService: ParametersService,
     private readonly templatesService: TemplatesService,
     private readonly mailerService: MailerService,
+    private readonly mailgunService: MailgunService,
     private readonly confirmationEmailConfigsService: ConfirmationEmailConfigsService,
     private readonly verificationCodesService: VerificationCodesService,
     private readonly forgottenPasswordConfigsService: ForgottenPasswordConfigsService,
@@ -579,16 +581,13 @@ export class UsersService {
     };
 
     const html = await this.templatesService.generateHtmlByTemplate('confirmation-email', paramsForTemplate, [], false);
-
-    await this.mailerService.sendEmail(
-      false,
-      fromEmail,
-      [user.email],
+    
+    await this.mailgunService.sendEmail({
+      from: fromEmail,
+      to: [user.email],
       html,
-      subject,
-      '',
-      []
-    );
+      subject
+    });
   }
 
   /**
@@ -698,15 +697,12 @@ export class UsersService {
 
     const html = await this.templatesService.generateHtmlByTemplate('forgotten-password-email', paramsForTemplate, [], false);
 
-    await this.mailerService.sendEmail(
-      false,
-      fromEmail,
-      [user.email],
+    await this.mailgunService.sendEmail({
+      from: fromEmail,
+      to: [user.email],
       html,
-      subject,
-      '',
-      []
-    );
+      subject
+    });
   }
 
   /**
@@ -741,15 +737,12 @@ export class UsersService {
 
     const { email } = sendUpdatedPasswordNotificationEmailInput;
 
-    await this.mailerService.sendEmail(
-      false,
-      fromEmail,
-      [email],
+    await this.mailgunService.sendEmail({
+      from: fromEmail,
+      to: [email],
       html,
-      subject,
-      '',
-      []
-    );
+      subject
+    });
   }
 
   /**

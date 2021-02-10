@@ -21,6 +21,7 @@ import { VerificationCodesModule } from '../verification-codes/verification-code
 import { ForgottenPasswordConfigsModule } from '../forgotten-password-configs/forgotten-password-configs.module';
 import { RolesModule } from '../roles/roles.module';
 import { AssignedRolesModule } from '../assigned-roles/assigned-roles.module';
+import { MailgunModule } from 'src/common/plugins/mailgun/mailgun.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AssignedRolesModule } from '../assigned-roles/assigned-roles.module';
     ParametersModule,
     TemplatesModule,
     MailerModule,
+    MailgunModule,
     ConfirmationEmailConfigsModule,
     VerificationCodesModule,
     ForgottenPasswordConfigsModule,

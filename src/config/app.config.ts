@@ -27,5 +27,10 @@ export default registerAs('config', () => ({
     port: process.env.SMTP_PORT,
     user: process.env.SMTP_USER,
     password: process.env.SMTP_PW
+  },
+  mailgun: {
+    domain: process.env.MAILGUN_DOMAIN,
+    privateKey: process.env.MAILGUN_PRIVATE_KEY,
+    publicKey: process.env.MAILGUN_PUBLIC_KEY
   }
 }));
