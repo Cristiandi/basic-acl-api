@@ -45,7 +45,7 @@
     "fastify-helmet": "5.2.0",
     "fastify-swagger": "4.3.0",
     "firebase": "8.2.6",
-    "firebase-admin": "9.4.2",
+    "firebase-admin": "9.5.0",
     "form-data": "3.0.0",
     "handlebars": "4.7.6",
     "joi": "17.4.0",
