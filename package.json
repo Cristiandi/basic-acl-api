@@ -44,7 +44,7 @@
     "faker": "5.4.0",
     "fastify-helmet": "5.2.0",
     "fastify-swagger": "4.3.1",
-    "firebase": "8.2.7",
+    "firebase": "8.2.9",
     "firebase-admin": "9.5.0",
     "form-data": "4.0.0",
     "handlebars": "4.7.7",
