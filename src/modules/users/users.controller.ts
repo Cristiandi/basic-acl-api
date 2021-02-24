@@ -36,6 +36,7 @@ export class UsersController {
     description: 'the item.',
     type: User
   })
+  @HitsWatcher(30, 60)
   @Post()
   create(@Body() createUserInput: CreateUserInput): Promise<User> {
     return this.usersService.create(createUserInput);
