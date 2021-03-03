@@ -207,14 +207,14 @@ export class GraphqlActionsService {
     return removed;
   }
 
-  public async getByNameAndProject(getByNameAndProjectInput: GetByNameAndProjectInput): Promise<GraphqlAction | null> {
-    const { name, projectId } = getByNameAndProjectInput;
+  public async getByNamesAndProject(getByNameAndProjectInput: GetByNameAndProjectInput): Promise<GraphqlAction[] | null> {
+    const { names, projectId } = getByNameAndProjectInput;
 
-    const existing = await this.graphqlActionRepository.createQueryBuilder('ga')
-      .where('ga.name = :name', { name })
+    const items = await this.graphqlActionRepository.createQueryBuilder('ga')
+      .where('ga.name in (:...names)', { names })
       .andWhere('ga.project_id = :projectId', { projectId })
-      .getOne();
+      .getMany();
 
-    return existing || null;
+    return items.length ? items : null;
   }
 }

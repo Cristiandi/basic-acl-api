@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsString } from 'class-validator';
 
 export class GetByNameAndProjectInput {
   @ApiProperty()
+  @IsArray()
   @IsString()
-  readonly name: string;
+  readonly names: string[];
   
   @ApiProperty()
   @IsNumber()

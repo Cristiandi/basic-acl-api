@@ -367,7 +367,7 @@ export class PermissionsService {
    * @memberof PermissionsService
    */
   public async checkPermissionGraphql(checkPermissionGraphqlInput: CheckPermissionGraphqlInput) : Promise<CheckPermissionGraphqlOutput>{
-    const { companyUuid, projectCode, token, graphqlActionName } = checkPermissionGraphqlInput;
+    const { companyUuid, projectCode, token, graphqlActionNames } = checkPermissionGraphqlInput;
 
     // get the client name
     const {
@@ -379,7 +379,7 @@ export class PermissionsService {
     const redisClient = await this.redisService.getClient(clientName);
 
     // define the key
-    const key = SparkMD5.hash(`${companyUuid}|${graphqlActionName}|${token}`);
+    const key = SparkMD5.hash(`${companyUuid}|${graphqlActionNames.toString()}|${token}`);
 
     // try to get the key value
     const unParsedKeyValue = await redisClient.get(key);
@@ -406,15 +406,15 @@ export class PermissionsService {
       return response;
     };
 
-    const graphqlAction = await this.graphqlActionsService.getByNameAndProject({
-      name: graphqlActionName,
+    const graphqlActions = await this.graphqlActionsService.getByNamesAndProject({
+      names: graphqlActionNames,
       projectId: project.id
     });
 
-    if (!graphqlAction) {
+    if (!graphqlActions.length) {
       const response = {
         allowed: false,
-        reason: `can't get a graphql action with name ${graphqlActionName} and for the project with code ${projectCode}.`
+        reason: `can't get a graphql actions with names ${graphqlActionNames.toString} and for the project with code ${projectCode}.`
       };
 
       this.setValueInRedis(redisClient, key, response, 3599)
@@ -423,22 +423,44 @@ export class PermissionsService {
       return response;
     }
 
+    const graphqlActionIds = graphqlActions.map(item => item.id);
+
     const user = await this.usersService.getUserByToken({ companyUuid, token });
 
-    const permission = await this.permissionRepository.createQueryBuilder('p')
-      .innerJoin('p.graphqlAction', 'ga')
+    const permissions = await this.permissionRepository.createQueryBuilder('p')
+      .innerJoinAndSelect('p.graphqlAction', 'ga')
       .innerJoin('p.role', 'r')
       .innerJoin('r.assignedRoles', 'ar')
       .innerJoin('ar.user', 'u')
       .where('u.id = :userId', { userId: user.id })
-      .andWhere('ga.id = :graphqlActionId', { graphqlActionId: graphqlAction.id })
+      .andWhere('ga.id in (:...graphqlActionIds)', { graphqlActionIds })
       .andWhere('p.allowed = true')
-      .getOne();
+      .getMany();
 
-    if (!permission) {
+    if (!permissions.length) {
       const response = {
         allowed: false,
-        reason: 'the user does not have this graphql action as assigned and allowed.'
+        reason: 'the user does not have any graphql action as assigned and allowed.'
+      };
+
+      this.setValueInRedis(redisClient, key, response, 3599)
+        .catch(err => Logger.error(err));
+
+      return response;
+    }
+
+    const notAllowedGraphQLActions = graphqlActions.filter(g => {
+      const found = permissions.find(p => p.graphqlAction.id === g.id);
+
+      return !found;
+    });
+
+    if (notAllowedGraphQLActions.length) {
+      const names = notAllowedGraphQLActions.map(g => g.name).toString();
+
+      const response = {
+        allowed: false,
+        reason: `the user does not have these graphql actions: ${names} as assigned and allowed.`
       };
 
       this.setValueInRedis(redisClient, key, response, 3599)
