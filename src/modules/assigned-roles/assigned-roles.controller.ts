@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/common/decorators/public.decorator';
 
 import { AssignedRole } from './assigned-role.entity';
 
@@ -55,6 +56,7 @@ export class AssignedRolesController {
     description: 'the items.',
     type: [AssignedRole]
   })
+  @Public()
   @Get('/user/:companyUuid/:authUid')
   getUserAssignedRoles(@Param() getUserAssignedRolesInput: GetUserAssignedRolesInput): Promise<any> {
     return this.assignedRolesService.getUserAssignedRoles(getUserAssignedRolesInput);
