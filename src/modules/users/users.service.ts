@@ -539,6 +539,10 @@ export class UsersService {
       throw new NotFoundException(`can't get the user ${email} for the company ${companyUuid}.`);
     }
 
+    if (user.anonymous) {
+      return;
+    }
+
     const { emailVerified } = user;
 
     if (emailVerified) {
@@ -659,6 +663,10 @@ export class UsersService {
 
     if (!user) {
       throw new NotFoundException(`can't get the user ${email} for the company ${companyUuid}.`);
+    }
+
+    if (user.anonymous) {
+      return;
     }
 
     const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
@@ -857,6 +865,10 @@ export class UsersService {
       throw new NotFoundException(`can't get the user with email ${email} for the company ${companyUuid}.`);
     }
 
+    if (existing.anonymous) {
+      return;
+    }
+
     const { oldPassword } = changePasswordInput;
 
     try {
@@ -899,6 +911,10 @@ export class UsersService {
 
     if (!existing) {
       throw new NotFoundException(`can't get the user with email ${email} for the company ${companyUuid}.`);
+    }
+
+    if (existing.anonymous) {
+      return existing;
     }
 
     const { company: { countryCode }, authUid } = existing;
