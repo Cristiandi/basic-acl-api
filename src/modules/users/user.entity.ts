@@ -30,6 +30,10 @@ export class User {
   emailVerified: boolean;
 
   @ApiProperty()
+  @Column({ name: 'anonymous', type: 'boolean', default: false })
+  anonymous: boolean;
+
+  @ApiProperty()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

@@ -104,11 +104,14 @@ export class UsersService {
       phone
     });
 
+    const { anonymous = false } = createUserInput;
+
     const created = this.usersRepository.create({
       company,
       authUid: createdFirebaseUser.uid,
       email,
-      isAdmin: false
+      isAdmin: false,
+      anonymous
     });
 
     const saved = await this.usersRepository.save(created);

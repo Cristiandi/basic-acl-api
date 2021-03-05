@@ -29,4 +29,9 @@ export class CreateUserInput {
   @IsOptional()
   @IsString()
   readonly roleCode?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  readonly anonymous?: boolean;
 }
