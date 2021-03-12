@@ -52,7 +52,7 @@
     "mailgun.js": "3.2.1",
     "md5": "2.3.0",
     "mjml": "4.9.0",
-    "nanoid": "3.1.20",
+    "nanoid": "3.1.21",
     "ncp": "2.0.0",
     "nestjs-redis": "1.2.8",
     "nodemailer": "6.5.0",
