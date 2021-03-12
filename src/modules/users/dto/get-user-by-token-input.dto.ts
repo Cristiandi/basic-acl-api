@@ -1,7 +1,7 @@
-import { IsJWT, IsUUID } from 'class-validator';
+import { IsJWT, IsString } from 'class-validator';
 
 export class GetUserByTokenInput {
-  @IsUUID()
+  @IsString()
   companyUuid: string;
 
   @IsJWT()

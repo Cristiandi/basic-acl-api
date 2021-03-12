@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsJWT, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsJWT, IsString } from 'class-validator';
 
 export class CheckPermissionGraphqlInput {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
   companyUuid: string;
 
   @ApiProperty()

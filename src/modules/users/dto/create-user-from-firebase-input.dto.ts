@@ -1,12 +1,12 @@
-import { IsUUID, IsEmail } from 'class-validator';
+import { IsString, IsEmail } from 'class-validator';
 
 export class CreateUserFromFirebaseInput {
-  @IsUUID()
+  @IsString()
   readonly companyUuid: string;
 
   @IsEmail()
   readonly email: string;
 
-  @IsUUID()
+  @IsString()
   readonly authUid: string;
 }

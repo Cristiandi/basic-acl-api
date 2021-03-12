@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID, IsString, IsEmail, Length } from 'class-validator';
+import { IsString, IsEmail, Length } from 'class-validator';
 
 export class CreateCompanyAdminInput {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
   readonly companyUuid: string;
 
   @ApiProperty()

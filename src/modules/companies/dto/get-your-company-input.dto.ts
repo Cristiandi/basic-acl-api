@@ -3,6 +3,6 @@ import { IsUUID } from 'class-validator';
 
 export class GetYourCompanyInput {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
   readonly uuid: string;
 }

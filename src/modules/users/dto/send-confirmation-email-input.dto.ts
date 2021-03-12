@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsUUID } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 
 export class SendConfirmationEmailnput {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
   readonly companyUuid: string;
 
   @ApiProperty()

@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID, IsEmail } from 'class-validator';
+import { IsString, IsEmail } from 'class-validator';
 
 export class SendForgottenPasswordEmailInput {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
   readonly companyUuid: string;
 
   @ApiProperty()

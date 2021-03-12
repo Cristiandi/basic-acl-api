@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsUUID } from 'class-validator';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateAssignedRoleInput {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
   readonly companyUuid: string;
 
   @ApiProperty()

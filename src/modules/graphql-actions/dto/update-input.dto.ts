@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateInput {
   @IsOptional()
@@ -14,7 +14,7 @@ export class UpdateInput {
   readonly isMutation?: boolean;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   readonly companyUuid?: string;
 
   @IsOptional()

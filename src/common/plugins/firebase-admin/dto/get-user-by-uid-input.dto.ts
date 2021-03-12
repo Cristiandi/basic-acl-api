@@ -1,9 +1,9 @@
-import { IsUUID } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class GetUserByUidInput {
-  @IsUUID()
+  @IsString()
   readonly companyUuid: string;
 
-  @IsUUID()
+  @IsString()
   readonly uid: string;
 }

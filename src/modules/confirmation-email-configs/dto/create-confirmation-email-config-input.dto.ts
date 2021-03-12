@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsUrl, IsUUID, Length } from 'class-validator';
+import { IsString, IsUrl, Length } from 'class-validator';
 
 export class CreateConfirmationEmailCionfig {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
   readonly companyUuid: string;
 
   @ApiProperty()

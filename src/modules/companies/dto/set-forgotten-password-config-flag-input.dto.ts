@@ -1,7 +1,7 @@
-import { IsBoolean, IsUUID } from 'class-validator';
+import { IsBoolean, IsString } from 'class-validator';
 
 export class SetForgottenPasswordFlagConfigFlagInput {
-  @IsUUID()
+  @IsString()
   readonly uuid: string;
 
   @IsBoolean()

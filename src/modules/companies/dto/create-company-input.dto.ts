@@ -1,4 +1,4 @@
-import { IsString, IsDefined, ValidateNested, IsUUID, IsOptional, IsBoolean, IsUrl } from 'class-validator';
+import { IsString, IsDefined, ValidateNested, IsOptional, IsBoolean, IsUrl } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -86,7 +86,6 @@ export class CreateCompanyInput {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @IsUUID()
   readonly uuid: string;
 
   @ApiProperty({ type: () => ServiceAccount })

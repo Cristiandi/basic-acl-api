@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 export class CreateInput {
   @IsString()
@@ -10,7 +10,7 @@ export class CreateInput {
   @IsBoolean()
   isMutation: boolean;
 
-  @IsUUID()
+  @IsString()
   companyUuid: string;
 
   @IsNumber()

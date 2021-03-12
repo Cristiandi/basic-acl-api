@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsJWT, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsJWT, IsOptional, IsString } from 'class-validator';
 
 export class CheckPermissionInput {
   @ApiProperty()
-  @IsUUID()
+  @IsString()
   companyUuid: string;
 
   @ApiProperty()

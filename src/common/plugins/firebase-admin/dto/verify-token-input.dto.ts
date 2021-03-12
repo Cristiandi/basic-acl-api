@@ -1,7 +1,7 @@
-import { IsString, IsUUID } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class VerifyTokenInput {
-  @IsUUID()
+  @IsString()
   readonly companyUuid;
 
   @IsString()
