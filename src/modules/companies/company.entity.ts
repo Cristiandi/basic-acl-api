@@ -21,7 +21,7 @@ export class Company {
   name: string;
 
   @ApiProperty()
-  @Column({ type: 'uuid' })
+  @Column({ type: 'varchar', length: 100 })
   @Index('uuid-idx')
   uuid: string;
 
