@@ -5,6 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "14.15.x"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build && npm run copy-files",
