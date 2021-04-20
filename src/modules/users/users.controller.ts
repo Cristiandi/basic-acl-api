@@ -66,13 +66,13 @@ export class UsersController {
     return this.usersService.getUserByAuthUid(getUserByAuthUidInput);
   }
 
-  @Post('/change-email')
+  @Patch('/change-email')
   changeEmail(@Body() changeEmailInput: ChangeEmailInput): Promise<User> {
     return this.usersService.changeEmail(changeEmailInput);
   }
 
 
-  @Post('/change-password')
+  @Patch('/change-password')
   changePassword(@Body() changePasswordInput: ChangePasswordInput): Promise<any> {
     return this.usersService.changePassword(changePasswordInput);
   }
