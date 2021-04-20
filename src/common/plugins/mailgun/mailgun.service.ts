@@ -30,8 +30,8 @@ export class MailgunService {
     const { subject } = sendEmailInput;
     const subjectTo = this.appConfiguration.environment === 'production' ? subject : `${this.appConfiguration.environment} | ${subject}`;
 
-    console.log('sendEmailInput', sendEmailInput);
-    console.log('subjectTo', subjectTo);
+    // console.log('sendEmailInput', sendEmailInput);
+    // console.log('subjectTo', subjectTo);
 
     const msg = await this.mg.messages.create(this.appConfiguration.mailgun.domain, {
       from: sendEmailInput.from,
