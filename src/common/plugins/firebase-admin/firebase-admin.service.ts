@@ -12,6 +12,7 @@ import { GetUsersInput } from './dto/get-users-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
 import { GetUserByUidInput } from './dto/get-user-by-uid-input.dto';
 import { RemoveUserInput } from './dto/remove-user-input.dto';
+import { getUserByPhoneNumber } from './dto/get-user-by-phone-input.dto';
 
 @Injectable()
 export class FirebaseAdminService {
@@ -169,5 +170,21 @@ export class FirebaseAdminService {
     const decodedToken = await app.auth().verifyIdToken(token);
 
     return decodedToken;
+  }
+
+  public async getUserByPhone(getUserByPhoneInput: getUserByPhoneNumber): Promise<firebaseAdmin.auth.UserRecord> {
+    const { companyUuid, countryCode, phone } = getUserByPhoneInput;
+
+    const phoneNumber = `${this.countryCodesPhoneNumber[countryCode]}${phone}`;
+
+    try {
+      const app = await this.initApp({ uuid: companyUuid });
+
+      const user = app.auth().getUserByPhoneNumber(phoneNumber);
+      
+      return user;
+    } catch (error) {
+      return null;
+    }
   }
 }

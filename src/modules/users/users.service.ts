@@ -44,6 +44,7 @@ import { GetCompanyUserByEmailInput } from './dto/get-company-user-by-email-inpu
 import { ChangePasswordInput } from './dto/change-password-input.dto';
 import { ChangePhoneInput } from './dto/change-phone-input.dto';
 import { MailgunService } from 'src/common/plugins/mailgun/mailgun.service';
+import { ChangeEmailInput } from './dto/change-email-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -936,5 +937,69 @@ export class UsersService {
     });
 
     return existing;
+  }
+
+  public async changeEmail(changeEmailInput: ChangeEmailInput): Promise<User> {
+    const { companyUuid, phone } = changeEmailInput;
+
+    const company = await this.companiesService.getCompanyByUuid({
+      uuid: companyUuid
+    });
+
+    const existingFirebaseUser = await this.firebaseAdminService.getUserByPhone({
+      companyUuid,
+      countryCode: company.countryCode,
+      phone
+    });
+
+    if (!existingFirebaseUser) {
+      throw new NotFoundException(`can't get the user in firebase with the phone ${phone} for the company ${companyUuid}.`);
+    }
+
+    const existing = await this.usersRepository.createQueryBuilder('u')
+      .innerJoin('u.company', 'c')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.auth_uid = :authUid', { authUid: existingFirebaseUser.uid })
+      .getOne();
+
+    if (!existing) {
+      throw new NotFoundException(`can't get the user with the auth_uid ${existingFirebaseUser.uid} for the company ${companyUuid}.`);
+    }
+
+    const { email } = changeEmailInput;
+
+    // if has the same email is not needed
+    if (email === existing.email) {
+      delete existing.company;
+      return existing;
+    }
+
+    // update the email in firebase
+    await this.firebaseAdminService.updateUser({
+      companyUuid,
+      countryCode: company.countryCode,
+      uid: existingFirebaseUser.uid,
+      email,
+      emailVerified: false
+    });
+
+    // update the email in bd
+    const preloaded = await this.usersRepository.preload({
+      id: existing.id,
+      email,
+      emailVerified: false
+    });
+
+    const saved = await this.usersRepository.save(preloaded);
+
+    delete saved.company;
+
+    // send the confirmation email
+    this.sendConfirmationEmail({
+      companyUuid,
+      email: saved.email
+    }).catch(err => console.error(err));
+
+    return saved;
   }
 }

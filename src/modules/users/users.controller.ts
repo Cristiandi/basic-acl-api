@@ -24,6 +24,7 @@ import { LoginAdminOutPut } from './dto/login-admin-output.dto';
 import { ChangePasswordInput } from './dto/change-password-input.dto';
 import { ChangePhoneInput } from './dto/change-phone-input.dto';
 import { GetUserByAuthUidInput } from './dto/get-user-by-auth-uid-input.dto';
+import { ChangeEmailInput } from './dto/change-email-input.dto';
 
 @ApiTags('users')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -53,6 +54,37 @@ export class UsersController {
     @Query() findAllUsersQueryInput: FindAllUsersQueryInput
   ): Promise<User[]> {
     return this.usersService.findAll(findAllUsersParamInput, findAllUsersQueryInput);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'response.',
+    type: User
+  })
+  @Get('/user/:authUid')
+  getUserByAuthUid(@Param() getUserByAuthUidInput: GetUserByAuthUidInput): Promise<User> {
+    return this.usersService.getUserByAuthUid(getUserByAuthUidInput);
+  }
+
+  @Post('/change-email')
+  changeEmail(@Body() changeEmailInput: ChangeEmailInput): Promise<User> {
+    return this.usersService.changeEmail(changeEmailInput);
+  }
+
+
+  @Post('/change-password')
+  changePassword(@Body() changePasswordInput: ChangePasswordInput): Promise<any> {
+    return this.usersService.changePassword(changePasswordInput);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'response.',
+    type: User
+  })
+  @Patch('/change-phone')
+  changePhone(@Body() changePhoneInput: ChangePhoneInput): Promise<User> {
+    return this.usersService.changePhone(changePhoneInput);
   }
 
   @ApiResponse({
@@ -132,30 +164,5 @@ export class UsersController {
   @Post('/forgotten-password-code')
   changeForgottenPassword(@Body() changeForgottenPasswordInput: ChangeForgottenPasswordInput): Promise<any> {
     return this.usersService.changeForgottenPassword(changeForgottenPasswordInput);
-  }
-
-  @Post('/change-password')
-  changePassword(@Body() changePasswordInput: ChangePasswordInput): Promise<any> {
-    return this.usersService.changePassword(changePasswordInput);
-  }
-
-  @ApiResponse({
-    status: 200,
-    description: 'response.',
-    type: User
-  })
-  @Patch('/change-phone')
-  changePhone(@Body() changePhoneInput: ChangePhoneInput): Promise<User> {
-    return this.usersService.changePhone(changePhoneInput);
-  }
-
-  @ApiResponse({
-    status: 200,
-    description: 'response.',
-    type: User
-  })
-  @Get('/user/:authUid')
-  getUserByAuthUid(@Param() getUserByAuthUidInput: GetUserByAuthUidInput): Promise<User> {
-    return this.usersService.getUserByAuthUid(getUserByAuthUidInput);
   }
 }
