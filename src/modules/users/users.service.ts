@@ -686,7 +686,7 @@ export class UsersService {
 
       subject = forgottenPasswordConfigForCompany.subject;
     } else {
-      subject = this.parametersService.getParameterValue({ name: 'FORGOTTEN_PASSOWRD_EMAIL_SUBJECT' });
+      subject = await this.parametersService.getParameterValue({ name: 'FORGOTTEN_PASSOWRD_EMAIL_SUBJECT' });
     }
 
     const companyLogoUrl = company.logoUrl || await this.parametersService.getParameterValue({ name: 'DEFAULT_COMPANY_LOGO_URL' });
