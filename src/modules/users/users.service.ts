@@ -631,6 +631,14 @@ export class UsersService {
 
     const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
 
+    await this.firebaseAdminService.updateUser({
+      companyUuid,
+      countryCode: company.countryCode,
+      uid: user.authUid,
+      emailVerified: true
+    });
+
+
     let redirectUrl = await this.parametersService.getParameterValue({ name: 'SELF_API_URL' });
 
     if (company.confirmationEmailConfig) {

@@ -137,12 +137,13 @@ export class FirebaseAdminService {
 
     const { uid } = updateUserInput;
 
-    const { countryCode, phone, email, password } = updateUserInput;
+    const { countryCode, phone, email, password, emailVerified } = updateUserInput;
 
     let updateRequest = {};
     if (email) updateRequest = { ...updateRequest, email };
     if (password) updateRequest = { ...updateRequest, password };
     if (phone) updateRequest = { ...updateRequest, phone: `${this.countryCodesPhoneNumber[countryCode]}${phone}` };
+    if (typeof emailVerified === 'boolean') updateRequest = { ...updateRequest, emailVerified };
 
     // console.log(updateRequest, 'updateRequest');
 

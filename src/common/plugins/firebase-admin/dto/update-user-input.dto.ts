@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsBoolean, IsString } from 'class-validator';
 
 export class UpdateUserInput {
   @IsString()
@@ -18,4 +18,7 @@ export class UpdateUserInput {
 
   @IsString()
   readonly countryCode: string;
+
+  @IsBoolean()
+  readonly emailVerified?: boolean;
 }
