@@ -25,6 +25,7 @@ import { ChangePasswordInput } from './dto/change-password-input.dto';
 import { ChangePhoneInput } from './dto/change-phone-input.dto';
 import { GetUserByAuthUidInput } from './dto/get-user-by-auth-uid-input.dto';
 import { ChangeEmailInput } from './dto/change-email-input.dto';
+import { CreateUserAlreadyInFirebaseInput } from './dto/create-user-already-in-fireabse-input.dto';
 
 @ApiTags('users')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -41,6 +42,17 @@ export class UsersController {
   @Post()
   create(@Body() createUserInput: CreateUserInput): Promise<User> {
     return this.usersService.create(createUserInput);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: User
+  })
+  @HitsWatcher(30, 60)
+  @Post('/already-in-firebase')
+  createAlreadyInFirebase(@Body() createUserAlreadyInFirebase: CreateUserAlreadyInFirebaseInput): Promise<User> {
+    return this.usersService.createAlreadyInFirebase(createUserAlreadyInFirebase);
   }
 
   @ApiResponse({

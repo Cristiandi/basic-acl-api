@@ -22,7 +22,7 @@ export class User {
   email: string;
 
   @ApiProperty()
-  @Column({ name: 'is_admin', type: 'boolean' })
+  @Column({ name: 'is_admin', type: 'boolean', default: false })
   isAdmin: boolean;
 
   @ApiProperty()

@@ -45,6 +45,7 @@ import { ChangePasswordInput } from './dto/change-password-input.dto';
 import { ChangePhoneInput } from './dto/change-phone-input.dto';
 import { MailgunService } from 'src/common/plugins/mailgun/mailgun.service';
 import { ChangeEmailInput } from './dto/change-email-input.dto';
+import { CreateUserAlreadyInFirebaseInput } from './dto/create-user-already-in-fireabse-input.dto';
 
 @Injectable()
 export class UsersService {
@@ -118,8 +119,73 @@ export class UsersService {
     const saved = await this.usersRepository.save(created);
 
     if (company.confirmationEmailConfig) {
-      this.sendConfirmationEmail({ companyUuid, email: saved.email });
+      this.sendConfirmationEmail({ companyUuid, email: saved.email })
+        .catch(err => console.error(err));
     }
+
+    if (roleCode) {
+      this.assignedRolesService.assign({ companyUuid, roleCode, userEmail: saved.email })
+        .catch(err => console.error(err));
+    }
+
+    delete saved.company;
+
+    return saved;
+  }
+
+  public async createAlreadyInFirebase(
+    createUserAlreadyInFirebase: CreateUserAlreadyInFirebaseInput
+  ): Promise<User> {
+    const { companyUuid } = createUserAlreadyInFirebase;
+
+    const company = await this.companiesService.getCompanyByUuid({ uuid: companyUuid });
+
+    if (!company) {
+      throw new NotFoundException(`can not get the company with uuid ${company}`);
+    }
+
+    const { roleCode } = createUserAlreadyInFirebase;
+
+    if (roleCode) {
+      const existingRole = await this.rolesService.getCompanyRoleByCode({ companyUuid, code: roleCode });
+
+      if (!existingRole) {
+        throw new NotFoundException(`can't get the role with code ${roleCode} for the company ${companyUuid}.`);
+      }
+    }
+
+    const { authUid } = createUserAlreadyInFirebase;
+
+    // look for the user en firebase
+    const firebaseUser = await this.firebaseAdminService.getUserByUid({
+      companyUuid,
+      uid: authUid
+    });
+
+    if (!firebaseUser) {
+      throw new NotFoundException(`can't get the user with uid ${authUid} in fireabse.`);
+    }
+
+    // check if the user exists or not
+    const existing = await this.getUserByAuthUid({
+      authUid
+    });
+
+    if (existing) {
+      delete existing.company;
+
+      return existing;
+    }
+
+    // create the user
+    const created = this.usersRepository.create({
+      company,
+      authUid: firebaseUser.uid,
+      email: firebaseUser.email,
+      emailVerified: firebaseUser.emailVerified
+    });
+
+    const saved = await this.usersRepository.save(created);
 
     if (roleCode) {
       this.assignedRolesService.assign({ companyUuid, roleCode, userEmail: saved.email })
