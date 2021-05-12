@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "node": "14.16.x"
+    "node": "14.17.x"
   },
   "scripts": {
     "prebuild": "rimraf dist",
