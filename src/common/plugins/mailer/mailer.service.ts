@@ -66,6 +66,6 @@ export class MailerService {
       attachments
     });
 
-    Logger.debug(`'Message sent: ${info.response}`, 'MailerService');
+    Logger.debug(`'Message sent: ${info.messageId}`, 'MailerService');
   }
 }
