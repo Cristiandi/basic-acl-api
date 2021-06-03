@@ -67,7 +67,7 @@
     "rimraf": "3.0.2",
     "rxjs": "7.1.0",
     "spark-md5": "3.0.1",
-    "typeorm": "0.2.32"
+    "typeorm": "0.2.34"
   },
   "devDependencies": {
     "@commitlint/cli": "12.1.4",
