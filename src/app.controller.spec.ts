@@ -8,15 +8,17 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService]
+      providers: [AppService],
     }).compile();
 
     appController = app.get<AppController>(AppController);
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return an object with name n message properties.', () => {
+      const result = appController.getHello();
+      expect(result).toHaveProperty('name');
+      expect(result).toHaveProperty('message');
     });
   });
 });
