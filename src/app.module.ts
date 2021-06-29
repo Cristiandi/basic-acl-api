@@ -1,5 +1,7 @@
 import * as path from 'path';
 
+import GraphQLJSON from 'graphql-type-json';
+
 import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -10,6 +12,7 @@ import appConfig from './config/app.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
+import { CompaniesModule } from './modules/companies/companies.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
@@ -44,6 +47,8 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
         logging: process.env.NODE_ENV !== 'production',
       }),
     }),
+
+    CompaniesModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
