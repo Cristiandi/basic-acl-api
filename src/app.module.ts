@@ -1,7 +1,5 @@
 import * as path from 'path';
 
-import GraphQLJSON from 'graphql-type-json';
-
 import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';

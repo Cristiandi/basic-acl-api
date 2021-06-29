@@ -25,6 +25,11 @@ scalar DateTime
 
 type Query {
   sayHello: String!
+  getCompany(input: GetOneCompanyInput!): Company
+}
+
+input GetOneCompanyInput {
+  uid: String!
 }
 
 type Mutation {

@@ -11,6 +11,7 @@ import { Company } from './company.entity';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { GetOneByCompanyByOneField } from './dto/get-one-company-by-one-field-input.dto';
+import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -22,7 +23,7 @@ export class CompaniesService {
   public async create(input: CreateCompanyInput): Promise<Company> {
     const { name, firebaseAdminConfig, firebaseConfig } = input;
 
-    const existingByName = await this.findOneByOneField({
+    const existingByName = await this.getOneByOneField({
       field: 'name',
       value: name,
       checkIfExists: false,
@@ -51,7 +52,7 @@ export class CompaniesService {
     return saved;
   }
 
-  public async findOneByOneField(
+  public async getOneByOneField(
     input: GetOneByCompanyByOneField,
   ): Promise<Company | undefined> {
     const { field, value, checkIfExists = false } = input;
@@ -65,5 +66,19 @@ export class CompaniesService {
     }
 
     return existing || undefined;
+  }
+
+  public async getOne(
+    getOneInput: GetOneCompanyInput,
+  ): Promise<Company | undefined> {
+    const { uid } = getOneInput;
+
+    const existing = await this.getOneByOneField({
+      field: 'uid',
+      value: uid,
+      checkIfExists: false,
+    });
+
+    return existing;
   }
 }
