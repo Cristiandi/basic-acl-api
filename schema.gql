@@ -25,7 +25,7 @@ scalar DateTime
 
 type Query {
   sayHello: String!
-  getCompany(input: GetOneCompanyInput!): Company
+  getCompany(getOneCompanyInput: GetOneCompanyInput!): Company
 }
 
 input GetOneCompanyInput {
@@ -33,11 +33,18 @@ input GetOneCompanyInput {
 }
 
 type Mutation {
-  createCompany(input: CreateCompanyInput!): Company!
+  createCompany(createCompanyInput: CreateCompanyInput!): Company!
+  updateCompany(updateCompanyInput: UpdateCompanyInput!, getOneCompanyInput: GetOneCompanyInput!): Company!
 }
 
 input CreateCompanyInput {
   name: String!
   firebaseAdminConfig: JSONObject!
   firebaseConfig: JSONObject!
+}
+
+input UpdateCompanyInput {
+  name: String
+  firebaseAdminConfig: JSONObject
+  firebaseConfig: JSONObject
 }

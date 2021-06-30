@@ -5,14 +5,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { generateId } from 'src/utils';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 import { Company } from './company.entity';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { GetOneByCompanyByOneField } from './dto/get-one-company-by-one-field-input.dto';
 import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
-
+import { UpdateCompanyInput } from './dto/update-company-input.dto';
 @Injectable()
 export class CompaniesService {
   constructor(
@@ -20,8 +20,10 @@ export class CompaniesService {
     readonly repository: Repository<Company>,
   ) {}
 
-  public async create(input: CreateCompanyInput): Promise<Company> {
-    const { name, firebaseAdminConfig, firebaseConfig } = input;
+  public async create(
+    createCompanyInput: CreateCompanyInput,
+  ): Promise<Company> {
+    const { name, firebaseAdminConfig, firebaseConfig } = createCompanyInput;
 
     const existingByName = await this.getOneByOneField({
       field: 'name',
@@ -53,9 +55,9 @@ export class CompaniesService {
   }
 
   public async getOneByOneField(
-    input: GetOneByCompanyByOneField,
+    getOneByCompanyByOneField: GetOneByCompanyByOneField,
   ): Promise<Company | undefined> {
-    const { field, value, checkIfExists = false } = input;
+    const { field, value, checkIfExists = false } = getOneByCompanyByOneField;
 
     const existing = await this.repository.findOne({ [field]: value });
 
@@ -69,9 +71,9 @@ export class CompaniesService {
   }
 
   public async getOne(
-    getOneInput: GetOneCompanyInput,
+    getOneCompanyInput: GetOneCompanyInput,
   ): Promise<Company | undefined> {
-    const { uid } = getOneInput;
+    const { uid } = getOneCompanyInput;
 
     const existing = await this.getOneByOneField({
       field: 'uid',
@@ -80,5 +82,38 @@ export class CompaniesService {
     });
 
     return existing;
+  }
+
+  public async update(
+    getOneCompanyInput: GetOneCompanyInput,
+    updateCompanyInput: UpdateCompanyInput,
+  ): Promise<Company> {
+    const existing = await this.getOne(getOneCompanyInput);
+
+    if (!existing) {
+      throw new NotFoundException(`can't get the company.`);
+    }
+
+    const { name } = updateCompanyInput;
+
+    const otherExisting = await this.repository.findOne({
+      where: {
+        name,
+        id: Not(existing.id),
+      },
+    });
+
+    if (otherExisting) {
+      throw new ConflictException(`the name is being used for other company`);
+    }
+
+    const preloaded = await this.repository.preload({
+      id: existing.id,
+      ...updateCompanyInput,
+    });
+
+    const saved = await this.repository.save(preloaded);
+
+    return saved;
   }
 }
