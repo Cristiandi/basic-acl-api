@@ -35,4 +35,11 @@ export class CompaniesResolver {
   ): Promise<Company> {
     return this.service.update(getOneCompanyInput, updateCompanyInput);
   }
+
+  @Mutation(() => Company, { name: 'daleteCompany' })
+  public delete(
+    @Args('getOneCompanyInput') getOneCompanyInput: GetOneCompanyInput,
+  ): Promise<Company> {
+    return this.service.delete(getOneCompanyInput);
+  }
 }

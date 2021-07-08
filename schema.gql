@@ -35,6 +35,7 @@ input GetOneCompanyInput {
 type Mutation {
   createCompany(createCompanyInput: CreateCompanyInput!): Company!
   updateCompany(updateCompanyInput: UpdateCompanyInput!, getOneCompanyInput: GetOneCompanyInput!): Company!
+  daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
 }
 
 input CreateCompanyInput {

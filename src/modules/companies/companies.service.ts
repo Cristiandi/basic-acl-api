@@ -116,4 +116,23 @@ export class CompaniesService {
 
     return saved;
   }
+
+  public async delete(
+    getOneCompanyInput: GetOneCompanyInput,
+  ): Promise<Company> {
+    const existing = await this.getOne(getOneCompanyInput);
+
+    if (!existing) {
+      throw new NotFoundException(`can't get the company.`);
+    }
+
+    const clone = { ...existing };
+
+    await this.repository.softRemove(existing);
+
+    delete clone.firebaseAdminConfig;
+    delete clone.firebaseConfig;
+
+    return clone;
+  }
 }
