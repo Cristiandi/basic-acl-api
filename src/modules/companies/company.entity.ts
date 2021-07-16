@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { GraphQLJSONObject } from 'graphql-type-json';
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -40,7 +41,7 @@ class FirebaseConfig {
 @Unique('uk_companies_uid', ['uid'])
 @Unique('uk_companies_access_key', ['accessKey'])
 @Unique('uk_companies_name', ['name'])
-export class Company {
+export class Company extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id: number;

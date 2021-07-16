@@ -4,30 +4,31 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { BaseService } from 'src/common/base.service';
 import { generateId } from 'src/utils';
 import { Not, Repository } from 'typeorm';
 
 import { Company } from './company.entity';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
-import { GetOneByCompanyByOneField } from './dto/get-one-company-by-one-field-input.dto';
 import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
 @Injectable()
-export class CompaniesService {
+export class CompaniesService extends BaseService<Company> {
   constructor(
     @InjectRepository(Company)
-    readonly repository: Repository<Company>,
-  ) {}
+    protected readonly repository: Repository<Company>,
+  ) {
+    super(repository);
+  }
 
   public async create(
     createCompanyInput: CreateCompanyInput,
   ): Promise<Company> {
     const { name, firebaseAdminConfig, firebaseConfig } = createCompanyInput;
 
-    const existingByName = await this.getOneByOneField({
-      field: 'name',
-      value: name,
+    const existingByName = await this.getOneByOneFields({
+      fields: { name },
       checkIfExists: false,
     });
 
@@ -54,30 +55,13 @@ export class CompaniesService {
     return saved;
   }
 
-  public async getOneByOneField(
-    getOneByCompanyByOneField: GetOneByCompanyByOneField,
-  ): Promise<Company | undefined> {
-    const { field, value, checkIfExists = false } = getOneByCompanyByOneField;
-
-    const existing = await this.repository.findOne({ [field]: value });
-
-    if (!existing && checkIfExists) {
-      throw new NotFoundException(
-        `can't get the user with the ${field} ${value}.`,
-      );
-    }
-
-    return existing || undefined;
-  }
-
   public async getOne(
     getOneCompanyInput: GetOneCompanyInput,
   ): Promise<Company | undefined> {
     const { uid } = getOneCompanyInput;
 
-    const existing = await this.getOneByOneField({
-      field: 'uid',
-      value: uid,
+    const existing = await this.getOneByOneFields({
+      fields: { uid },
       checkIfExists: false,
     });
 
@@ -133,6 +117,6 @@ export class CompaniesService {
     delete clone.firebaseAdminConfig;
     delete clone.firebaseConfig;
 
-    return clone;
+    return clone as Company;
   }
 }
