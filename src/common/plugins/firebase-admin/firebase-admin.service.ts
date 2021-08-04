@@ -1,5 +1,5 @@
-import * as firebaseAdmin from 'firebase-admin';
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import  * as firebaseAdmin from 'firebase-admin';
+import { Injectable, Inject, Logger, PreconditionFailedException } from '@nestjs/common';
 
 import { CompaniesService } from '../../../modules/companies/companies.service';
 
@@ -12,6 +12,7 @@ import { GetUsersInput } from './dto/get-users-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
 import { GetUserByUidInput } from './dto/get-user-by-uid-input.dto';
 import { RemoveUserInput } from './dto/remove-user-input.dto';
+import { getUserByPhoneNumber } from './dto/get-user-by-phone-input.dto';
 
 @Injectable()
 export class FirebaseAdminService {
@@ -22,7 +23,7 @@ export class FirebaseAdminService {
     Logger.debug(`countryCodesPhoneNumber ${JSON.stringify(countryCodesPhoneNumber)}`, 'FirebaseAdminService');
   }
 
-  private async initApp (initAppInput: InitAppInput): Promise<firebaseAdmin.app.App> {
+  private async initApp(initAppInput: InitAppInput): Promise<firebaseAdmin.app.App> {
     const { uuid } = initAppInput;
     const accountService = await this.companiesService.getServiceAccount({ uuid });
 
@@ -30,7 +31,7 @@ export class FirebaseAdminService {
       const app = firebaseAdmin.initializeApp({
         credential: firebaseAdmin.credential.cert(accountService)
       });
-  
+
       return app;
     }
 
@@ -43,22 +44,51 @@ export class FirebaseAdminService {
     return app;
   }
 
-  public async createUser (createUserInput: CreateUserInput): Promise<firebaseAdmin.auth.UserRecord> {
+  public async createUser(createUserInput: CreateUserInput): Promise<firebaseAdmin.auth.UserRecord> {
     const { companyUuid } = createUserInput;
     const admin = await this.initApp({ uuid: companyUuid });
 
     const { email, password, countryCode, phone } = createUserInput;
+
+    const phoneNumber = `${this.countryCodesPhoneNumber[countryCode]}${phone}`;
+
+    try {
+      const userByEmail = await admin.auth().getUserByEmail(email);
+
+      if (userByEmail) {
+        throw new PreconditionFailedException(`already exists a user in firebase with the email ${email} for the company ${companyUuid}.`);
+      }
+    } catch (error) {
+      if (error instanceof PreconditionFailedException) {
+        throw error;
+      }
+      // Logger.log(`the user with email ${email} doesn't exists in firebase for the company ${companyUuid}!`, 'FirebaseAdminService');
+    }
+
+    try {
+      const userByPhone = await admin.auth().getUserByPhoneNumber(phoneNumber);
+
+      if (userByPhone) {
+        throw new PreconditionFailedException(`already exists a user in firebase with the phone ${phoneNumber} for the company ${companyUuid}.`);
+      }
+    } catch (error) {
+      if (error instanceof PreconditionFailedException) {
+        throw error;
+      }
+      // Logger.log(`the user with phone ${phoneNumber} doesn't exists in firebase for the company ${companyUuid}!`, 'FirebaseAdminService');
+    }
+
     const properties = {
       email,
       password,
-      phoneNumber: `${this.countryCodesPhoneNumber[countryCode]}${phone}`
+      phoneNumber
     };
 
     const userRecord = await admin.auth().createUser(properties);
     return userRecord;
   }
 
-  public async getUsers (getUsersInput: GetUsersInput): Promise<firebaseAdmin.auth.UserRecord[]> {
+  public async getUsers(getUsersInput: GetUsersInput): Promise<firebaseAdmin.auth.UserRecord[]> {
     const { companyUuid } = getUsersInput;
 
     const app = await this.initApp({ uuid: companyUuid });
@@ -73,7 +103,7 @@ export class FirebaseAdminService {
 
     let userList = [...listUsersResult.users];
 
-    while(nextPageToken) {
+    while (nextPageToken) {
       listUsersResult = await app.auth().listUsers(maxResults, nextPageToken);
 
       nextPageToken = listUsersResult.pageToken;
@@ -108,12 +138,13 @@ export class FirebaseAdminService {
 
     const { uid } = updateUserInput;
 
-    const { countryCode, phone, email, password } = updateUserInput;
+    const { countryCode, phone, email, password, emailVerified } = updateUserInput;
 
     let updateRequest = {};
     if (email) updateRequest = { ...updateRequest, email };
-    if (password) updateRequest = {...updateRequest, password };
+    if (password) updateRequest = { ...updateRequest, password };
     if (phone) updateRequest = { ...updateRequest, phone: `${this.countryCodesPhoneNumber[countryCode]}${phone}` };
+    if (typeof emailVerified === 'boolean') updateRequest = { ...updateRequest, emailVerified };
 
     // console.log(updateRequest, 'updateRequest');
 
@@ -130,14 +161,30 @@ export class FirebaseAdminService {
     return app.auth().deleteUser(uid);
   }
 
-  public async verifyToken (verifyTokenInput: VerifyTokenInput): Promise<firebaseAdmin.auth.DecodedIdToken> {
+  public async verifyToken(verifyTokenInput: VerifyTokenInput): Promise<firebaseAdmin.auth.DecodedIdToken> {
     const { companyUuid } = verifyTokenInput;
-    
+
     const app = await this.initApp({ uuid: companyUuid });
 
     const { token } = verifyTokenInput;
     const decodedToken = await app.auth().verifyIdToken(token);
 
-    return decodedToken; 
+    return decodedToken;
+  }
+
+  public async getUserByPhone(getUserByPhoneInput: getUserByPhoneNumber): Promise<firebaseAdmin.auth.UserRecord> {
+    const { companyUuid, countryCode, phone } = getUserByPhoneInput;
+
+    const phoneNumber = `${this.countryCodesPhoneNumber[countryCode]}${phone}`;
+
+    try {
+      const app = await this.initApp({ uuid: companyUuid });
+
+      const user = app.auth().getUserByPhoneNumber(phoneNumber);
+      
+      return user;
+    } catch (error) {
+      return null;
+    }
   }
 }

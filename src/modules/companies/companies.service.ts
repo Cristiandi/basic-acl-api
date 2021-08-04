@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Injectable, HttpException, NotFoundException, PreconditionFailedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -15,6 +15,8 @@ import { GetFirebaseConfigInput } from './dto/get-firebase-config-input.dto';
 import { GetCompanyByNameInput } from './dto/get-company-by-name-input.dto';
 import { GetCompanyByUuidInput } from './dto/get-company-by-uuid-input.dto';
 import { GetYourCompanyInput } from './dto/get-your-company-input.dto';
+import { SetConfirmationEmailConfigFlagInput } from './dto/set-confirmation-email-config-flag-input.dto';
+import { SetForgottenPasswordFlagConfigFlagInput } from './dto/set-forgotten-password-config-flag-input.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -40,13 +42,13 @@ export class CompaniesService {
     const existing = await query;
 
     if (existing.length) {
-      throw new HttpException('already exists a company for the name or the uuid', HttpStatus.PRECONDITION_FAILED);
+      throw new PreconditionFailedException('already exists a company for the name or the uuid');
     }
 
     const created = this.companiesRepository.create({
       name: createCompanyInput.name,
       countryCode: createCompanyInput.countryCode,
-      uuid: createCompanyInput.uuid || generateUuid(),
+      uuid: createCompanyInput.uuid || generateUuid(10),
       serviceAccount: createCompanyInput.serviceAccount as any,
       firebaseConfig: createCompanyInput.firebaseConfig as any
     });
@@ -66,37 +68,41 @@ export class CompaniesService {
     });
   }
 
-  public async findOne(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
-    const { id } = findOneCompanyInput;
-    const existing = await this.companiesRepository.findOne(id);
+  public async findOne(findOneCompanyInput: FindOneCompanyInput): Promise<Company | null> {
+    const { companyUuid } = findOneCompanyInput;
+
+    const existing = await this.getCompanyByUuid({ uuid: companyUuid });
 
     if (!existing) {
-      throw new NotFoundException(`company ${id} not found`);
+      return null;
     }
 
     return existing;
   }
 
   public async update(findOneCompanyInput: FindOneCompanyInput, updateCompanyInput: UpdateCompanyInput): Promise<Company> {
-    const { id } = findOneCompanyInput;
+    const { companyUuid } = findOneCompanyInput;
 
-    const existing = await this.companiesRepository.preload({
-      id: +id,
-      ...updateCompanyInput,
-      serviceAccount: updateCompanyInput.serviceAccount ? updateCompanyInput.serviceAccount as any : undefined
-    });
+    const existing = await this.getCompanyByUuid({ uuid: companyUuid });
 
     if (!existing) {
-      throw new NotFoundException(`company ${id} not found.`);
+      throw new NotFoundException(`company with company uuid ${companyUuid} not found.`);
     }
+
+    const preloaded = await this.companiesRepository.preload({
+      id: existing.id,
+      ...updateCompanyInput,
+      serviceAccount: updateCompanyInput.serviceAccount ? updateCompanyInput.serviceAccount as any : undefined,
+      firebaseConfig: updateCompanyInput.firebaseConfig ? updateCompanyInput.firebaseConfig as any : undefined
+    });
 
     const compareTo = await this.companiesRepository.find({
       where: [
         {
-          name: existing.name
+          name: preloaded.name
         },
         {
-          uuid: existing.uuid
+          uuid: preloaded.uuid
         }
       ]
     });
@@ -104,16 +110,20 @@ export class CompaniesService {
     if (compareTo.length) {
       const [companyToCompare] = compareTo;
 
-      if (companyToCompare.id !== existing.id) {
+      if (companyToCompare.id !== preloaded.id) {
         throw new HttpException('other company already exists for the name or uuid', 412);
       }
     }
 
-    return this.companiesRepository.save(existing);
+    return this.companiesRepository.save(preloaded);
   }
 
   public async remove(findOneCompanyInput: FindOneCompanyInput): Promise<Company> {
     const existing = await this.findOne(findOneCompanyInput);
+
+    if (!existing) {
+      throw new NotFoundException();
+    }
 
     return this.companiesRepository.remove(existing);
   }
@@ -198,5 +208,37 @@ export class CompaniesService {
     }
 
     return company;
+  }
+
+  public async setConfirmationEmailConfigFlag(setConfirmationEmailConfigFlagInput: SetConfirmationEmailConfigFlagInput): Promise<Company> {
+    const { uuid } = setConfirmationEmailConfigFlagInput;
+
+    const company = await this.getCompanyByUuid({ uuid });
+
+    if (!company) {
+      throw new NotFoundException(`can't get the company with uuid ${uuid}.`);
+    }
+
+    const { confirmationEmailConfig } = setConfirmationEmailConfigFlagInput;
+
+    company.confirmationEmailConfig = confirmationEmailConfig;
+
+    return this.companiesRepository.save(company);
+  }
+
+  public async setForgottenPasswordConfigFlag(setForgottenPasswordFlagConfigFlagInput: SetForgottenPasswordFlagConfigFlagInput): Promise<Company> {
+    const { uuid } = setForgottenPasswordFlagConfigFlagInput;
+
+    const company = await this.getCompanyByUuid({ uuid });
+
+    if (!company) {
+      throw new NotFoundException(`can't get the company with uuid ${uuid}.`);
+    }
+
+    const { forgottenPasswordConfig } = setForgottenPasswordFlagConfigFlagInput;
+
+    company.forgottenPasswordConfig = forgottenPasswordConfig;
+
+    return this.companiesRepository.save(company);
   }
 }

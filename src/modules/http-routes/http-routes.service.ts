@@ -11,6 +11,7 @@ import { FindAllHttpRoutesParamInput } from './dto/find-all-http-routes-param-in
 import { FindAllHttpRoutesQueryInput } from './dto/find-all-http-routes-query-input-dto';
 import { FindOneHttpRouteInput } from './dto/find-one-http-route-input.dto';
 import { UpdateHttpRouteInput } from './dto/update-http-route-input.dto';
+import { GetUserRoutesInput } from './dto/get-user-routes-input.dto';
 
 @Injectable()
 export class HttpRoutesService {
@@ -24,6 +25,10 @@ export class HttpRoutesService {
     const { companyUuid, projectId } = createHttpRouteInput;
 
     const project = await this.projectsService.findOne({ companyUuid, id: `${projectId}` });
+
+    if (!project) {
+      throw new NotFoundException(`can't get the project ${projectId} for the compant with uuid ${companyUuid}.`);
+    }
 
     delete project.company;
 
@@ -82,24 +87,19 @@ export class HttpRoutesService {
     return data;
   }
 
-  public async findOne(findOneHttpRouteInput: FindOneHttpRouteInput): Promise<HttpRoute> {
+  public async findOne(findOneHttpRouteInput: FindOneHttpRouteInput): Promise<HttpRoute | null> {
     const { companyUuid, id } = findOneHttpRouteInput;
 
-    const count = await this.httpRouteRepository.createQueryBuilder('hr')
-      .select(['hr.id as "id"'])
-      .innerJoin('hr.project', 'p')
+    const existing = await this.httpRouteRepository.createQueryBuilder('hr')
+      .innerJoinAndSelect('hr.project', 'p')
       .innerJoin('p.company', 'c')
       .where('c.uuid = :companyUuid', { companyUuid })
       .andWhere('hr.id = :id', { id })
-      .getCount();
+      .getOne();
 
-    if (!count) {
-      throw new NotFoundException(`can not get the  httpe route ${id} for the company with uuid ${companyUuid}`);
+    if (!existing) {
+      return null;
     }
-
-    const existing = await this.httpRouteRepository.findOne(id, {
-      relations: ['project']
-    });
 
     return existing;
   }
@@ -116,10 +116,20 @@ export class HttpRoutesService {
     if (projectId) {
       const { companyUuid } = findOneHttpRouteInput;
       project = await this.projectsService.findOne({ companyUuid, id: `${projectId}` });
+
+      if (!project) {
+        throw new NotFoundException(`can not get the project ${projectId} for the company with uuid ${companyUuid}`);
+      }
+
       delete project.company;
     } else {
       const { companyUuid } = findOneHttpRouteInput;
       const existing = await this.findOne({ companyUuid, id });
+
+      if (!existing) {
+        throw new NotFoundException(`can not get the  httpe route ${id} for the company with uuid ${companyUuid}`);
+      }
+
       project = existing.project;
     }
 
@@ -159,10 +169,30 @@ export class HttpRoutesService {
   public async remove(findOneHttpRouteInput: FindOneHttpRouteInput): Promise<HttpRoute> {
     const existing = await this.findOne(findOneHttpRouteInput);
 
+    if (!existing) {
+      const { id, companyUuid } = findOneHttpRouteInput;
+      throw new NotFoundException(`can not get the  httpe route ${id} for the company with uuid ${companyUuid}`);
+    }
+
     const removed = await this.httpRouteRepository.remove(existing);
 
     delete removed.project.company;
 
     return removed;
+  }
+
+  public async getUserRoutes(getUserRoutesInput: GetUserRoutesInput): Promise<HttpRoute[]> {
+    const { userId } = getUserRoutesInput;
+
+    const query = this.httpRouteRepository.createQueryBuilder('hr')
+      .innerJoin('hr.permissions', 'p')
+      .innerJoin('p.role', 'r')
+      .innerJoin('r.assignedRoles', 'ar')
+      .innerJoin('ar.user', 'u')
+      .where('u.id = :userId', { userId })
+      .andWhere('p.allowed = true')
+      .orderBy('hr.path', 'DESC');
+
+    return query.getMany();
   }
 }

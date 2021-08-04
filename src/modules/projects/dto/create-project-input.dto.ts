@@ -1,12 +1,16 @@
-import { IsString, IsUUID } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString } from 'class-validator';
 
 export class CreateProjectInput {
-    @IsUUID()
-    readonly companyUuid;
+    @ApiProperty()
+    @IsString()
+    readonly companyUuid: string;
     
+    @ApiProperty()
     @IsString()
     readonly name: string;
 
+    @ApiProperty()
     @IsString()
     readonly code: string;
 }

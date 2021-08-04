@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -12,12 +12,15 @@ import { CreateAssignedRoleInput } from './dto/create-assigned-role-input.dto';
 import { FindAllAssignedRolesParamInput } from './dto/find-all-assigned-roles-param-input.dto';
 import { FindAllAssignedRolesQueryInput } from './dto/find-alll-assigned-roles-query-input.dto';
 import { FindOneAssignedRoleInput } from './dto/find-one-assigned-role-input.dto';
+import { AssignInput } from './dto/assign-input.dto';
+import { GetUserAssignedRolesInput } from './dto/get-user-assigned-roles-input.dto';
 
 @Injectable()
 export class AssignedRolesService {
   constructor(
     @InjectRepository(AssignedRole)
     private readonly assignedRoleRepository: Repository<AssignedRole>,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     private readonly rolesService: RolesService,
     private readonly apiKeysService: ApiKeysService
@@ -34,6 +37,10 @@ export class AssignedRolesService {
     const { companyUuid, roleId } = createAssignedRoleInput;
 
     const role = await this.rolesService.findOne({ companyUuid, id: `${roleId}` });
+
+    if (!role) {
+      throw new NotFoundException(`can't get the role ${roleId} for the company with uuid ${companyUuid}.`);
+    }
     delete role.company;
 
     const { userId, apiKeyId } = createAssignedRoleInput;
@@ -49,12 +56,22 @@ export class AssignedRolesService {
     let user;
     if (userId) {
       user = await this.usersService.findOne({ companyUuid, id: `${userId}` });
+
+      if (!user) {
+        throw new NotFoundException(`can't get the user ${userId} for the company with uuid ${companyUuid}.`);
+      }
+
       delete user.company;
     }
 
     let apiKey;
     if (apiKeyId) {
       apiKey = await this.apiKeysService.findOne({ companyUuid, id: `${apiKeyId}` });
+
+      if (!apiKey) {
+        throw new NotFoundException(`can't get the api key ${apiKeyId} for the company with uuid ${companyUuid}.`);
+      }
+
       delete apiKey.company;
     }
 
@@ -96,23 +113,23 @@ export class AssignedRolesService {
     const { companyUuid } = findAllAssignedRolesParamInput;
 
     const data = await this.assignedRoleRepository.createQueryBuilder('ar')
-    .select([
-      'ar.id as id',
-      'r.id as "roleId"',
-      'r.code as "roleCode"',
-      'u.id as "userId"',
-      'u.email as "userEmail"',
-      'ak.id as "apikeyId"',
-      'ak.value as "apikeyValue"'
-    ])
-    .innerJoin('ar.role', 'r')
-    .innerJoin('r.company', 'c')
-    .leftJoin('ar.user', 'u')
-    .leftJoin('ar.apiKey', 'ak')
-    .where('c.uuid = :companyUuid', { companyUuid })
-    .take(limit || undefined)
-    .skip(offset)
-    .execute();
+      .select([
+        'ar.id as id',
+        'r.id as "roleId"',
+        'r.code as "roleCode"',
+        'u.id as "userId"',
+        'u.email as "userEmail"',
+        'ak.id as "apikeyId"',
+        'ak.value as "apikeyValue"'
+      ])
+      .innerJoin('ar.role', 'r')
+      .innerJoin('r.company', 'c')
+      .leftJoin('ar.user', 'u')
+      .leftJoin('ar.apiKey', 'ak')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .take(limit || undefined)
+      .skip(offset)
+      .execute();
 
     return data;
   }
@@ -124,21 +141,21 @@ export class AssignedRolesService {
    * @return {*}  {Promise<AssignedRole>}
    * @memberof AssignedRolesService
    */
-  public async findOne(findOneAssignedRoleInput: FindOneAssignedRoleInput): Promise<AssignedRole> {
+  public async findOne(findOneAssignedRoleInput: FindOneAssignedRoleInput): Promise<AssignedRole | null> {
     const { companyUuid, id } = findOneAssignedRoleInput;
 
     const existing = await this.assignedRoleRepository.createQueryBuilder('ar')
-    .select(['ar.id', 'ar.role'])
-    .innerJoinAndSelect('ar.role', 'r')
-    .innerJoin('r.company', 'c')
-    .leftJoinAndSelect('ar.user', 'u')
-    .leftJoinAndSelect('ar.apiKey', 'ak')
-    .where('c.uuid = :companyUuid', { companyUuid })
-    .andWhere('ar.id = :id', { id })
-    .getOne();
+      .select(['ar.id', 'ar.role'])
+      .innerJoinAndSelect('ar.role', 'r')
+      .innerJoin('r.company', 'c')
+      .leftJoinAndSelect('ar.user', 'u')
+      .leftJoinAndSelect('ar.apiKey', 'ak')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('ar.id = :id', { id })
+      .getOne();
 
     if (!existing) {
-      throw new NotFoundException(`can not get the assigned role ${id} for the company with uuid ${companyUuid}`);
+      return null;
     }
 
     return existing;
@@ -154,8 +171,63 @@ export class AssignedRolesService {
   public async remove(findOneAssignedRoleInput: FindOneAssignedRoleInput): Promise<AssignedRole> {
     const existing = await this.findOne(findOneAssignedRoleInput);
 
+    if (!existing) {
+      const { id, companyUuid } = findOneAssignedRoleInput;
+      throw new NotFoundException(`can't get the assigned role ${id} for the company with uuid ${companyUuid}.`);
+    }
+
     const removed = await this.assignedRoleRepository.remove(existing);
 
     return removed;
+  }
+
+  /**
+   *
+   *
+   * @param {AssignInput} assignInput
+   * @return {*}  {Promise<AssignedRole>}
+   * @memberof AssignedRolesService
+   */
+  public async assign(assignInput: AssignInput): Promise<AssignedRole> {
+    const { companyUuid, userEmail } = assignInput;
+
+    const user = await this.usersService.getCompanyUserByEmail({ companyUuid, email: userEmail });
+
+    if (!user) {
+      throw new NotFoundException(`can't get the user with email ${userEmail} for the company ${companyUuid}.`);
+    }
+
+    const { roleCode } = assignInput;
+
+    const role = await this.rolesService.getCompanyRoleByCode({ companyUuid, code: roleCode });
+
+    if (!role) {
+      throw new NotFoundException(`cant get the role with code ${roleCode} for the company ${companyUuid}.`);
+    }
+
+    const createdAssignedRole = await this.create({ companyUuid, roleId: role.id, userId: user.id });
+
+    return createdAssignedRole;
+  }
+
+  /**
+   *
+   *
+   * @param {GetUserAssignedRolesInput} getUserAssignedRolesInput
+   * @return {*}  {Promise<AssignedRole[]>}
+   * @memberof AssignedRolesService
+   */
+  public async getUserAssignedRoles(getUserAssignedRolesInput: GetUserAssignedRolesInput): Promise<AssignedRole[]> {
+    const { authUid, companyUuid } = getUserAssignedRolesInput;
+
+    const userAssignedRoles = await this.assignedRoleRepository.createQueryBuilder('ar')
+      .innerJoinAndSelect('ar.role', 'r')
+      .innerJoin('r.company', 'c')
+      .innerJoin('ar.user', 'u')
+      .where('c.uuid = :companyUuid', { companyUuid })
+      .andWhere('u.authUid = :authUid', { authUid })
+      .getMany();
+
+    return userAssignedRoles;
   }
 }

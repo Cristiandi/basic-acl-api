@@ -1,4 +1,7 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Patch, Get, Param, Query, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Patch, Get, Param, Query, Delete, Redirect } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { User } from './user.entity';
 
 import { UsersService } from './users.service';
 
@@ -13,25 +16,94 @@ import { FindOneUserInput } from './dto/find-one-user-input.dto';
 import { UpdateUserInput } from './dto/update-user-input.dto';
 import { CreateCompanyAdminInput } from './dto/create-company-admin-input.dto';
 import { HitsWatcher } from '../../common/decorators/hits-watcher.decorator';
+import { SendConfirmationEmailnput } from './dto/send-confirmation-email-input.dto';
+import { ConfirmEmailInput } from './dto/confirm-email-input.dto';
+import { SendForgottenPasswordEmailInput } from './dto/send-forgotten-password-email-input.dto';
+import { ChangeForgottenPasswordInput } from './dto/change-forgotten-password-input.dto';
+import { LoginAdminOutPut } from './dto/login-admin-output.dto';
+import { ChangePasswordInput } from './dto/change-password-input.dto';
+import { ChangePhoneInput } from './dto/change-phone-input.dto';
+import { GetUserByAuthUidInput } from './dto/get-user-by-auth-uid-input.dto';
+import { ChangeEmailInput } from './dto/change-email-input.dto';
+import { CreateUserAlreadyInFirebaseInput } from './dto/create-user-already-in-fireabse-input.dto';
 
+@ApiTags('users')
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-  
+  constructor(private readonly usersService: UsersService) { }
+
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: User
+  })
+  @HitsWatcher(30, 60)
   @Post()
-  create(@Body() createUserInput: CreateUserInput): Promise<any> {
+  create(@Body() createUserInput: CreateUserInput): Promise<User> {
     return this.usersService.create(createUserInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: User
+  })
+  @HitsWatcher(30, 60)
+  @Post('/already-in-firebase')
+  createAlreadyInFirebase(@Body() createUserAlreadyInFirebase: CreateUserAlreadyInFirebaseInput): Promise<User> {
+    return this.usersService.createAlreadyInFirebase(createUserAlreadyInFirebase);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'the items.',
+    type: [User]
+  })
   @Get(':companyUuid')
   findAll(
     @Param() findAllUsersParamInput: FindAllUsersParamInput,
     @Query() findAllUsersQueryInput: FindAllUsersQueryInput
-  ): Promise<any> {
+  ): Promise<User[]> {
     return this.usersService.findAll(findAllUsersParamInput, findAllUsersQueryInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'response.',
+    type: User
+  })
+  @Get('/user/:authUid')
+  getUserByAuthUid(@Param() getUserByAuthUidInput: GetUserByAuthUidInput): Promise<User> {
+    return this.usersService.getUserByAuthUid(getUserByAuthUidInput);
+  }
+
+  @Patch('/change-email')
+  changeEmail(@Body() changeEmailInput: ChangeEmailInput): Promise<User> {
+    return this.usersService.changeEmail(changeEmailInput);
+  }
+
+
+  @Patch('/change-password')
+  changePassword(@Body() changePasswordInput: ChangePasswordInput): Promise<any> {
+    return this.usersService.changePassword(changePasswordInput);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'response.',
+    type: User
+  })
+  @Patch('/change-phone')
+  changePhone(@Body() changePhoneInput: ChangePhoneInput): Promise<User> {
+    return this.usersService.changePhone(changePhoneInput);
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: User
+  })
   @Patch(':companyUuid/:id')
   update(
     @Param() findOneUserInput: FindOneUserInput,
@@ -40,15 +112,26 @@ export class UsersController {
     return this.usersService.update(findOneUserInput, updateUserInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'the item.',
+    type: User
+  })
   @Delete(':companyUuid/:id')
   remove(@Param() findOneUserInput: FindOneUserInput): Promise<any> {
     return this.usersService.remove(findOneUserInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'response.',
+    type: LoginAdminOutPut
+  })
+  @HitsWatcher(10, 60)
   @Public()
-  @Post('/login')
-  loginUser(@Body() loginUserInput: LoginUserInput): Promise<any> {
-    return this.usersService.loginUser(loginUserInput);
+  @Post('/login-admin')
+  loginAdmin(@Body() loginUserInput: LoginUserInput): Promise<LoginAdminOutPut> {
+    return this.usersService.loginAdmin(loginUserInput);
   }
 
   @HitsWatcher(1, 86400)
@@ -59,10 +142,39 @@ export class UsersController {
     return this.usersService.createUsersFromFirebase(createUsersFromFirebaseInput);
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'response.',
+    type: User
+  })
   @Public()
   @Post('/company-admin')
-  createCompanyAdmin(@Body() createCompanyAdminInput: CreateCompanyAdminInput): Promise<any> {
+  createCompanyAdmin(@Body() createCompanyAdminInput: CreateCompanyAdminInput): Promise<User> {
     return this.usersService.createCompanyAdmin(createCompanyAdminInput);
   }
 
+  @Public()
+  @Post('/confirmation-email')
+  sendConfirmationEmail(@Body() sendConfirmationEmailnput: SendConfirmationEmailnput): Promise<any> {
+    return this.usersService.sendConfirmationEmail(sendConfirmationEmailnput);
+  }
+
+  @Public()
+  @Redirect('https://nestjs.com', 302)
+  @Get('/confirmation-email-code')
+  confirmEmail(@Query() confirmEmailInput: ConfirmEmailInput): Promise<any> {
+    return this.usersService.confirmEmail(confirmEmailInput);
+  }
+
+  @Public()
+  @Post('/forgotten-password')
+  sendForgottentPasswordEmail(@Body() sendForgottenPasswordEmailInput: SendForgottenPasswordEmailInput): Promise<any> {
+    return this.usersService.sendForgottentPasswordEmail(sendForgottenPasswordEmailInput);
+  }
+
+  @Public()
+  @Post('/forgotten-password-code')
+  changeForgottenPassword(@Body() changeForgottenPasswordInput: ChangeForgottenPasswordInput): Promise<any> {
+    return this.usersService.changeForgottenPassword(changeForgottenPasswordInput);
+  }
 }

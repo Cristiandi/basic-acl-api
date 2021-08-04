@@ -17,6 +17,11 @@ import { ApiKeysModule } from './modules/api-keys/api-keys.module';
 import { AssignedRolesModule } from './modules/assigned-roles/assigned-roles.module';
 import { HttpRoutesModule } from './modules/http-routes/http-routes.module';
 import { PermissionsModule } from './modules/permisssions/permissions.module';
+import { VerificationCodesModule } from './modules/verification-codes/verification-codes.module';
+import { ConfirmationEmailConfigsModule } from './modules/confirmation-email-configs/confirmation-email-configs.module';
+import { ParametersModule } from './modules/parameters/parameters.module';
+import { ForgottenPasswordConfigsModule } from './modules/forgotten-password-configs/forgotten-password-configs.module';
+import { GraphqlActionsModule } from './modules/graphql-actions/graphql-actions.module';
 
 import appConfig from './config/app.config';
 import appConfigSchema from './config/app.config.schema';
@@ -40,7 +45,8 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
         autoLoadEntities: true,
-        synchronize: process.env.NODE_ENV !== 'production'
+        synchronize: process.env.NODE_ENV !== 'production',
+        logging: true
       })
     }),
     CommonModule,
@@ -51,7 +57,12 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
     ApiKeysModule,
     AssignedRolesModule,
     HttpRoutesModule,
-    PermissionsModule
+    PermissionsModule,
+    VerificationCodesModule,
+    ConfirmationEmailConfigsModule,
+    ParametersModule,
+    ForgottenPasswordConfigsModule,
+    GraphqlActionsModule
   ],
   controllers: [AppController],
   providers: [AppService]

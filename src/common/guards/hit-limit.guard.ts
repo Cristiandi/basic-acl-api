@@ -1,5 +1,5 @@
 import * as requestIp from 'request-ip';
-import * as md5 from 'md5';
+import * as SparkMD5 from 'spark-md5';
 import { CanActivate, ExecutionContext, Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ConfigType } from '@nestjs/config';
@@ -48,7 +48,7 @@ export class HitLimitGuard implements CanActivate {
     const clientIp = requestIp.getClientIp(request);
 
     // define the key
-    const key = md5(`${clientIp}|${originalUrl}`);
+    const key = SparkMD5.hash(`${clientIp}|${originalUrl}`);
 
     // define the value for the key
     const initialTimeDate = new Date();

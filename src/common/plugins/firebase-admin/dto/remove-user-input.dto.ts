@@ -1,9 +1,9 @@
-import { IsString, IsUUID } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class RemoveUserInput {
   @IsString()
   readonly companyUuid: string;
 
-  @IsUUID()
+  @IsString()
   readonly uid: string;
 }

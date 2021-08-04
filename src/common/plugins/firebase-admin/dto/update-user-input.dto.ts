@@ -1,10 +1,10 @@
-import { IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsString } from 'class-validator';
 
 export class UpdateUserInput {
   @IsString()
   readonly companyUuid: string;
 
-  @IsUUID()
+  @IsString()
   readonly uid: string;
 
   @IsString()
@@ -18,4 +18,7 @@ export class UpdateUserInput {
 
   @IsString()
   readonly countryCode: string;
+
+  @IsBoolean()
+  readonly emailVerified?: boolean;
 }

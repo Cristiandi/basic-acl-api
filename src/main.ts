@@ -25,7 +25,25 @@ async function bootstrap() {
   app.enableCors();
 
   // use helmet
-  await app.register(helmet, { hidePoweredBy: false });
+  // await app.register(helmet, { hidePoweredBy: false });
+
+  /*
+  app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ['self'],
+        styleSrc: ['self', 'unsafe-inline'],
+        imgSrc: ['self', 'data:', 'validator.swagger.io'],
+        scriptSrc: ['self', 'https: \'unsafe-inline\'']
+      }
+    }
+  });
+  */
+
+  app.register(helmet, {
+    hidePoweredBy: false,
+    contentSecurityPolicy: false
+  });
   
   // using the filters
   app.useGlobalFilters(new CustomExceptionFilter());

@@ -8,14 +8,26 @@ import { LoginInput } from './dto/login-input.dto';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class FirebaseService {
-  constructor(private readonly companiesService: CompaniesService) { }
+  private appsPool: Map<string, firebase.app.App>;
+
+  constructor(private readonly companiesService: CompaniesService) {
+    this.appsPool = new Map<string, firebase.app.App>();
+  }
 
   private async initFirebase(initFirebaseInput: InitFirebaseInput): Promise<firebase.app.App> {
     const { uuid } = initFirebaseInput;
+
+    const appInPool = this.appsPool.get(uuid);
+
+    if (appInPool) return appInPool; 
+
     const firebaseConfig = await this.companiesService.getFirebaseConfig({ uuid });
 
     if (!firebase.apps.length) {
-      const app = firebase.initializeApp(firebaseConfig);    
+      const app = firebase.initializeApp(firebaseConfig);
+      
+      this.appsPool.set(uuid, app);
+      
       return app;
     }
 
@@ -23,6 +35,9 @@ export class FirebaseService {
     if (existingApp) return existingApp;
 
     const app = firebase.initializeApp(firebaseConfig, uuid);
+    
+    this.appsPool.set(uuid, app);
+    
     return app;
   }
 
