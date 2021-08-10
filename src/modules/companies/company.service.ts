@@ -14,12 +14,12 @@ import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
 @Injectable()
-export class CompaniesService extends BaseService<Company> {
+export class CompanyService extends BaseService<Company> {
   constructor(
     @InjectRepository(Company)
-    protected readonly repository: Repository<Company>,
+    private readonly companyRepository: Repository<Company>,
   ) {
-    super(repository);
+    super(companyRepository);
   }
 
   public async create(
@@ -40,14 +40,14 @@ export class CompaniesService extends BaseService<Company> {
 
     const accessKey = generateId(20);
 
-    const created = await this.repository.create({
+    const created = await this.companyRepository.create({
       name,
       accessKey,
       firebaseAdminConfig,
       firebaseConfig,
     });
 
-    const saved = await this.repository.save(created);
+    const saved = await this.companyRepository.save(created);
 
     delete saved.firebaseAdminConfig;
     delete saved.firebaseConfig;
@@ -80,7 +80,7 @@ export class CompaniesService extends BaseService<Company> {
 
     const { name } = updateCompanyInput;
 
-    const otherExisting = await this.repository.findOne({
+    const otherExisting = await this.companyRepository.findOne({
       where: {
         name,
         id: Not(existing.id),
@@ -91,12 +91,12 @@ export class CompaniesService extends BaseService<Company> {
       throw new ConflictException(`the name is being used for other company`);
     }
 
-    const preloaded = await this.repository.preload({
+    const preloaded = await this.companyRepository.preload({
       id: existing.id,
       ...updateCompanyInput,
     });
 
-    const saved = await this.repository.save(preloaded);
+    const saved = await this.companyRepository.save(preloaded);
 
     return saved;
   }
@@ -112,7 +112,7 @@ export class CompaniesService extends BaseService<Company> {
 
     const clone = { ...existing };
 
-    await this.repository.softRemove(existing);
+    await this.companyRepository.softRemove(existing);
 
     delete clone.firebaseAdminConfig;
     delete clone.firebaseConfig;

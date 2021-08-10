@@ -37,10 +37,10 @@ class FirebaseConfig {
 }
 
 @ObjectType()
-@Entity({ name: 'companies' })
-@Unique('uk_companies_uid', ['uid'])
-@Unique('uk_companies_access_key', ['accessKey'])
-@Unique('uk_companies_name', ['name'])
+@Entity({ name: 'company' })
+@Unique('uk_company_uid', ['uid'])
+@Unique('uk_company_access_key', ['accessKey'])
+@Unique('uk_company_name', ['name'])
 export class Company extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()

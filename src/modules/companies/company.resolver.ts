@@ -3,7 +3,7 @@ import { UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { Company } from './company.entity';
 
-import { CompaniesService } from './companies.service';
+import { CompanyService } from './company.service';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
@@ -11,8 +11,8 @@ import { UpdateCompanyInput } from './dto/update-company-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => Company)
-export class CompaniesResolver {
-  constructor(private readonly service: CompaniesService) {}
+export class CompanyResolver {
+  constructor(private readonly service: CompanyService) {}
 
   @Mutation(() => Company, { name: 'createCompany' })
   public create(

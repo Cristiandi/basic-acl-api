@@ -10,7 +10,8 @@ import appConfig from './config/app.config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
-import { CompaniesModule } from './modules/companies/companies.module';
+
+import { CompanyModule } from './modules/companies/company.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
@@ -26,9 +27,9 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
     // GraphQL
     GraphQLModule.forRoot({
       autoSchemaFile: 'schema.gql',
-      playground: NODE_ENV === 'development',
       introspection: true,
       installSubscriptionHandlers: true,
+      playground: NODE_ENV === 'development',
     }),
 
     // TypeORM
@@ -46,7 +47,7 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
       }),
     }),
 
-    CompaniesModule,
+    CompanyModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

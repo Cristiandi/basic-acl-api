@@ -4,7 +4,7 @@ import { BaseEntity, Entity, Repository } from 'typeorm';
 import { GetOneByOneFieldInput } from './dto/get-one-input.dto';
 
 export class BaseService<Entity extends BaseEntity> {
-  constructor(protected readonly repository: Repository<Entity>) {}
+  constructor(private readonly repository: Repository<Entity>) {}
 
   public async getOneByOneFields(
     input: GetOneByOneFieldInput,
