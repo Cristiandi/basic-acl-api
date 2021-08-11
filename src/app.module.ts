@@ -1,8 +1,6 @@
-import * as path from 'path';
-
 import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import appConfig from './config/app.config';
@@ -14,38 +12,48 @@ import { AppResolver } from './app.resolver';
 import { CompanyModule } from './modules/company/company.module';
 import { ProjectModule } from './modules/project/project.module';
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
-const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
-
 @Module({
   imports: [
     // config
     ConfigModule.forRoot({
-      envFilePath: envPath,
+      isGlobal: true,
       load: [appConfig],
     }),
 
     // GraphQL
-    GraphQLModule.forRoot({
-      autoSchemaFile: 'schema.gql',
-      introspection: true,
-      installSubscriptionHandlers: true,
-      playground: NODE_ENV === 'development',
+    GraphQLModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          autoSchemaFile: 'schema.gql',
+          introspection: true,
+          installSubscriptionHandlers: true,
+          playground:
+            configService.get<string>('config.environment') === 'development',
+        };
+      },
     }),
 
     // TypeORM
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        type: 'postgres',
-        host: process.env.DATABASE_HOST,
-        port: +process.env.DATABASE_PORT,
-        username: process.env.DATABASE_USER,
-        password: process.env.DATABASE_PASSWORD,
-        database: process.env.DATABASE_NAME,
-        autoLoadEntities: true,
-        synchronize: process.env.NODE_ENV !== 'production',
-        logging: process.env.NODE_ENV !== 'production',
-      }),
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          type: 'postgres',
+          host: configService.get<string>('config.database.host'),
+          port: configService.get<number>('config.database.port'),
+          username: configService.get<string>('config.database.user'),
+          password: configService.get<string>('config.database.password'),
+          database: configService.get<string>('config.database.database'),
+          autoLoadEntities: true,
+          synchronize:
+            configService.get<string>('config.environment') !== 'production',
+          logging:
+            configService.get<string>('config.environment') !== 'production',
+        };
+      },
     }),
 
     CompanyModule,
