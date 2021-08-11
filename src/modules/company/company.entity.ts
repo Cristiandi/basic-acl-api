@@ -7,10 +7,14 @@ import {
   DeleteDateColumn,
   Entity,
   Generated,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { Project } from '../project/project.entity';
 
 class FirebaseAdminConfig {
   type: string;
@@ -77,4 +81,10 @@ export class Company extends BaseEntity {
 
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
+
+  // relations
+
+  @Field(() => [Project])
+  @OneToMany(() => Project, (project) => project.company)
+  projects: Project[];
 }

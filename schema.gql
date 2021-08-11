@@ -2,6 +2,15 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Project {
+  id: Float!
+  uuid: String!
+  code: String!
+  name: String!
+  description: String!
+  company: Company!
+}
+
 type Company {
   id: Float!
   uid: String!
@@ -11,6 +20,7 @@ type Company {
   firebaseConfig: JSONObject
   createdAt: DateTime!
   updatedAt: DateTime!
+  projects: [Project!]!
 }
 
 """

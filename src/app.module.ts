@@ -11,7 +11,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
 
-import { CompanyModule } from './modules/companies/company.module';
+import { CompanyModule } from './modules/company/company.module';
+import { ProjectModule } from './modules/project/project.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
@@ -48,6 +49,8 @@ const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
     }),
 
     CompanyModule,
+
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
