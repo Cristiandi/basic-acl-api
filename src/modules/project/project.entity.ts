@@ -34,8 +34,8 @@ export class Project extends BaseEntity {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Field()
-  @Column({ type: 'varchar', length: 160 })
+  @Field({ nullable: true })
+  @Column({ type: 'varchar', length: 160, nullable: true })
   description: string;
 
   // relations

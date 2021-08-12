@@ -1,5 +1,5 @@
 export class GetOneByOneFieldInput {
-  readonly fields: Record<string, any>;
+  readonly fields: Record<any, any>;
 
   readonly relations?: string[];
 

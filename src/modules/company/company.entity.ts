@@ -7,7 +7,6 @@ import {
   DeleteDateColumn,
   Entity,
   Generated,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   Unique,

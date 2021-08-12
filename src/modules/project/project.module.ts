@@ -5,8 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Project } from './project.entity';
 
+import { CompanyModule } from '../company/company.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Project])],
+  imports: [TypeOrmModule.forFeature([Project]), CompanyModule],
   providers: [ProjectService, ProjectResolver],
   exports: [ProjectService],
 })

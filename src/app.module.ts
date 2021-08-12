@@ -5,12 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import appConfig from './config/app.config';
 
+// import { loggerMiddleware } from './common/middlewares/logger.middleware';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
 
 import { CompanyModule } from './modules/company/company.module';
 import { ProjectModule } from './modules/project/project.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -26,11 +29,16 @@ import { ProjectModule } from './modules/project/project.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          autoSchemaFile: 'schema.gql',
+          autoSchemaFile: join(process.cwd(), 'schema.gql'),
+          sortSchema: true,
           introspection: true,
           installSubscriptionHandlers: true,
           playground:
             configService.get<string>('config.environment') === 'development',
+          formatError: (error) => {
+            console.error(error);
+            return error;
+          },
         };
       },
     }),
@@ -50,8 +58,7 @@ import { ProjectModule } from './modules/project/project.module';
           autoLoadEntities: true,
           synchronize:
             configService.get<string>('config.environment') !== 'production',
-          logging:
-            configService.get<string>('config.environment') !== 'production',
+          logging: configService.get<string>('config.database.log') === 'yes',
         };
       },
     }),

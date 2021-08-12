@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { BaseEntity, Entity, Repository } from 'typeorm';
+import { BaseEntity, Repository } from 'typeorm';
 
 import { GetOneByOneFieldInput } from './dto/get-one-input.dto';
 
@@ -18,11 +18,16 @@ export class BaseService<Entity extends BaseEntity> {
 
     if (!existing && checkIfExists) {
       const values = Object.keys(fields)
-        .map((key) => `${key} -> ${values[key]}`)
+        .map(
+          (key) =>
+            `${key} = ${
+              typeof fields[key] === 'object' ? fields[key].id : fields[key]
+            }`,
+        )
         .join(' | ');
 
       throw new NotFoundException(
-        `can't get the ${Entity.name} with the values ${values}.`,
+        `can't get the ${this.repository.metadata.tableName} with the values: ${values}.`,
       );
     }
 
