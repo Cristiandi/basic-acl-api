@@ -52,7 +52,7 @@
     "form-data": "4.0.0",
     "handlebars": "4.7.7",
     "joi": "17.4.2",
-    "mailgun.js": "3.5.5",
+    "mailgun.js": "3.5.6",
     "md5": "2.3.0",
     "mjml": "4.10.2",
     "nanoid": "3.1.23",
