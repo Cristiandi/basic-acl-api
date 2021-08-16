@@ -32,7 +32,18 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input GetAllProjectsInput {
+  companyUid: String!
+  limit: Int
+  q: String
+  skip: Int
+}
+
 input GetOneCompanyInput {
+  uid: String!
+}
+
+input GetOneProjectInput {
   uid: String!
 }
 
@@ -45,25 +56,38 @@ type Mutation {
   createCompany(createCompanyInput: CreateCompanyInput!): Company!
   createProject(createProjectInput: CreateProjectInput!): Project!
   daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
+  deleteProject(getOneProjectInput: GetOneProjectInput!): Project!
   updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
+  updateProject(getOneProjectInput: GetOneProjectInput!, updateProjectInput: UpdateProjectInput!): Project!
 }
 
 type Project {
   code: String!
   company: Company!
+  createdAt: DateTime!
   description: String
   id: Float!
   name: String!
-  uuid: String!
+  uid: String!
+  updatedAt: DateTime!
 }
 
 type Query {
+  getAllProjects(getProjectsInput: GetAllProjectsInput!): [Project!]
   getCompany(getOneCompanyInput: GetOneCompanyInput!): Company
+  getOneProject(getOneProjectInput: GetOneProjectInput!): Project
   sayHello: String!
 }
 
 input UpdateCompanyInput {
   firebaseAdminConfig: JSONObject
   firebaseConfig: JSONObject
+  name: String
+}
+
+input UpdateProjectInput {
+  code: String
+  companyUid: String
+  description: String
   name: String
 }

@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
-import { ProjectService } from './project.service';
-import { ProjectResolver } from './project.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Project } from './project.entity';
 
-import { CompanyModule } from '../company/company.module';
+import { ProjectService } from './project.service';
+import { ProjectLoaders } from './project.loaders';
+import { ProjectResolver } from './project.resolver';
 
+import { CompanyModule } from '../company/company.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Project]), CompanyModule],
-  providers: [ProjectService, ProjectResolver],
+  providers: [ProjectService, ProjectLoaders, ProjectResolver],
   exports: [ProjectService],
 })
 export class ProjectModule {}

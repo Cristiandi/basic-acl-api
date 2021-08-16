@@ -12,6 +12,7 @@ export class BaseService<Entity extends BaseEntity> {
     const { fields, relations, checkIfExists = false } = input;
 
     const existing = await this.repository.findOne({
+      loadRelationIds: true,
       where: { ...fields },
       relations,
     });

@@ -10,8 +10,12 @@ import { BaseService } from 'src/common/base.service';
 
 import { Project } from './project.entity';
 
-import { CreateProjectInput } from './dto/create-project-input.dto';
 import { CompanyService } from '../company/company.service';
+
+import { CreateProjectInput } from './dto/create-project-input.dto';
+import { GetOneProjectInput } from './dto/get-one-project-input.dto';
+import { GetAllProjectsInput } from './dto/get-all-projects-input.dto';
+import { UpdateProjectInput } from './dto/update-project-input.dto';
 @Injectable()
 export class ProjectService extends BaseService<Project> {
   constructor(
@@ -37,7 +41,6 @@ export class ProjectService extends BaseService<Project> {
 
     const existing = await this.getOneByOneFields({
       fields: { company, code },
-      checkIfExists: true,
     });
 
     if (existing) {
@@ -52,5 +55,81 @@ export class ProjectService extends BaseService<Project> {
     const saved = await this.projectRepository.save(created);
 
     return saved;
+  }
+
+  public async getOne(input: GetOneProjectInput): Promise<Project | undefined> {
+    const { uid } = input;
+
+    const existing = await this.getOneByOneFields({
+      fields: { uid },
+      checkIfExists: false,
+    });
+
+    return existing;
+  }
+
+  public async getAll(input: GetAllProjectsInput): Promise<Project[]> {
+    console.log('inpit', input);
+
+    const { companyUid, limit, skip, q } = input;
+
+    const query = this.projectRepository
+      .createQueryBuilder('project')
+      .loadAllRelationIds()
+      .innerJoin('project.company', 'company')
+      .where('company.uid = :companyUid', { companyUid });
+
+    if (q)
+      query.andWhere(
+        'project.code ilike :q OR project.name ilike :q OR project.description ilike :q',
+        {
+          q: `%${q}%`,
+        },
+      );
+
+    query.limit(limit || 10).skip(skip);
+
+    const items = await query.getMany();
+
+    return items;
+  }
+
+  public async update(
+    getOneProjectInput: GetOneProjectInput,
+    input: UpdateProjectInput,
+  ): Promise<Project> {
+    const { uid } = getOneProjectInput;
+
+    const existing = await this.getOneByOneFields({
+      fields: { uid },
+      checkIfExists: true,
+    });
+
+    const preloaded = await this.projectRepository.preload({
+      id: existing.id,
+      ...input,
+    });
+
+    const saved = await this.projectRepository.save(preloaded);
+
+    return {
+      ...existing,
+      ...saved,
+    } as Project;
+  }
+
+  public async delete(input: GetOneProjectInput): Promise<Project> {
+    const { uid } = input;
+
+    const existing = await this.getOneByOneFields({
+      fields: { uid },
+      checkIfExists: true,
+    });
+
+    const clone = { ...existing };
+
+    await this.projectRepository.softRemove(existing);
+
+    return clone as Project;
   }
 }

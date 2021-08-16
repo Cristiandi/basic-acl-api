@@ -1,7 +1,15 @@
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Resolver,
+  Query,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { Company } from './company.entity';
+import { Project } from '../project/project.entity';
 
 import { CompanyService } from './company.service';
 
@@ -41,5 +49,10 @@ export class CompanyResolver {
     @Args('getOneCompanyInput') getOneCompanyInput: GetOneCompanyInput,
   ): Promise<Company> {
     return this.service.delete(getOneCompanyInput);
+  }
+
+  @ResolveField(() => [Project], { name: 'projects' })
+  public assignedCategories(@Parent() parent: Company): Promise<Project[]> {
+    return this.service.projects(parent);
   }
 }
