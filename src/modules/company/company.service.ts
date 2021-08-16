@@ -139,4 +139,18 @@ export class CompanyService extends BaseService<Company> {
 
     return items.map((item) => ({ ...item, company: master.id }));
   }
+
+  public async roles(parent: Company): Promise<any[]> {
+    const { id } = parent;
+
+    const master = await this.companyRepository
+      .createQueryBuilder('company')
+      .leftJoinAndSelect('company.roles', 'role')
+      .where('company.id = :id', { id })
+      .getOne();
+
+    const items = master ? master.roles : [];
+
+    return items.map((item) => ({ ...item, company: master.id }));
+  }
 }

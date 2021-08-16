@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 
 import { Project } from '../project/project.entity';
+import { Role } from '../role/role.entity';
 
 class FirebaseAdminConfig {
   type: string;
@@ -86,4 +87,8 @@ export class Company extends BaseEntity {
   @Field(() => [Project])
   @OneToMany(() => Project, (project) => project.company)
   projects: Project[];
+
+  @Field(() => [Role])
+  @OneToMany(() => Role, (role) => role.company)
+  roles: Role[];
 }

@@ -14,6 +14,7 @@ import { AppResolver } from './app.resolver';
 import { CompanyModule } from './modules/company/company.module';
 import { ProjectModule } from './modules/project/project.module';
 import { join } from 'path';
+import { RoleModule } from './modules/role/role.module';
 
 @Module({
   imports: [
@@ -66,6 +67,8 @@ import { join } from 'path';
     CompanyModule,
 
     ProjectModule,
+
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

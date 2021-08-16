@@ -10,6 +10,7 @@ type Company {
   id: Float!
   name: String!
   projects: [Project!]!
+  roles: [Role!]!
   uid: String!
   updatedAt: DateTime!
 }
@@ -21,6 +22,13 @@ input CreateCompanyInput {
 }
 
 input CreateProjectInput {
+  code: String!
+  companyUid: String!
+  description: String
+  name: String!
+}
+
+input CreateRoleInput {
   code: String!
   companyUid: String!
   description: String
@@ -39,11 +47,22 @@ input GetAllProjectsInput {
   skip: Int
 }
 
+input GetAllRolesInput {
+  companyUid: String!
+  limit: Int
+  q: String
+  skip: Int
+}
+
 input GetOneCompanyInput {
   uid: String!
 }
 
 input GetOneProjectInput {
+  uid: String!
+}
+
+input GetOneRoleInput {
   uid: String!
 }
 
@@ -55,10 +74,13 @@ scalar JSONObject @specifiedBy(url: "http://www.ecma-international.org/publicati
 type Mutation {
   createCompany(createCompanyInput: CreateCompanyInput!): Company!
   createProject(createProjectInput: CreateProjectInput!): Project!
+  createRole(createRoleInput: CreateRoleInput!): Role!
   daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
   deleteProject(getOneProjectInput: GetOneProjectInput!): Project!
+  deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
   updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
   updateProject(getOneProjectInput: GetOneProjectInput!, updateProjectInput: UpdateProjectInput!): Project!
+  updateRole(getOneRoleInput: GetOneRoleInput!, updateRoleInput: UpdateRoleInput!): Role!
 }
 
 type Project {
@@ -74,9 +96,22 @@ type Project {
 
 type Query {
   getAllProjects(getProjectsInput: GetAllProjectsInput!): [Project!]
+  getAllRoles(getRolesInput: GetAllRolesInput!): [Role!]
   getCompany(getOneCompanyInput: GetOneCompanyInput!): Company
   getOneProject(getOneProjectInput: GetOneProjectInput!): Project
+  getOneRole(getOneRoleInput: GetOneRoleInput!): Role
   sayHello: String!
+}
+
+type Role {
+  code: String!
+  company: Company!
+  createdAt: DateTime!
+  description: String
+  id: Float!
+  name: String!
+  uid: String!
+  updatedAt: DateTime!
 }
 
 input UpdateCompanyInput {
@@ -86,6 +121,13 @@ input UpdateCompanyInput {
 }
 
 input UpdateProjectInput {
+  code: String
+  companyUid: String
+  description: String
+  name: String
+}
+
+input UpdateRoleInput {
   code: String
   companyUid: String
   description: String

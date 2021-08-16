@@ -16,6 +16,7 @@ import { CompanyService } from './company.service';
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
+import { Role } from '../role/role.entity';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => Company)
@@ -52,7 +53,12 @@ export class CompanyResolver {
   }
 
   @ResolveField(() => [Project], { name: 'projects' })
-  public assignedCategories(@Parent() parent: Company): Promise<Project[]> {
+  public projects(@Parent() parent: Company): Promise<Project[]> {
     return this.service.projects(parent);
+  }
+
+  @ResolveField(() => [Role], { name: 'roles' })
+  public roles(@Parent() parent: Company): Promise<Role[]> {
+    return this.service.roles(parent);
   }
 }
