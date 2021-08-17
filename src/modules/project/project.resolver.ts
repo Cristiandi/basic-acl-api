@@ -64,7 +64,7 @@ export class ProjectResolver {
   }
 
   @ResolveField(() => Company, { name: 'company' })
-  company(@Parent() project: Project): Promise<Company> {
+  public company(@Parent() project: Project): Promise<Company> {
     const value: any = project.company;
 
     let id = value;

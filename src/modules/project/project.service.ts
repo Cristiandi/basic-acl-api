@@ -26,6 +26,8 @@ export class ProjectService extends BaseService<Project> {
     super(projectRepository);
   }
 
+  // CRUD
+
   public async create(input: CreateProjectInput): Promise<Project> {
     const { companyUid } = input;
 
@@ -132,4 +134,6 @@ export class ProjectService extends BaseService<Project> {
 
     return clone as Project;
   }
+
+  // CRUD
 }

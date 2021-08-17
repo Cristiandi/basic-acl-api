@@ -41,7 +41,7 @@ export class RoleResolver {
     return this.service.getOne(input);
   }
 
-  @Query(() => [Role], { name: 'getAllRoles', nullable: true })
+  @Query(() => [Role], { name: 'getAllRoles' })
   public getAll(
     @Args('getRolesInput') input: GetAllRolesInput,
   ): Promise<Role[]> {

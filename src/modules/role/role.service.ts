@@ -26,6 +26,8 @@ export class RoleService extends BaseService<Role> {
     super(roleRepository);
   }
 
+  // CRUD
+
   public async create(input: CreateRoleInput): Promise<Role> {
     const { companyUid } = input;
 
@@ -130,4 +132,6 @@ export class RoleService extends BaseService<Role> {
 
     return clone as Role;
   }
+
+  // CRUD
 }

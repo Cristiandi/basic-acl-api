@@ -22,10 +22,10 @@ export class CompanyService extends BaseService<Company> {
     super(companyRepository);
   }
 
-  public async create(
-    createCompanyInput: CreateCompanyInput,
-  ): Promise<Company> {
-    const { name, firebaseAdminConfig, firebaseConfig } = createCompanyInput;
+  // CRUD
+
+  public async create(input: CreateCompanyInput): Promise<Company> {
+    const { name, firebaseAdminConfig, firebaseConfig } = input;
 
     const existingByName = await this.getOneByOneFields({
       fields: { name },
@@ -40,7 +40,7 @@ export class CompanyService extends BaseService<Company> {
 
     const accessKey = generateId(20);
 
-    const created = await this.companyRepository.create({
+    const created = this.companyRepository.create({
       name,
       accessKey,
       firebaseAdminConfig,
@@ -120,6 +120,8 @@ export class CompanyService extends BaseService<Company> {
     return clone as Company;
   }
 
+  // CRUD
+
   public async getByIds(ids: number[]): Promise<Company[]> {
     return this.companyRepository.findByIds(ids, {
       loadRelationIds: true,
@@ -150,6 +152,20 @@ export class CompanyService extends BaseService<Company> {
       .getOne();
 
     const items = master ? master.roles : [];
+
+    return items.map((item) => ({ ...item, company: master.id }));
+  }
+
+  public async apiKeys(parent: Company): Promise<any[]> {
+    const { id } = parent;
+
+    const master = await this.companyRepository
+      .createQueryBuilder('company')
+      .leftJoinAndSelect('company.apiKeys', 'apiKey')
+      .where('company.id = :id', { id })
+      .getOne();
+
+    const items = master ? master.apiKeys : [];
 
     return items.map((item) => ({ ...item, company: master.id }));
   }

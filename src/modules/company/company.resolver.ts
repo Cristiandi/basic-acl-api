@@ -10,6 +10,7 @@ import { UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { Company } from './company.entity';
 import { Project } from '../project/project.entity';
+import { ApiKey } from '../api-key/api-key.entity';
 
 import { CompanyService } from './company.service';
 
@@ -60,5 +61,10 @@ export class CompanyResolver {
   @ResolveField(() => [Role], { name: 'roles' })
   public roles(@Parent() parent: Company): Promise<Role[]> {
     return this.service.roles(parent);
+  }
+
+  @ResolveField(() => [Role], { name: 'apiKeys' })
+  public apiKeys(@Parent() parent: Company): Promise<ApiKey[]> {
+    return this.service.apiKeys(parent);
   }
 }

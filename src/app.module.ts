@@ -15,6 +15,7 @@ import { CompanyModule } from './modules/company/company.module';
 import { ProjectModule } from './modules/project/project.module';
 import { join } from 'path';
 import { RoleModule } from './modules/role/role.module';
+import { ApiKeyModule } from './modules/api-key/api-key.module';
 
 @Module({
   imports: [
@@ -69,6 +70,8 @@ import { RoleModule } from './modules/role/role.module';
     ProjectModule,
 
     RoleModule,
+
+    ApiKeyModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
