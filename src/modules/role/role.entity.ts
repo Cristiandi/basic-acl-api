@@ -55,7 +55,7 @@ export class Role extends BaseEntity {
   // relations
 
   @Field(() => Company)
-  @ManyToOne(() => Company, (company) => company.roles)
+  @ManyToOne(() => Company, (company) => company.roles, { nullable: false })
   @JoinColumn({ name: 'company_id' })
   company: Company;
 }

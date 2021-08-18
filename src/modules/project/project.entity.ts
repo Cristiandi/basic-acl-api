@@ -55,7 +55,7 @@ export class Project extends BaseEntity {
   // relations
 
   @Field(() => Company)
-  @ManyToOne(() => Company, (company) => company.projects)
+  @ManyToOne(() => Company, (company) => company.projects, { nullable: false })
   @JoinColumn({ name: 'company_id' })
   company: Company;
 }

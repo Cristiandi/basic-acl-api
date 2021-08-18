@@ -51,7 +51,7 @@ export class ApiKey extends BaseEntity {
   // relations
 
   @Field(() => Company)
-  @ManyToOne(() => Company, (company) => company.apiKeys)
+  @ManyToOne(() => Company, (company) => company.apiKeys, { nullable: false })
   @JoinColumn({ name: 'company_id' })
   company: Company;
 }

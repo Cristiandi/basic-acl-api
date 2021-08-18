@@ -28,28 +28,28 @@ export class ApiKeyResolver {
 
   @Mutation(() => ApiKey, { name: 'createApiKey' })
   public create(
-    @Args('CreateApiKeyInput') input: CreateApiKeyInput,
+    @Args('createApiKeyInput') input: CreateApiKeyInput,
   ): Promise<ApiKey> {
     return this.service.create(input);
   }
 
   @Query(() => ApiKey, { name: 'getOneApiKey', nullable: true })
   public getOne(
-    @Args('GetOneApiKeyInput') input: GetOneApiKeyInput,
+    @Args('getOneApiKeyInput') input: GetOneApiKeyInput,
   ): Promise<ApiKey | undefined> {
     return this.service.getOne(input);
   }
 
   @Query(() => [ApiKey], { name: 'getAllApiKeys' })
   public getAll(
-    @Args('GetAllApiKeysInput') input: GetAllApiKeysInput,
+    @Args('getAllApiKeysInput') input: GetAllApiKeysInput,
   ): Promise<ApiKey[]> {
     return this.service.getAll(input);
   }
 
   @Mutation(() => ApiKey, { name: 'updateApiKey' })
   public update(
-    @Args('GetOneApiKeyInput') getOneApiKeyInput: GetOneApiKeyInput,
+    @Args('getOneApiKeyInput') getOneApiKeyInput: GetOneApiKeyInput,
     @Args('updateApiKeyInput') input: UpdateApiKeyInput,
   ): Promise<ApiKey> {
     return this.service.update(getOneApiKeyInput, input);
@@ -57,7 +57,7 @@ export class ApiKeyResolver {
 
   @Mutation(() => ApiKey, { name: 'deleteApiKey' })
   public delete(
-    @Args('GetOneApiKeyInput') input: GetOneApiKeyInput,
+    @Args('getOneApiKeyInput') input: GetOneApiKeyInput,
   ): Promise<ApiKey> {
     return this.service.delete(input);
   }

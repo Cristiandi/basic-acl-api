@@ -38,11 +38,12 @@ export class ApiKeyService extends BaseService<ApiKey> {
       throw new NotFoundException(`company with uid ${companyUid} not found.`);
     }
 
-    const value = generateId(20);
+    const value = generateId(16);
 
     const created = this.apiKeyRepository.create({
       value,
-      ...company,
+      ...input,
+      company,
     });
 
     const saved = await this.apiKeyRepository.save(created);
@@ -71,7 +72,7 @@ export class ApiKeyService extends BaseService<ApiKey> {
       .where('company.uid = :companyUid', { companyUid });
 
     if (q)
-      query.andWhere('apiKey.value ilike :q OR role.alias ilike :q', {
+      query.andWhere('apiKey.value ilike :q OR apiKey.alias ilike :q', {
         q: `%${q}%`,
       });
 
