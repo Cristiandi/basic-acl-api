@@ -16,6 +16,7 @@ import { ProjectModule } from './modules/project/project.module';
 import { join } from 'path';
 import { RoleModule } from './modules/role/role.module';
 import { ApiKeyModule } from './modules/api-key/api-key.module';
+import { EmailTemplateModule } from './modules/email-template/email-template.module';
 
 @Module({
   imports: [
@@ -72,6 +73,8 @@ import { ApiKeyModule } from './modules/api-key/api-key.module';
     RoleModule,
 
     ApiKeyModule,
+
+    EmailTemplateModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
