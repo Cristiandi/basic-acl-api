@@ -22,7 +22,9 @@ export class BaseService<Entity extends BaseEntity> {
         .map(
           (key) =>
             `${key} = ${
-              typeof fields[key] === 'object' ? fields[key].id : fields[key]
+              typeof fields[key] === 'object' && fields[key]
+                ? fields[key].id
+                : fields[key]
             }`,
         )
         .join(' | ');

@@ -4,11 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BaseService } from 'src/common/base.service';
-import { generateId } from 'src/utils';
 import { Not, Repository } from 'typeorm';
 
+import { BaseService } from '../../common/base.service';
+
 import { Company } from './company.entity';
+
+import { generateId } from '../../utils';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
