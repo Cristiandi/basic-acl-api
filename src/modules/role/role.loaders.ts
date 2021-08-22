@@ -2,7 +2,7 @@ import * as DataLoader from 'dataloader';
 
 import { Injectable, Scope } from '@nestjs/common';
 
-import { CompanyService } from '../company/company.service';
+import { CompanyService } from '../company/services/company.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class RoleLoaders {

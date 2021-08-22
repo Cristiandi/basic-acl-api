@@ -10,7 +10,7 @@ import { BaseService } from '../../common/base.service';
 
 import { User } from './user.entity';
 
-import { CompanyService } from '../company/company.service';
+import { CompanyService } from '../company/services/company.service';
 import { FirebaseAdminService } from 'src/plugins/firebase-admin/firebase-admin.service';
 
 import { CreateUserInput } from './dto/create-user-input.dto';

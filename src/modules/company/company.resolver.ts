@@ -12,7 +12,7 @@ import { Company } from './company.entity';
 import { Project } from '../project/project.entity';
 import { ApiKey } from '../api-key/api-key.entity';
 
-import { CompanyService } from './company.service';
+import { CompanyService } from './services/company.service';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { GetOneCompanyInput } from './dto/get-one-company-input.dto';

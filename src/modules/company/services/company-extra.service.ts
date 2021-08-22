@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { CompanyService } from './company.service';
 
-import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
+import { GetOneCompanyInput } from '../dto/get-one-company-input.dto';
 
 @Injectable()
 export class CompanyExtraService {

@@ -10,7 +10,7 @@ import { BaseService } from '../../common/base.service';
 
 import { Project } from './project.entity';
 
-import { CompanyService } from '../company/company.service';
+import { CompanyService } from '../company/services/company.service';
 
 import { CreateProjectInput } from './dto/create-project-input.dto';
 import { GetOneProjectInput } from './dto/get-one-project-input.dto';

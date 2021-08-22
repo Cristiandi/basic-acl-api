@@ -2,8 +2,8 @@ import * as firebaseAdmin from 'firebase-admin';
 
 import { Injectable, PreconditionFailedException } from '@nestjs/common';
 
-import { CompanyService } from '../../modules/company/company.service';
-import { CompanyExtraService } from '../../modules/company/company-extra.service';
+import { CompanyService } from '../../modules/company/services/company.service';
+import { CompanyExtraService } from '../../modules/company/services/company-extra.service';
 
 import { InitAppInput } from './dto/init-app-input.dto';
 import { CreateUserInput } from './dto/create-user-input.dto';

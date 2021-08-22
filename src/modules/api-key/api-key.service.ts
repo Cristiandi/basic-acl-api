@@ -6,7 +6,7 @@ import { BaseService } from '../../common/base.service';
 
 import { ApiKey } from './api-key.entity';
 
-import { CompanyService } from '../company/company.service';
+import { CompanyService } from '../company/services/company.service';
 
 import { generateUid } from '../../utils';
 

@@ -6,7 +6,7 @@ import { BaseService } from '../../common/base.service';
 
 import { EmailTemplate } from './email-template.entity';
 
-import { CompanyService } from '../company/company.service';
+import { CompanyService } from '../company/services/company.service';
 
 import { GetEmailTemplateStringInput } from './dto/get-email-template-string-input.dto';
 

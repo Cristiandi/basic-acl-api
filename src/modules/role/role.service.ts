@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { BaseService } from '../../common/base.service';
-import { CompanyService } from '../company/company.service';
+import { CompanyService } from '../company/services/company.service';
 
 import { Role } from './role.entity';
 

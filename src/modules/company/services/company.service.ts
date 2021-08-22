@@ -6,15 +6,15 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 
-import { BaseService } from '../../common/base.service';
+import { BaseService } from '../../../common/base.service';
 
-import { Company } from './company.entity';
+import { Company } from '../company.entity';
 
-import { generateUid } from '../../utils';
+import { generateUid } from '../../../utils';
 
-import { CreateCompanyInput } from './dto/create-company-input.dto';
-import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
-import { UpdateCompanyInput } from './dto/update-company-input.dto';
+import { CreateCompanyInput } from '../dto/create-company-input.dto';
+import { GetOneCompanyInput } from '../dto/get-one-company-input.dto';
+import { UpdateCompanyInput } from '../dto/update-company-input.dto';
 @Injectable()
 export class CompanyService extends BaseService<Company> {
   constructor(
