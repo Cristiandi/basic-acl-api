@@ -24,6 +24,7 @@ type Company {
   roles: [Role!]!
   uid: String!
   updatedAt: DateTime!
+  users: [User!]!
 }
 
 input CreateApiKeyInput {
@@ -49,6 +50,14 @@ input CreateRoleInput {
   companyUid: String!
   description: String
   name: String!
+}
+
+input CreateUserInput {
+  authUid: String
+  companyUid: String!
+  email: String
+  password: String
+  phone: String
 }
 
 """
@@ -77,6 +86,13 @@ input GetAllRolesInput {
   skip: Int
 }
 
+input GetAllUsersInput {
+  companyUid: String!
+  limit: Int
+  q: String
+  skip: Int
+}
+
 input GetOneApiKeyInput {
   uid: String!
 }
@@ -93,6 +109,10 @@ input GetOneRoleInput {
   uid: String!
 }
 
+input GetOneUserInput {
+  authUid: String!
+}
+
 """
 The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -103,10 +123,12 @@ type Mutation {
   createCompany(createCompanyInput: CreateCompanyInput!): Company!
   createProject(createProjectInput: CreateProjectInput!): Project!
   createRole(createRoleInput: CreateRoleInput!): Role!
+  createUser(createUserInput: CreateUserInput!): User!
   daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
   deleteApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey!
   deleteProject(getOneProjectInput: GetOneProjectInput!): Project!
   deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
+  deleteUser(getOneUserInput: GetOneUserInput!): User!
   updateApiKey(getOneApiKeyInput: GetOneApiKeyInput!, updateApiKeyInput: UpdateApiKeyInput!): ApiKey!
   updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
   updateProject(getOneProjectInput: GetOneProjectInput!, updateProjectInput: UpdateProjectInput!): Project!
@@ -128,10 +150,12 @@ type Query {
   getAllApiKeys(getAllApiKeysInput: GetAllApiKeysInput!): [ApiKey!]!
   getAllProjects(getProjectsInput: GetAllProjectsInput!): [Project!]
   getAllRoles(getRolesInput: GetAllRolesInput!): [Role!]!
+  getAllUsers(getAllUsersInput: GetAllUsersInput!): [User!]!
   getCompany(getOneCompanyInput: GetOneCompanyInput!): Company
   getOneApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey
   getOneProject(getOneProjectInput: GetOneProjectInput!): Project
   getOneRole(getOneRoleInput: GetOneRoleInput!): Role
+  getOneUser(getOneUserInput: GetOneUserInput!): User
   sayHello: String!
 }
 
@@ -169,4 +193,14 @@ input UpdateRoleInput {
   companyUid: String
   description: String
   name: String
+}
+
+type User {
+  authUid: String!
+  company: Company!
+  createdAt: DateTime!
+  email: String
+  id: Float!
+  phone: String
+  updatedAt: DateTime!
 }

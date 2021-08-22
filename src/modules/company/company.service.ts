@@ -10,7 +10,7 @@ import { BaseService } from '../../common/base.service';
 
 import { Company } from './company.entity';
 
-import { generateId } from '../../utils';
+import { generateUid } from '../../utils';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
@@ -40,7 +40,7 @@ export class CompanyService extends BaseService<Company> {
       );
     }
 
-    const accessKey = generateId(20);
+    const accessKey = generateUid(20);
 
     const created = this.companyRepository.create({
       name,

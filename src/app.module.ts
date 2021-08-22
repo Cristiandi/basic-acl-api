@@ -17,6 +17,10 @@ import { join } from 'path';
 import { RoleModule } from './modules/role/role.module';
 import { ApiKeyModule } from './modules/api-key/api-key.module';
 import { EmailTemplateModule } from './modules/email-template/email-template.module';
+import { UserModule } from './modules/user/user.module';
+import { CommonModule } from './common/common.module';
+import { FirebaseAdminModule } from './plugins/firebase-admin/firebase-admin.module';
+import { FirebaseModule } from './plugins/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -75,6 +79,14 @@ import { EmailTemplateModule } from './modules/email-template/email-template.mod
     ApiKeyModule,
 
     EmailTemplateModule,
+
+    UserModule,
+
+    CommonModule,
+
+    FirebaseAdminModule,
+
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

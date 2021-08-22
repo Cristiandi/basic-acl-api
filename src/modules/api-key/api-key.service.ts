@@ -8,7 +8,7 @@ import { ApiKey } from './api-key.entity';
 
 import { CompanyService } from '../company/company.service';
 
-import { generateId } from '../../utils';
+import { generateUid } from '../../utils';
 
 import { CreateApiKeyInput } from './dto/create-api-key-input.dto';
 import { GetOneApiKeyInput } from './dto/get-one-api-key-input.dto';
@@ -38,7 +38,7 @@ export class ApiKeyService extends BaseService<ApiKey> {
       throw new NotFoundException(`company with uid ${companyUid} not found.`);
     }
 
-    const value = generateId(16);
+    const value = generateUid(16);
 
     const created = this.apiKeyRepository.create({
       value,

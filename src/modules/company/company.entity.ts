@@ -16,6 +16,7 @@ import {
 import { Project } from '../project/project.entity';
 import { Role } from '../role/role.entity';
 import { ApiKey } from '../api-key/api-key.entity';
+import { User } from '../user/user.entity';
 class FirebaseAdminConfig {
   type: string;
   project_id: string;
@@ -95,4 +96,8 @@ export class Company extends BaseEntity {
   @Field(() => [ApiKey])
   @OneToMany(() => ApiKey, (apiKey) => apiKey.company)
   apiKeys: ApiKey[];
+
+  @Field(() => [User])
+  @OneToMany(() => User, (user) => user.company)
+  users: User[];
 }
