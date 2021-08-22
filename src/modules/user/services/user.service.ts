@@ -11,7 +11,8 @@ import { BaseService } from '../../../common/base.service';
 import { User } from '../user.entity';
 
 import { CompanyService } from '../../company/services/company.service';
-import { FirebaseAdminService } from 'src/plugins/firebase-admin/firebase-admin.service';
+import { FirebaseAdminService } from '../../../plugins/firebase-admin/firebase-admin.service';
+import { UserExtraService } from './user-extra.service';
 
 import { CreateUserInput } from '../dto/create-user-input.dto';
 import { GetOneUserInput } from '../dto/get-one-user-input.dto';
@@ -22,6 +23,7 @@ export class UserService extends BaseService<User> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly userExtraService: UserExtraService,
     private readonly companyService: CompanyService,
     private readonly firebaseAdminService: FirebaseAdminService,
   ) {
@@ -73,6 +75,15 @@ export class UserService extends BaseService<User> {
       });
 
       const saved = await this.userRepository.save(created);
+
+      if (saved.email) {
+        // send the confirmation email
+        this.userExtraService
+          .sendConfirmationEmail({
+            authUid,
+          })
+          .catch((error) => console.error(error));
+      }
 
       return saved;
     }
@@ -127,6 +138,15 @@ export class UserService extends BaseService<User> {
     });
 
     const saved = await this.userRepository.save(created);
+
+    if (saved.email) {
+      // send the confirmation email
+      this.userExtraService
+        .sendConfirmationEmail({
+          authUid: saved.authUid,
+        })
+        .catch((error) => console.error(error));
+    }
 
     return saved;
   }

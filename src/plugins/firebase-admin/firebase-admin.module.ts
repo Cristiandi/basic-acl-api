@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { FirebaseAdminService } from './firebase-admin.service';
 
-import { CompanyModule } from 'src/modules/company/company.module';
+import { CompanyModule } from '../../modules/company/company.module';
 
 @Module({
   imports: [CompanyModule],

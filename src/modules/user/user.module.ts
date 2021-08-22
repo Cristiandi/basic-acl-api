@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
-
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+
+import appConfig from '../../config/app.config';
 
 import { User } from './user.entity';
 
@@ -12,12 +14,16 @@ import { UserExtraResolver } from './resolvers/user-extra.resolver';
 
 import { CompanyModule } from '../company/company.module';
 import { FirebaseAdminModule } from '../../plugins/firebase-admin/firebase-admin.module';
-
+import { EmailTemplateModule } from '../email-template/email-template.module';
+import { MailgunModule } from '../../plugins/mailgun/mailgun.module';
 @Module({
   imports: [
+    ConfigModule.forFeature(appConfig),
     TypeOrmModule.forFeature([User]),
     CompanyModule,
     FirebaseAdminModule,
+    EmailTemplateModule,
+    MailgunModule,
   ],
   providers: [
     UserService,

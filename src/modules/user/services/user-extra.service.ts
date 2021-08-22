@@ -1,23 +1,42 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FirebaseAdminService } from 'src/plugins/firebase-admin/firebase-admin.service';
 import { Repository } from 'typeorm';
+
+import appConfig from '../../../config/app.config';
 
 import { User } from '../user.entity';
 
+import { TemplateType } from '../../email-template/email-template.entity';
+
 import { UserService } from './user.service';
+import { FirebaseAdminService } from '../../../plugins/firebase-admin/firebase-admin.service';
+import { EmailTemplateService } from '../../email-template/email-template.service';
+import { MailgunService } from '../../../plugins/mailgun/mailgun.service';
 
 import { ChangeUserPhoneInput } from '../dto/change-user-phone-input.dto';
 import { ChangeUserEmailInput } from '../dto/change-user-email-input.dto';
 import { ChangeUserPasswordInput } from '../dto/change-user-password-input.dto';
+import { GetOneUserInput } from '../dto/get-one-user-input.dto';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class UserExtraService {
   constructor(
+    @Inject(appConfig.KEY)
+    private readonly appConfiguration: ConfigType<typeof appConfig>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly firebaseAdminService: FirebaseAdminService,
+    private readonly emailTemplateService: EmailTemplateService,
+    private readonly mailgunService: MailgunService,
   ) {}
 
   public async changePhone(input: ChangeUserPhoneInput): Promise<User> {
@@ -153,5 +172,39 @@ export class UserExtraService {
     // TODO: send a notification to the user
 
     return existingUser;
+  }
+
+  public async sendConfirmationEmail(input: GetOneUserInput): Promise<void> {
+    const { authUid } = input;
+
+    // get the user and check if exists
+    const existingUser = await this.userService.getOneByOneFields({
+      fields: { authUid },
+      checkIfExists: true,
+    });
+
+    // check the email
+    const { email } = existingUser;
+
+    if (!email) {
+      throw new ConflictException('the user does not have email.');
+    }
+
+    // generate the html for the email
+    const html = await this.emailTemplateService.generateTemplateHtml({
+      type: TemplateType.CONFIRMATION_EMAIL,
+      parameters: {
+        firstName: email,
+        link: 'http://www.google.com', // TODO: use the link to handle the confirmation
+      },
+    });
+
+    // send the email
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      subject: 'Please confirm your email',
+      to: email,
+      html,
+    });
   }
 }

@@ -21,6 +21,7 @@ import { UserModule } from './modules/user/user.module';
 import { CommonModule } from './common/common.module';
 import { FirebaseAdminModule } from './plugins/firebase-admin/firebase-admin.module';
 import { FirebaseModule } from './plugins/firebase/firebase.module';
+import { MailgunModule } from './plugins/mailgun/mailgun.module';
 
 @Module({
   imports: [
@@ -87,6 +88,8 @@ import { FirebaseModule } from './plugins/firebase/firebase.module';
     FirebaseAdminModule,
 
     FirebaseModule,
+
+    MailgunModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

@@ -1,3 +1,6 @@
+import * as mjml2html from 'mjml';
+import hbs from 'handlebars';
+
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -9,6 +12,7 @@ import { EmailTemplate } from './email-template.entity';
 import { CompanyService } from '../company/services/company.service';
 
 import { GetEmailTemplateStringInput } from './dto/get-email-template-string-input.dto';
+import { GenerateTemplateHtml } from './dto/generate-template-html-input.dto';
 
 @Injectable()
 export class EmailTemplateService extends BaseService<EmailTemplate> {
@@ -41,5 +45,30 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
     });
 
     return existing.file.toString('utf-8');
+  }
+
+  public async generateTemplateHtml(
+    input: GenerateTemplateHtml,
+  ): Promise<string> {
+    const { type, companyUid } = input;
+
+    // the the email template string
+    const emailTemplateString = await this.getEmailTemplateString({
+      type,
+      companyUid,
+    });
+
+    // compile the template
+    const template = hbs.compile(emailTemplateString);
+
+    const { parameters } = input;
+
+    // get the result
+    const result = template(parameters);
+
+    // get the html
+    const { html } = mjml2html(result);
+
+    return html;
   }
 }
