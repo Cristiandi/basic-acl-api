@@ -6,16 +6,16 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { BaseService } from '../../common/base.service';
+import { BaseService } from '../../../common/base.service';
 
-import { User } from './user.entity';
+import { User } from '../user.entity';
 
-import { CompanyService } from '../company/services/company.service';
+import { CompanyService } from '../../company/services/company.service';
 import { FirebaseAdminService } from 'src/plugins/firebase-admin/firebase-admin.service';
 
-import { CreateUserInput } from './dto/create-user-input.dto';
-import { GetOneUserInput } from './dto/get-one-user-input.dto';
-import { GetAllUsersInput } from './dto/get-all-users-input.dto';
+import { CreateUserInput } from '../dto/create-user-input.dto';
+import { GetOneUserInput } from '../dto/get-one-user-input.dto';
+import { GetAllUsersInput } from '../dto/get-all-users-input.dto';
 
 @Injectable()
 export class UserService extends BaseService<User> {

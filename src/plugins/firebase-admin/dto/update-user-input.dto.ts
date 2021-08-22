@@ -3,11 +3,11 @@ export class UpdateUserInput {
 
   readonly uid: string;
 
-  readonly phone: string;
+  readonly phone?: string;
 
-  readonly email: string;
+  readonly email?: string;
 
-  readonly password: string;
+  readonly password?: string;
 
-  readonly emailVerified: boolean;
+  readonly emailVerified?: boolean;
 }

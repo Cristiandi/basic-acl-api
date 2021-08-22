@@ -8,15 +8,15 @@ import {
   Parent,
 } from '@nestjs/graphql';
 
-import { User } from './user.entity';
-import { Company } from '../company/company.entity';
+import { User } from '../user.entity';
+import { Company } from '../../company/company.entity';
 
-import { UserService } from './user.service';
-import { UserLoaders } from './user.loaders';
+import { UserService } from '../services/user.service';
+import { UserLoaders } from '../user.loaders';
 
-import { CreateUserInput } from './dto/create-user-input.dto';
-import { GetOneUserInput } from './dto/get-one-user-input.dto';
-import { GetAllUsersInput } from './dto/get-all-users-input.dto';
+import { CreateUserInput } from '../dto/create-user-input.dto';
+import { GetOneUserInput } from '../dto/get-one-user-input.dto';
+import { GetAllUsersInput } from '../dto/get-all-users-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => User)

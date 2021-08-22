@@ -4,9 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { User } from './user.entity';
 
-import { UserService } from './user.service';
+import { UserService } from './services/user.service';
+import { UserExtraService } from './services/user-extra.service';
 import { UserLoaders } from './user.loaders';
-import { UserResolver } from './user.resolver';
+import { UserResolver } from './resolvers/user.resolver';
+import { UserExtraResolver } from './resolvers/user-extra.resolver';
 
 import { CompanyModule } from '../company/company.module';
 import { FirebaseAdminModule } from '../../plugins/firebase-admin/firebase-admin.module';
@@ -17,7 +19,13 @@ import { FirebaseAdminModule } from '../../plugins/firebase-admin/firebase-admin
     CompanyModule,
     FirebaseAdminModule,
   ],
-  providers: [UserService, UserLoaders, UserResolver],
-  exports: [UserService],
+  providers: [
+    UserService,
+    UserExtraService,
+    UserLoaders,
+    UserResolver,
+    UserExtraResolver,
+  ],
+  exports: [UserService, UserExtraService],
 })
 export class UserModule {}
