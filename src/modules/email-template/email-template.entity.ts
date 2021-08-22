@@ -36,6 +36,7 @@ export class EmailTemplate extends BaseEntity {
   @Generated('uuid')
   uid: string;
 
+  @Field()
   @Column({
     type: 'enum',
     enum: TemplateType,

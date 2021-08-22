@@ -22,6 +22,7 @@ import { CommonModule } from './common/common.module';
 import { FirebaseAdminModule } from './plugins/firebase-admin/firebase-admin.module';
 import { FirebaseModule } from './plugins/firebase/firebase.module';
 import { MailgunModule } from './plugins/mailgun/mailgun.module';
+import { VerificationCodeModule } from './modules/verification-code/verification-code.module';
 
 @Module({
   imports: [
@@ -90,6 +91,8 @@ import { MailgunModule } from './plugins/mailgun/mailgun.module';
     FirebaseModule,
 
     MailgunModule,
+
+    VerificationCodeModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

@@ -13,17 +13,22 @@ import appConfig from '../../../config/app.config';
 import { User } from '../user.entity';
 
 import { TemplateType } from '../../email-template/email-template.entity';
+import { VerificationCodeType } from '../../verification-code/verfication-code.entity';
 
 import { UserService } from './user.service';
 import { FirebaseAdminService } from '../../../plugins/firebase-admin/firebase-admin.service';
 import { EmailTemplateService } from '../../email-template/email-template.service';
 import { MailgunService } from '../../../plugins/mailgun/mailgun.service';
 
+import { addDaysToDate } from '../../../utils';
+
 import { ChangeUserPhoneInput } from '../dto/change-user-phone-input.dto';
 import { ChangeUserEmailInput } from '../dto/change-user-email-input.dto';
 import { ChangeUserPasswordInput } from '../dto/change-user-password-input.dto';
 import { GetOneUserInput } from '../dto/get-one-user-input.dto';
 import { ConfigType } from '@nestjs/config';
+import { VerificationCodeService } from 'src/modules/verification-code/verification-code.service';
+import { ConfirmUserEmailInput } from '../dto/confirm-user-email-input.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -37,6 +42,7 @@ export class UserExtraService {
     private readonly firebaseAdminService: FirebaseAdminService,
     private readonly emailTemplateService: EmailTemplateService,
     private readonly mailgunService: MailgunService,
+    private readonly verificationCodeService: VerificationCodeService,
   ) {}
 
   public async changePhone(input: ChangeUserPhoneInput): Promise<User> {
@@ -190,12 +196,22 @@ export class UserExtraService {
       throw new ConflictException('the user does not have email.');
     }
 
+    // TODO: generate the verification code
+    const verificationCode = await this.verificationCodeService.create({
+      expirationDate: addDaysToDate(new Date(), 1),
+      type: VerificationCodeType.CONFIRMATE_EMAIL,
+      user: existingUser,
+    });
+
     // generate the html for the email
     const html = await this.emailTemplateService.generateTemplateHtml({
       type: TemplateType.CONFIRMATION_EMAIL,
       parameters: {
         firstName: email,
-        link: 'http://www.google.com', // TODO: use the link to handle the confirmation
+        link:
+          this.appConfiguration.app.selfApiUrl +
+          'users/confirm-email?code=' +
+          verificationCode.code,
       },
     });
 
@@ -206,5 +222,39 @@ export class UserExtraService {
       to: email,
       html,
     });
+  }
+
+  public async confirmEmail(
+    input: ConfirmUserEmailInput,
+  ): Promise<{ url: string }> {
+    const { code } = input;
+
+    const verificationCode = await this.verificationCodeService.validate({
+      code,
+    });
+
+    const { user } = verificationCode;
+
+    const { company } = await this.userService.getOneByOneFields({
+      fields: { id: user.id },
+      relations: ['company'],
+    });
+
+    await this.verificationCodeService.delete({
+      uid: verificationCode.uid,
+    });
+
+    const urlToRedirect =
+      company.website || this.appConfiguration.app.selfApiUrl;
+
+    await this.firebaseAdminService.updateUser({
+      companyUid: company.uid,
+      uid: user.authUid,
+      emailVerified: true,
+    });
+
+    return {
+      url: urlToRedirect,
+    };
   }
 }

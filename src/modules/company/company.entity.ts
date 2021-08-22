@@ -72,6 +72,10 @@ export class Company extends BaseEntity {
   @Column({ name: 'firebase_config', type: 'json' })
   firebaseConfig: FirebaseConfig;
 
+  @Field({ nullable: true })
+  @Column({ type: 'varchar', length: 160, nullable: true })
+  website: string;
+
   @Field()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

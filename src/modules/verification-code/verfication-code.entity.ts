@@ -1,0 +1,67 @@
+import { Field, ObjectType } from '@nestjs/graphql';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  Generated,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
+
+import { User } from '../user/user.entity';
+
+export enum VerificationCodeType {
+  CONFIRMATE_EMAIL = 'CONFIRMATE_EMAIL',
+}
+
+@ObjectType()
+@Entity({ name: 'verification_code' })
+@Unique('uk_verification_code_uid', ['uid'])
+export class VerificationCode extends BaseEntity {
+  @Field()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Field()
+  @Generated('uuid')
+  @Column()
+  uid: string;
+
+  @Field()
+  @Column({
+    type: 'enum',
+    enum: VerificationCodeType,
+    default: VerificationCodeType.CONFIRMATE_EMAIL,
+  })
+  type: VerificationCodeType;
+
+  @Field()
+  @Column({ type: 'varchar', length: 20 })
+  code: string;
+
+  @Column({ name: 'expiration_date', type: 'timestamp' })
+  expirationDate: Date;
+
+  @Field()
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @Field()
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: Date;
+
+  // relations
+
+  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.verificationCodes, { nullable: true })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+}

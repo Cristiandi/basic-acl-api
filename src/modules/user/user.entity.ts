@@ -7,12 +7,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { Company } from '../company/company.entity';
+import { VerificationCode } from '../verification-code/verfication-code.entity';
 
 @ObjectType()
 @Entity({ name: 'user' })
@@ -54,4 +56,11 @@ export class User extends BaseEntity {
   @ManyToOne(() => Company, (company) => company.users, { nullable: false })
   @JoinColumn({ name: 'company_id' })
   company: Company;
+
+  @Field(() => [VerificationCode])
+  @OneToMany(
+    () => VerificationCode,
+    (verificationCode) => verificationCode.user,
+  )
+  verificationCodes: User[];
 }

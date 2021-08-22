@@ -41,6 +41,7 @@ type Company {
   uid: String!
   updatedAt: DateTime!
   users: [User!]!
+  website: String
 }
 
 input CreateApiKeyInput {
@@ -222,4 +223,15 @@ type User {
   id: Float!
   phone: String
   updatedAt: DateTime!
+  verificationCodes: [VerificationCode!]!
+}
+
+type VerificationCode {
+  code: String!
+  createdAt: DateTime!
+  id: Float!
+  type: String!
+  uid: String!
+  updatedAt: DateTime!
+  user: User!
 }

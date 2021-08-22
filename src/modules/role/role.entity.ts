@@ -25,8 +25,8 @@ export class Role extends BaseEntity {
   id: number;
 
   @Field()
-  @Column()
   @Generated('uuid')
+  @Column()
   uid: string;
 
   @Field()

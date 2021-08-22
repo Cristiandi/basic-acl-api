@@ -16,6 +16,8 @@ import { CompanyModule } from '../company/company.module';
 import { FirebaseAdminModule } from '../../plugins/firebase-admin/firebase-admin.module';
 import { EmailTemplateModule } from '../email-template/email-template.module';
 import { MailgunModule } from '../../plugins/mailgun/mailgun.module';
+import { VerificationCodeModule } from '../verification-code/verification-code.module';
+import { UserController } from './user.controller';
 @Module({
   imports: [
     ConfigModule.forFeature(appConfig),
@@ -24,6 +26,7 @@ import { MailgunModule } from '../../plugins/mailgun/mailgun.module';
     FirebaseAdminModule,
     EmailTemplateModule,
     MailgunModule,
+    VerificationCodeModule,
   ],
   providers: [
     UserService,
@@ -33,5 +36,6 @@ import { MailgunModule } from '../../plugins/mailgun/mailgun.module';
     UserExtraResolver,
   ],
   exports: [UserService, UserExtraService],
+  controllers: [UserController],
 })
 export class UserModule {}
