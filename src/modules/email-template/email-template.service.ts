@@ -36,13 +36,22 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
       });
     }
 
-    const existing = await this.getOneByOneFields({
+    let existing = await this.getOneByOneFields({
       fields: {
         type,
         company: company || null,
       },
-      checkIfExists: true,
+      checkIfExists: false,
     });
+
+    if (!existing) {
+      existing = await this.getOneByOneFields({
+        fields: {
+          type,
+        },
+        checkIfExists: true,
+      });
+    }
 
     return existing.file.toString('utf-8');
   }

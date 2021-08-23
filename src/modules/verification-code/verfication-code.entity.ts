@@ -16,7 +16,8 @@ import {
 import { User } from '../user/user.entity';
 
 export enum VerificationCodeType {
-  CONFIRMATE_EMAIL = 'CONFIRMATE_EMAIL',
+  CONFIRM_EMAIL = 'CONFIRM_EMAIL',
+  RESET_PASSWORD = 'RESET_PASSWORD',
 }
 
 @ObjectType()
@@ -36,7 +37,7 @@ export class VerificationCode extends BaseEntity {
   @Column({
     type: 'enum',
     enum: VerificationCodeType,
-    default: VerificationCodeType.CONFIRMATE_EMAIL,
+    default: VerificationCodeType.CONFIRM_EMAIL,
   })
   type: VerificationCodeType;
 

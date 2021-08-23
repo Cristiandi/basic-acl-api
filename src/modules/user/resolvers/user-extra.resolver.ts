@@ -8,6 +8,11 @@ import { UserExtraService } from '../services/user-extra.service';
 import { ChangeUserPhoneInput } from '../dto/change-user-phone-input.dto';
 import { ChangeUserEmailInput } from '../dto/change-user-email-input.dto';
 import { ChangeUserPasswordInput } from '../dto/change-user-password-input.dto';
+import { SendResetUserPasswordEmailInput } from '../dto/send-reset-user-password-input.dto';
+import { GetOneUserInput } from '../dto/get-one-user-input.dto';
+import { VoidOutput } from '../dto/void-output.dto';
+import { ResetUserPasswordInput } from '../dto/reset-user-password-input.dto';
+import { ResetUserPasswordOutput } from '../dto/reset-user-password-output.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => User)
@@ -33,5 +38,29 @@ export class UserExtraResolver {
     @Args('changeUserPasswordInput') input: ChangeUserPasswordInput,
   ): Promise<User> {
     return this.service.changePassword(input);
+  }
+
+  @Mutation(() => VoidOutput, { name: 'sendConfirmationUserEmail' })
+  public sendConfirmationEmail(
+    @Args('getOneUserInput')
+    input: GetOneUserInput,
+  ): Promise<VoidOutput> {
+    return this.service.sendConfirmationEmail(input);
+  }
+
+  @Mutation(() => VoidOutput, { name: 'sendResetUserPasswordEmail' })
+  public sendResetPasswordEmail(
+    @Args('sendResetUserPasswordEmailInput')
+    input: SendResetUserPasswordEmailInput,
+  ): Promise<VoidOutput> {
+    return this.service.sendResetPasswordEmail(input);
+  }
+
+  @Mutation(() => ResetUserPasswordOutput, { name: 'resetUserPassword' })
+  public resetPassword(
+    @Args('resetUserPasswordInput')
+    input: ResetUserPasswordInput,
+  ): Promise<ResetUserPasswordOutput> {
+    return this.service.resetPassword(input);
   }
 }

@@ -149,6 +149,9 @@ type Mutation {
   deleteProject(getOneProjectInput: GetOneProjectInput!): Project!
   deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
   deleteUser(getOneUserInput: GetOneUserInput!): User!
+  resetUserPassword(resetUserPasswordInput: ResetUserPasswordInput!): ResetUserPasswordOutput!
+  sendConfirmationUserEmail(getOneUserInput: GetOneUserInput!): VoidOutput!
+  sendResetUserPasswordEmail(sendResetUserPasswordEmailInput: SendResetUserPasswordEmailInput!): VoidOutput!
   updateApiKey(getOneApiKeyInput: GetOneApiKeyInput!, updateApiKeyInput: UpdateApiKeyInput!): ApiKey!
   updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
   updateProject(getOneProjectInput: GetOneProjectInput!, updateProjectInput: UpdateProjectInput!): Project!
@@ -179,6 +182,15 @@ type Query {
   sayHello: String!
 }
 
+input ResetUserPasswordInput {
+  code: String!
+  password: String!
+}
+
+type ResetUserPasswordOutput {
+  url: String!
+}
+
 type Role {
   code: String!
   company: Company!
@@ -188,6 +200,11 @@ type Role {
   name: String!
   uid: String!
   updatedAt: DateTime!
+}
+
+input SendResetUserPasswordEmailInput {
+  companyUid: String!
+  email: String!
 }
 
 input UpdateApiKeyInput {
@@ -234,4 +251,8 @@ type VerificationCode {
   uid: String!
   updatedAt: DateTime!
   user: User!
+}
+
+type VoidOutput {
+  message: String!
 }

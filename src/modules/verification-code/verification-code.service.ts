@@ -39,9 +39,9 @@ export class VerificationCodeService extends BaseService<VerificationCode> {
   }
 
   public async validate(
-    validVerificationCode: validateVerificationCodeInput,
+    input: validateVerificationCodeInput,
   ): Promise<VerificationCode> {
-    const { code } = validVerificationCode;
+    const { code } = input;
 
     const existing = await this.getOneByOneFields({
       fields: { code },
@@ -55,6 +55,13 @@ export class VerificationCodeService extends BaseService<VerificationCode> {
 
     if (!(expirationDate.getTime() > currentDate.getTime())) {
       throw new ConflictException(`the verification code ${code} is expired.`);
+    }
+
+    const { type } = input;
+    if (type && type !== existing.type) {
+      throw new ConflictException(
+        `the verification code ${code} doesn't have the expected type.`,
+      );
     }
 
     return existing;

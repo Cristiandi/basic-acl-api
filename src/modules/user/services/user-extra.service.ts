@@ -4,9 +4,11 @@ import {
   Inject,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ConfigType } from '@nestjs/config';
 
 import appConfig from '../../../config/app.config';
 
@@ -19,6 +21,7 @@ import { UserService } from './user.service';
 import { FirebaseAdminService } from '../../../plugins/firebase-admin/firebase-admin.service';
 import { EmailTemplateService } from '../../email-template/email-template.service';
 import { MailgunService } from '../../../plugins/mailgun/mailgun.service';
+import { VerificationCodeService } from '../../verification-code/verification-code.service';
 
 import { addDaysToDate } from '../../../utils';
 
@@ -26,9 +29,11 @@ import { ChangeUserPhoneInput } from '../dto/change-user-phone-input.dto';
 import { ChangeUserEmailInput } from '../dto/change-user-email-input.dto';
 import { ChangeUserPasswordInput } from '../dto/change-user-password-input.dto';
 import { GetOneUserInput } from '../dto/get-one-user-input.dto';
-import { ConfigType } from '@nestjs/config';
-import { VerificationCodeService } from 'src/modules/verification-code/verification-code.service';
 import { ConfirmUserEmailInput } from '../dto/confirm-user-email-input.dto';
+import { SendResetUserPasswordEmailInput } from '../dto/send-reset-user-password-input.dto';
+import { VoidOutput } from '../dto/void-output.dto';
+import { ResetUserPasswordInput } from '../dto/reset-user-password-input.dto';
+import { ResetUserPasswordOutput } from '../dto/reset-user-password-output.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -180,12 +185,15 @@ export class UserExtraService {
     return existingUser;
   }
 
-  public async sendConfirmationEmail(input: GetOneUserInput): Promise<void> {
+  public async sendConfirmationEmail(
+    input: GetOneUserInput,
+  ): Promise<VoidOutput> {
     const { authUid } = input;
 
     // get the user and check if exists
     const existingUser = await this.userService.getOneByOneFields({
       fields: { authUid },
+      relations: ['company'],
       checkIfExists: true,
     });
 
@@ -196,15 +204,18 @@ export class UserExtraService {
       throw new ConflictException('the user does not have email.');
     }
 
-    // TODO: generate the verification code
+    // generate the verification code
     const verificationCode = await this.verificationCodeService.create({
       expirationDate: addDaysToDate(new Date(), 1),
-      type: VerificationCodeType.CONFIRMATE_EMAIL,
+      type: VerificationCodeType.CONFIRM_EMAIL,
       user: existingUser,
     });
 
+    const { company } = existingUser;
+
     // generate the html for the email
     const html = await this.emailTemplateService.generateTemplateHtml({
+      companyUid: company.uid,
       type: TemplateType.CONFIRMATION_EMAIL,
       parameters: {
         firstName: email,
@@ -222,6 +233,10 @@ export class UserExtraService {
       to: email,
       html,
     });
+
+    return {
+      message: 'an email has been sent.',
+    };
   }
 
   public async confirmEmail(
@@ -229,29 +244,128 @@ export class UserExtraService {
   ): Promise<{ url: string }> {
     const { code } = input;
 
+    // validate and get the verification code
     const verificationCode = await this.verificationCodeService.validate({
       code,
+      type: VerificationCodeType.CONFIRM_EMAIL,
     });
 
     const { user } = verificationCode;
 
+    // get the company of the user
     const { company } = await this.userService.getOneByOneFields({
       fields: { id: user.id },
       relations: ['company'],
     });
 
-    await this.verificationCodeService.delete({
-      uid: verificationCode.uid,
-    });
-
-    const urlToRedirect =
-      company.website || this.appConfiguration.app.selfApiUrl;
-
+    // update the user in firebase
     await this.firebaseAdminService.updateUser({
       companyUid: company.uid,
       uid: user.authUid,
       emailVerified: true,
     });
+
+    // delete the verification code (that indicates that the verification has been used)
+    await this.verificationCodeService.delete({
+      uid: verificationCode.uid,
+    });
+
+    // determinate the url to redirect
+    const urlToRedirect =
+      company.website || this.appConfiguration.app.selfApiUrl;
+
+    return {
+      url: urlToRedirect,
+    };
+  }
+
+  public async sendResetPasswordEmail(
+    input: SendResetUserPasswordEmailInput,
+  ): Promise<VoidOutput> {
+    const { companyUid, email } = input;
+
+    // get the user for the given email and company
+    const existingUser = await this.userRepository
+      .createQueryBuilder('user')
+      .innerJoin('company', 'company')
+      .where('company.uid = :companyUid', { companyUid })
+      .andWhere('user.email = :email', { email })
+      .getOne();
+
+    if (!existingUser) {
+      throw new NotFoundException(
+        `can't get a user with email ${email} for the company ${companyUid}.`,
+      );
+    }
+
+    // generate the verification code
+    const verificationCode = await this.verificationCodeService.create({
+      expirationDate: addDaysToDate(new Date(), 1),
+      type: VerificationCodeType.RESET_PASSWORD,
+      user: existingUser,
+    });
+
+    // generate the html for the email
+    const html = await this.emailTemplateService.generateTemplateHtml({
+      companyUid,
+      parameters: {
+        link:
+          this.appConfiguration.app.selfApiUrl +
+          'change-forgotten-password?code=' +
+          verificationCode.code,
+      },
+      type: TemplateType.RESET_PASSWORD_EMAIL,
+    });
+
+    // send the email
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      subject: 'Reset password!',
+      to: email,
+      html,
+    });
+
+    return {
+      message: 'an email has been sent.',
+    };
+  }
+
+  public async resetPassword(
+    input: ResetUserPasswordInput,
+  ): Promise<ResetUserPasswordOutput> {
+    const { code } = input;
+
+    // validate and get the verification code
+    const verificationCode = await this.verificationCodeService.validate({
+      code,
+      type: VerificationCodeType.RESET_PASSWORD,
+    });
+
+    const { user } = verificationCode;
+
+    // get the company of the user
+    const { company } = await this.userService.getOneByOneFields({
+      fields: { id: user.id },
+      relations: ['company'],
+    });
+
+    const { password } = input;
+
+    // update the user in firebase
+    await this.firebaseAdminService.updateUser({
+      companyUid: company.uid,
+      uid: user.authUid,
+      password,
+    });
+
+    // delete the verification code (that indicates that the verification has been used)
+    await this.verificationCodeService.delete({
+      uid: verificationCode.uid,
+    });
+
+    // determinate the url to redirect
+    const urlToRedirect =
+      company.website || this.appConfiguration.app.selfApiUrl;
 
     return {
       url: urlToRedirect,
