@@ -181,7 +181,10 @@ export class UserExtraService {
       password: newPassword,
     });
 
-    // TODO: send a notification to the user
+    // send a notification to the user
+    this.sendPasswordUpdatedEmail({
+      authUid,
+    }).catch((error) => console.error(error));
 
     return existingUser;
   }
@@ -285,13 +288,6 @@ export class UserExtraService {
   ): Promise<VoidOutput> {
     const { companyUid, email } = input;
 
-    const users = await this.userRepository
-      .createQueryBuilder('user')
-      .innerJoinAndSelect('company', 'x')
-      .getMany();
-
-    console.dir(users);
-
     // get the user for the given email and company
     const existingUser = await this.userRepository
       .createQueryBuilder('user')
@@ -382,12 +378,51 @@ export class UserExtraService {
       uid: verificationCode.uid,
     });
 
+    // notify the user
+    this.sendPasswordUpdatedEmail({
+      authUid: user.authUid,
+    }).catch((error) => console.error(error));
+
     // determinate the url to redirect
     const urlToRedirect =
       company.website || this.appConfiguration.app.selfApiUrl;
 
+    // return the url to redirect
     return {
       url: urlToRedirect,
+    };
+  }
+
+  public async sendPasswordUpdatedEmail(
+    input: GetOneUserInput,
+  ): Promise<VoidOutput> {
+    const { authUid } = input;
+
+    // get the user and check if exists
+    const existingUser = await this.userService.getOneByOneFields({
+      fields: { authUid },
+      relations: ['company'],
+      checkIfExists: true,
+    });
+
+    // generate the html for the email
+    const html = await this.emailTemplateService.generateTemplateHtml({
+      parameters: {},
+      type: TemplateType.PASSWORD_UPDATED_EMAIL,
+    });
+
+    const { email } = existingUser;
+
+    // send the email
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      subject: 'Your password has been updated',
+      to: email,
+      html,
+    });
+
+    return {
+      message: 'an email has been sent.',
     };
   }
 }
