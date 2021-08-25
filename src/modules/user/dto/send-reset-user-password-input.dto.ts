@@ -1,5 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsEmail, IsUUID } from 'class-validator';
+import { IsEmail, IsOptional, IsUUID } from 'class-validator';
+import { GraphQLJSONObject } from 'graphql-type-json';
 
 @InputType()
 export class SendResetUserPasswordEmailInput {
@@ -10,4 +11,8 @@ export class SendResetUserPasswordEmailInput {
   @IsEmail()
   @Field(() => String)
   readonly email: string;
+
+  @Field(() => GraphQLJSONObject, { nullable: true })
+  @IsOptional()
+  readonly emailTemplateParams?: Record<string, string>;
 }

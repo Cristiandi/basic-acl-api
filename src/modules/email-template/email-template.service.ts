@@ -12,7 +12,9 @@ import { EmailTemplate } from './email-template.entity';
 import { CompanyService } from '../company/services/company.service';
 
 import { GetEmailTemplateStringInput } from './dto/get-email-template-string-input.dto';
-import { GenerateTemplateHtml } from './dto/generate-template-html-input.dto';
+import { GenerateTemplateHtmlInput } from './dto/generate-template-html-input.dto';
+import { GetEmailTemplateStringOutput } from './dto/get-email-template-string-output.dto';
+import { GenerateTemplateHtmlOutput } from './dto/generate-template-html-output.dto';
 
 @Injectable()
 export class EmailTemplateService extends BaseService<EmailTemplate> {
@@ -26,9 +28,10 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
 
   public async getEmailTemplateString(
     input: GetEmailTemplateStringInput,
-  ): Promise<string> {
+  ): Promise<GetEmailTemplateStringOutput> {
     const { type, companyUid } = input;
 
+    // try to get the company
     let company;
     if (companyUid) {
       company = await this.companyService.getOne({
@@ -36,13 +39,17 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
       });
     }
 
-    let existing = await this.getOneByOneFields({
-      fields: {
-        type,
-        company: company || null,
-      },
-      checkIfExists: false,
-    });
+    // get the email template
+    let existing;
+    if (company) {
+      existing = await this.getOneByOneFields({
+        fields: {
+          type,
+          company: company,
+        },
+        checkIfExists: false,
+      });
+    }
 
     if (!existing) {
       existing = await this.getOneByOneFields({
@@ -53,19 +60,24 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
       });
     }
 
-    return existing.file.toString('utf-8');
+    // return the email template string
+    return {
+      stringValue: existing.file.toString('utf-8'),
+      subject: existing.subject,
+    };
   }
 
   public async generateTemplateHtml(
-    input: GenerateTemplateHtml,
-  ): Promise<string> {
+    input: GenerateTemplateHtmlInput,
+  ): Promise<GenerateTemplateHtmlOutput> {
     const { type, companyUid } = input;
 
     // the the email template string
-    const emailTemplateString = await this.getEmailTemplateString({
-      type,
-      companyUid,
-    });
+    const { stringValue: emailTemplateString, subject } =
+      await this.getEmailTemplateString({
+        type,
+        companyUid,
+      });
 
     // compile the template
     const template = hbs.compile(emailTemplateString);
@@ -78,6 +90,9 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
     // get the html
     const { html } = mjml2html(result);
 
-    return html;
+    return {
+      html,
+      subject,
+    };
   }
 }

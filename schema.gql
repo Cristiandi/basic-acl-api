@@ -13,12 +13,19 @@ type ApiKey {
 }
 
 input ChangeUserEmailInput {
+  """uid from firebase"""
   authUid: String!
+
+  """new email address"""
   email: String!
+
+  """custom parameters for CONFIRMATION_EMAIL"""
+  emailTemplateParams: JSONObject
 }
 
 input ChangeUserPasswordInput {
   authUid: String!
+  emailTemplateParams: JSONObject
   newPassword: String!
   oldPassword: String!
 }
@@ -70,9 +77,13 @@ input CreateRoleInput {
 }
 
 input CreateUserInput {
+  """uid of the user in firebase."""
   authUid: String
+
+  """uid of the owner company."""
   companyUid: String!
   email: String
+  emailTemplateParams: JSONObject
   password: String
   phone: String
 }
@@ -184,6 +195,7 @@ type Query {
 
 input ResetUserPasswordInput {
   code: String!
+  emailTemplateParams: JSONObject
   password: String!
 }
 
@@ -205,6 +217,7 @@ type Role {
 input SendResetUserPasswordEmailInput {
   companyUid: String!
   email: String!
+  emailTemplateParams: JSONObject
 }
 
 input UpdateApiKeyInput {

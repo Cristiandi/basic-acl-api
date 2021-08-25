@@ -50,6 +50,10 @@ export class EmailTemplate extends BaseEntity {
   file: Buffer;
 
   @Field()
+  @Column({ type: 'varchar', length: 160, nullable: true })
+  subject: string;
+
+  @Field()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

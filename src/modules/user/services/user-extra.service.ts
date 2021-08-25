@@ -142,8 +142,10 @@ export class UserExtraService {
 
     const saved = await this.userRepository.save(preloaded);
 
-    // TODO: send a notification to the user
-    // TODO: send confirmation email
+    // send confirmation email
+    this.sendConfirmationEmail({
+      authUid,
+    }).catch((err) => console.error(err));
 
     return {
       ...saved,
@@ -218,22 +220,23 @@ export class UserExtraService {
     const { company } = existingUser;
 
     // generate the html for the email
-    const html = await this.emailTemplateService.generateTemplateHtml({
-      companyUid: company.uid,
-      type: TemplateType.CONFIRMATION_EMAIL,
-      parameters: {
-        firstName: email,
-        link:
-          this.appConfiguration.app.selfApiUrl +
-          'users/confirm-email?code=' +
-          verificationCode.code,
-      },
-    });
+    const { html, subject } =
+      await this.emailTemplateService.generateTemplateHtml({
+        companyUid: company.uid,
+        type: TemplateType.CONFIRMATION_EMAIL,
+        parameters: {
+          firstName: email,
+          link:
+            this.appConfiguration.app.selfApiUrl +
+            'users/confirm-email?code=' +
+            verificationCode.code,
+        },
+      });
 
     // send the email
     await this.mailgunService.sendEmail({
       from: this.appConfiguration.mailgun.emailFrom,
-      subject: 'Please confirm your email',
+      subject: subject || 'Please confirm your email',
       to: email,
       html,
     });
@@ -323,19 +326,23 @@ export class UserExtraService {
         'change-forgotten-password?code=' +
         verificationCode.code;
 
+    const { emailTemplateParams } = input;
+
     // generate the html for the email
-    const html = await this.emailTemplateService.generateTemplateHtml({
-      companyUid: company.uid,
-      parameters: {
-        link,
-      },
-      type: TemplateType.RESET_PASSWORD_EMAIL,
-    });
+    const { html, subject } =
+      await this.emailTemplateService.generateTemplateHtml({
+        companyUid: company.uid,
+        parameters: {
+          link,
+          ...emailTemplateParams,
+        },
+        type: TemplateType.RESET_PASSWORD_EMAIL,
+      });
 
     // send the email
     await this.mailgunService.sendEmail({
       from: this.appConfiguration.mailgun.emailFrom,
-      subject: 'Reset password!',
+      subject: subject || 'Reset password!',
       to: email,
       html,
     });
@@ -406,17 +413,18 @@ export class UserExtraService {
     });
 
     // generate the html for the email
-    const html = await this.emailTemplateService.generateTemplateHtml({
-      parameters: {},
-      type: TemplateType.PASSWORD_UPDATED_EMAIL,
-    });
+    const { html, subject } =
+      await this.emailTemplateService.generateTemplateHtml({
+        parameters: {},
+        type: TemplateType.PASSWORD_UPDATED_EMAIL,
+      });
 
     const { email } = existingUser;
 
     // send the email
     await this.mailgunService.sendEmail({
       from: this.appConfiguration.mailgun.emailFrom,
-      subject: 'Your password has been updated',
+      subject: subject || 'Your password has been updated', // TODO: use a parameter
       to: email,
       html,
     });

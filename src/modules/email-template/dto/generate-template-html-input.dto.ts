@@ -1,6 +1,6 @@
 import { TemplateType } from '../email-template.entity';
 
-export class GenerateTemplateHtml {
+export class GenerateTemplateHtmlInput {
   readonly type: TemplateType;
 
   readonly companyUid?: string;
