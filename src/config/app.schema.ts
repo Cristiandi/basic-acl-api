@@ -3,6 +3,8 @@ import * as Joi from 'joi';
 export default Joi.object({
   /* APP */
   PORT: Joi.required(),
+  SELF_API_URL: Joi.string().required(),
+  SELF_WEB_URL: Joi.required(),
 
   /* DATABASE */
   DATABASE_CLIENT: Joi.required(),

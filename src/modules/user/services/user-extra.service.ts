@@ -9,6 +9,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigType } from '@nestjs/config';
+import { InternalServerError } from 'http-errors';
 
 import appConfig from '../../../config/app.config';
 
@@ -284,10 +285,17 @@ export class UserExtraService {
   ): Promise<VoidOutput> {
     const { companyUid, email } = input;
 
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .innerJoinAndSelect('company', 'x')
+      .getMany();
+
+    console.dir(users);
+
     // get the user for the given email and company
     const existingUser = await this.userRepository
       .createQueryBuilder('user')
-      .innerJoin('company', 'company')
+      .innerJoinAndSelect('user.company', 'company')
       .where('company.uid = :companyUid', { companyUid })
       .andWhere('user.email = :email', { email })
       .getOne();
@@ -298,6 +306,10 @@ export class UserExtraService {
       );
     }
 
+    if (!existingUser.company) {
+      throw new InternalServerError('can not get company from user.');
+    }
+
     // generate the verification code
     const verificationCode = await this.verificationCodeService.create({
       expirationDate: addDaysToDate(new Date(), 1),
@@ -305,14 +317,21 @@ export class UserExtraService {
       user: existingUser,
     });
 
+    const { company } = existingUser;
+
+    const link = company.website
+      ? company.website +
+        'change-forgotten-password?code=' +
+        verificationCode.code
+      : this.appConfiguration.app.selftWebUrl +
+        'change-forgotten-password?code=' +
+        verificationCode.code;
+
     // generate the html for the email
     const html = await this.emailTemplateService.generateTemplateHtml({
-      companyUid,
+      companyUid: company.uid,
       parameters: {
-        link:
-          this.appConfiguration.app.selfApiUrl +
-          'change-forgotten-password?code=' +
-          verificationCode.code,
+        link,
       },
       type: TemplateType.RESET_PASSWORD_EMAIL,
     });

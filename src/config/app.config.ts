@@ -7,6 +7,7 @@ export default registerAs('config', () => {
       port: parseInt(process.env.PORT, 10) || 8080,
       apiKey: process.env.API_KEY,
       selfApiUrl: process.env.SELF_API_URL,
+      selftWebUrl: process.env.SELF_WEB_URL,
     },
     database: {
       client: process.env.DATABASE_CLIENT,
