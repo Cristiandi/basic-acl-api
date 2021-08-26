@@ -21,7 +21,8 @@ import { TemplateType } from '../../modules/email-template/email-template.entity
     },
   });
 
-  console.log('result', result);
+  Logger.log(result.subject);
+  Logger.log(result.html);
 
   Logger.log('END');
 })()

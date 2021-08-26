@@ -11,13 +11,14 @@ import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Company } from './company.entity';
 import { Project } from '../project/project.entity';
 import { ApiKey } from '../api-key/api-key.entity';
+import { Role } from '../role/role.entity';
+import { User } from '../user/user.entity';
 
 import { CompanyService } from './services/company.service';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
 import { GetOneCompanyInput } from './dto/get-one-company-input.dto';
 import { UpdateCompanyInput } from './dto/update-company-input.dto';
-import { Role } from '../role/role.entity';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => Company)
@@ -63,8 +64,13 @@ export class CompanyResolver {
     return this.service.roles(parent);
   }
 
-  @ResolveField(() => [Role], { name: 'apiKeys' })
+  @ResolveField(() => [ApiKey], { name: 'apiKeys' })
   public apiKeys(@Parent() parent: Company): Promise<ApiKey[]> {
     return this.service.apiKeys(parent);
+  }
+
+  @ResolveField(() => [User], { name: 'users' })
+  public users(@Parent() parent: Company): Promise<User[]> {
+    return this.service.users(parent);
   }
 }

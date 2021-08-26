@@ -71,8 +71,6 @@ export class ProjectService extends BaseService<Project> {
   }
 
   public async getAll(input: GetAllProjectsInput): Promise<Project[]> {
-    console.log('inpit', input);
-
     const { companyUid, limit, skip, q } = input;
 
     const query = this.projectRepository

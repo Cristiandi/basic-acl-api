@@ -17,7 +17,8 @@ import { TemplateType } from '../../modules/email-template/email-template.entity
     type: TemplateType.CONFIRMATION_EMAIL,
   });
 
-  console.log('result', result);
+  Logger.log(result.subject);
+  Logger.log(result.stringValue);
 
   Logger.log('END');
 })()

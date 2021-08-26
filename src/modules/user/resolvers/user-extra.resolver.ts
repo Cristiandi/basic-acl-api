@@ -5,6 +5,8 @@ import { User } from '../user.entity';
 
 import { UserExtraService } from '../services/user-extra.service';
 
+import { Public } from '../../../common/decorators/public.decorator';
+
 import { ChangeUserPhoneInput } from '../dto/change-user-phone-input.dto';
 import { ChangeUserEmailInput } from '../dto/change-user-email-input.dto';
 import { ChangeUserPasswordInput } from '../dto/change-user-password-input.dto';
@@ -48,6 +50,7 @@ export class UserExtraResolver {
     return this.service.sendConfirmationEmail(input);
   }
 
+  @Public()
   @Mutation(() => VoidOutput, { name: 'sendResetUserPasswordEmail' })
   public sendResetPasswordEmail(
     @Args('sendResetUserPasswordEmailInput')
@@ -56,6 +59,7 @@ export class UserExtraResolver {
     return this.service.sendResetPasswordEmail(input);
   }
 
+  @Public()
   @Mutation(() => ResetUserPasswordOutput, { name: 'resetUserPassword' })
   public resetPassword(
     @Args('resetUserPasswordInput')

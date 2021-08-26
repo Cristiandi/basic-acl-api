@@ -36,7 +36,7 @@ input ChangeUserPhoneInput {
 }
 
 type Company {
-  accessKey: String!
+  accessKey: String
   apiKeys: [ApiKey!]!
   createdAt: DateTime!
   firebaseAdminConfig: JSONObject

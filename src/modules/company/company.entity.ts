@@ -17,6 +17,8 @@ import { Project } from '../project/project.entity';
 import { Role } from '../role/role.entity';
 import { ApiKey } from '../api-key/api-key.entity';
 import { User } from '../user/user.entity';
+
+import { loggerMiddleware } from '../../common/middlewares/logger.middleware';
 class FirebaseAdminConfig {
   type: string;
   project_id: string;
@@ -60,15 +62,22 @@ export class Company extends BaseEntity {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Field()
+  @Field({ nullable: true, middleware: [loggerMiddleware] })
   @Column({ name: 'access_key', type: 'varchar', length: 100 })
   accessKey: string;
 
-  @Field(() => GraphQLJSONObject, { nullable: true })
+  @Field({ middleware: [loggerMiddleware] })
+  @Field(() => GraphQLJSONObject, {
+    nullable: true,
+    middleware: [loggerMiddleware],
+  })
   @Column({ name: 'firebase_admin_config', type: 'json' })
   firebaseAdminConfig: FirebaseAdminConfig;
 
-  @Field(() => GraphQLJSONObject, { nullable: true })
+  @Field(() => GraphQLJSONObject, {
+    nullable: true,
+    middleware: [loggerMiddleware],
+  })
   @Column({ name: 'firebase_config', type: 'json' })
   firebaseConfig: FirebaseConfig;
 
