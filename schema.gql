@@ -12,6 +12,14 @@ type ApiKey {
   value: String!
 }
 
+type AssignedRole {
+  createdAt: DateTime!
+  id: Float!
+  role: Role!
+  updatedAt: DateTime!
+  user: User!
+}
+
 input ChangeUserEmailInput {
   """uid from firebase"""
   authUid: String!
@@ -86,6 +94,8 @@ input CreateUserInput {
   emailTemplateParams: JSONObject
   password: String
   phone: String
+  roleCode: String
+  sendEmail: Boolean
 }
 
 """
@@ -204,6 +214,7 @@ type ResetUserPasswordOutput {
 }
 
 type Role {
+  assignedRoles: [AssignedRole!]!
   code: String!
   company: Company!
   createdAt: DateTime!
@@ -246,6 +257,7 @@ input UpdateRoleInput {
 }
 
 type User {
+  assignedRoles: [AssignedRole!]!
   authUid: String!
   company: Company!
   createdAt: DateTime!

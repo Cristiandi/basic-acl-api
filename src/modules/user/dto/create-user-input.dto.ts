@@ -1,5 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import {
+  IsBoolean,
   IsEmail,
   IsOptional,
   IsString,
@@ -39,7 +40,17 @@ export class CreateUserInput {
   @Field(() => String, { nullable: true })
   readonly phone?: string;
 
-  @Field(() => GraphQLJSONObject, { nullable: true })
   @IsOptional()
+  @Field(() => GraphQLJSONObject, { nullable: true })
   readonly emailTemplateParams?: Record<string, string>;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  readonly sendEmail?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @Field(() => String, { nullable: true })
+  readonly roleCode?: string;
 }

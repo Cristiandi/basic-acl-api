@@ -15,10 +15,11 @@ import {
 
 import { Company } from '../company/company.entity';
 import { VerificationCode } from '../verification-code/verfication-code.entity';
+import { AssignedRole } from '../assigned-role/assigned-role.entity';
 
 @ObjectType()
 @Entity({ name: 'user' })
-@Unique('uk_user_auth_uid', ['authUid'])
+@Unique('uk_user_auth_uid', ['authUid', 'deletedAt'])
 export class User extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
@@ -57,10 +58,15 @@ export class User extends BaseEntity {
   @JoinColumn({ name: 'company_id' })
   company: Company;
 
+  // TODO: create the resolvers for this relation
   @Field(() => [VerificationCode])
   @OneToMany(
     () => VerificationCode,
     (verificationCode) => verificationCode.user,
   )
-  verificationCodes: User[];
+  verificationCodes: VerificationCode[];
+
+  @Field(() => [AssignedRole])
+  @OneToMany(() => AssignedRole, (assignedRole) => assignedRole.user)
+  assignedRoles: AssignedRole[];
 }

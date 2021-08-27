@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { CompanyModule } from 'src/modules/company/company.module';
+import { CompanyModule } from '../modules/company/company.module';
 
 import appConfig from '../config/app.config';
 

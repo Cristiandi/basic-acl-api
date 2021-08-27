@@ -8,12 +8,14 @@ import {
   Generated,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { Company } from '../company/company.entity';
+import { AssignedRole } from '../assigned-role/assigned-role.entity';
 
 @ObjectType()
 @Entity({ name: 'role' })
@@ -58,4 +60,8 @@ export class Role extends BaseEntity {
   @ManyToOne(() => Company, (company) => company.roles, { nullable: false })
   @JoinColumn({ name: 'company_id' })
   company: Company;
+
+  @Field(() => [AssignedRole])
+  @OneToMany(() => AssignedRole, (assignedRole) => assignedRole.role)
+  assignedRoles: AssignedRole[];
 }

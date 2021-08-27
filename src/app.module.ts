@@ -23,6 +23,7 @@ import { FirebaseAdminModule } from './plugins/firebase-admin/firebase-admin.mod
 import { FirebaseModule } from './plugins/firebase/firebase.module';
 import { MailgunModule } from './plugins/mailgun/mailgun.module';
 import { VerificationCodeModule } from './modules/verification-code/verification-code.module';
+import { AssignedRoleModule } from './modules/assigned-role/assigned-role.module';
 
 @Module({
   imports: [
@@ -93,6 +94,8 @@ import { VerificationCodeModule } from './modules/verification-code/verification
     MailgunModule,
 
     VerificationCodeModule,
+
+    AssignedRoleModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

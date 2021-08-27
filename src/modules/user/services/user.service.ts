@@ -1,18 +1,22 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { auth } from 'firebase-admin';
 
 import { BaseService } from '../../../common/base.service';
 
 import { User } from '../user.entity';
+import { Role } from '../../role/role.entity';
 
 import { CompanyService } from '../../company/services/company.service';
 import { FirebaseAdminService } from '../../../plugins/firebase-admin/firebase-admin.service';
 import { UserExtraService } from './user-extra.service';
+import { RoleService } from '../../role/role.service';
 
 import { CreateUserInput } from '../dto/create-user-input.dto';
 import { GetOneUserInput } from '../dto/get-one-user-input.dto';
@@ -26,6 +30,7 @@ export class UserService extends BaseService<User> {
     private readonly userExtraService: UserExtraService,
     private readonly companyService: CompanyService,
     private readonly firebaseAdminService: FirebaseAdminService,
+    private readonly roleService: RoleService,
   ) {
     super(userRepository);
   }
@@ -34,11 +39,27 @@ export class UserService extends BaseService<User> {
   public async create(input: CreateUserInput): Promise<User> {
     const { companyUid } = input;
 
-    const company = await this.companyService.getOne({
-      uid: companyUid,
+    const company = await this.companyService.getOneByOneFields({
+      fields: { uid: companyUid },
+      checkIfExists: true,
     });
 
+    const { roleCode } = input;
+
+    let role: Role;
+
+    if (roleCode) {
+      role = await this.roleService.getOneByOneFields({
+        fields: {
+          company,
+          code: roleCode,
+        },
+      });
+    }
+
     const { authUid } = input;
+
+    let firebaseUser: auth.UserRecord;
 
     if (authUid) {
       // check if the user already exists by authUid
@@ -56,7 +77,7 @@ export class UserService extends BaseService<User> {
       }
 
       // get the user in firebase by authUid
-      const firebaseUser = await this.firebaseAdminService.getUserByUid({
+      firebaseUser = await this.firebaseAdminService.getUserByUid({
         companyUid,
         uid: authUid,
       });
@@ -66,80 +87,88 @@ export class UserService extends BaseService<User> {
           `user with auth uid ${authUid} does not exist in firebase.`,
         );
       }
+    } else {
+      // check if the user already exists by email
+      const { email } = input;
 
-      const created = this.userRepository.create({
-        authUid,
-        email: firebaseUser.email,
-        phone: firebaseUser.phoneNumber,
-        company,
-      });
+      if (email) {
+        const existing = await this.getOneByOneFields({
+          fields: {
+            email,
+            company,
+          },
+        });
 
-      const saved = await this.userRepository.save(created);
-
-      if (saved.email) {
-        // send the confirmation email
-        this.userExtraService
-          .sendConfirmationEmail({
-            authUid,
-          })
-          .catch((error) => console.error(error));
+        if (existing) {
+          throw new ConflictException(
+            `user with email ${email} already exists.`,
+          );
+        }
       }
 
-      return saved;
-    }
+      // check if the user already exists by phone
+      const { phone } = input;
 
-    // check if the user already exists by email
-    const { email } = input;
+      if (phone) {
+        const existing = await this.getOneByOneFields({
+          fields: {
+            phone,
+            company,
+          },
+        });
 
-    if (email) {
-      const existing = await this.getOneByOneFields({
-        fields: {
-          email,
-          company,
-        },
-      });
-
-      if (existing) {
-        throw new ConflictException(`user with email ${email} already exists.`);
+        if (existing) {
+          throw new ConflictException(
+            `user with phone ${phone} already exists.`,
+          );
+        }
       }
-    }
 
-    // check if the user already exists by phone
-    const { phone } = input;
+      const { password } = input;
 
-    if (phone) {
-      const existing = await this.getOneByOneFields({
-        fields: {
-          phone,
-          company,
-        },
+      // create the user in firebase
+      firebaseUser = await this.firebaseAdminService.createUser({
+        companyUid,
+        email,
+        password,
+        phone,
       });
-
-      if (existing) {
-        throw new ConflictException(`user with phone ${phone} already exists.`);
-      }
     }
 
-    const { password } = input;
-
-    // create the user in firebase
-    const createdFirebaseUser = await this.firebaseAdminService.createUser({
-      companyUid,
-      email,
-      password,
-      phone,
-    });
-
+    // create the user
     const created = this.userRepository.create({
-      authUid: createdFirebaseUser.uid,
-      email,
-      phone,
+      authUid: firebaseUser.uid,
+      email: firebaseUser.email,
+      phone: firebaseUser.phoneNumber,
       company,
     });
 
+    // save the user in the database
     const saved = await this.userRepository.save(created);
 
-    if (saved.email) {
+    // decide if need to assign the role
+    if (role) {
+      try {
+        await this.userExtraService.assignRole({
+          roleUid: role.uid,
+          userAuthUid: saved.authUid,
+        });
+      } catch (error) {
+        Logger.error(
+          `error assigning the role ${role.uid} to the user ${saved.authUid}.`,
+          UserService.name,
+        );
+        Logger.log('deleting that user...');
+        await this.delete({
+          authUid: saved.authUid,
+        });
+      }
+    }
+
+    const { sendEmail = true } = input;
+
+    // decide if need to send an email to the user
+    if (sendEmail && saved.email) {
       // send the confirmation email
       this.userExtraService
         .sendConfirmationEmail({

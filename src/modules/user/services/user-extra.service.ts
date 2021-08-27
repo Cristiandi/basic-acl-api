@@ -23,6 +23,9 @@ import { FirebaseAdminService } from '../../../plugins/firebase-admin/firebase-a
 import { EmailTemplateService } from '../../email-template/email-template.service';
 import { MailgunService } from '../../../plugins/mailgun/mailgun.service';
 import { VerificationCodeService } from '../../verification-code/verification-code.service';
+import { RoleService } from '../../role/role.service';
+import { CompanyService } from '../../company/services/company.service';
+import { AssignedRoleService } from '../../assigned-role/assigned-role.service';
 
 import { addDaysToDate } from '../../../utils';
 
@@ -35,6 +38,8 @@ import { SendResetUserPasswordEmailInput } from '../dto/send-reset-user-password
 import { VoidOutput } from '../dto/void-output.dto';
 import { ResetUserPasswordInput } from '../dto/reset-user-password-input.dto';
 import { ResetUserPasswordOutput } from '../dto/reset-user-password-output.dto';
+import { CreateUsersFromFirebaseInput } from '../dto/create-users-from-firebase-input.dto';
+import { AssignUserRoleInput } from '../dto/assign-user-role-input.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -49,7 +54,38 @@ export class UserExtraService {
     private readonly emailTemplateService: EmailTemplateService,
     private readonly mailgunService: MailgunService,
     private readonly verificationCodeService: VerificationCodeService,
+    private readonly companyService: CompanyService,
+    private readonly roleService: RoleService,
+    private readonly assignedRoleService: AssignedRoleService,
   ) {}
+
+  public async assignRole(input: AssignUserRoleInput): Promise<User> {
+    const { userAuthUid, roleUid } = input;
+
+    // get the user
+    const exisitingUser = await this.userService.getOneByOneFields({
+      fields: {
+        authUid: userAuthUid,
+      },
+      checkIfExists: true,
+    });
+
+    // get the role
+    const exisitingRole = await this.roleService.getOneByOneFields({
+      fields: {
+        uid: roleUid,
+      },
+      checkIfExists: true,
+    });
+
+    // assign the role to the user
+    await this.assignedRoleService.create({
+      role: exisitingRole,
+      user: exisitingUser,
+    });
+
+    return exisitingUser;
+  }
 
   public async changePhone(input: ChangeUserPhoneInput): Promise<User> {
     const { authUid } = input;
@@ -431,6 +467,57 @@ export class UserExtraService {
 
     return {
       message: 'an email has been sent.',
+    };
+  }
+
+  public async createUsersFromFirebase(
+    input: CreateUsersFromFirebaseInput,
+  ): Promise<VoidOutput> {
+    const { companyUid, roleCode } = input;
+
+    const company = await this.companyService.getOneByOneFields({
+      fields: { uid: companyUid },
+      checkIfExists: true,
+    });
+
+    const role = await this.roleService.getOneByOneFields({
+      fields: { company, code: roleCode },
+      checkIfExists: true,
+    });
+
+    (async () => {
+      const firebaseUsers = await this.firebaseAdminService.getUsers({
+        companyUid,
+      });
+
+      for (const firebaseUser of firebaseUsers) {
+        const { email, uid, phoneNumber } = firebaseUser;
+
+        try {
+          await this.userService.create({
+            companyUid,
+            authUid: uid,
+            email,
+            phone: phoneNumber,
+            sendEmail: false,
+          });
+
+          Logger.log(
+            `user with auth uid ${uid} created.`,
+            UserExtraService.name,
+          );
+        } catch (error) {
+          console.error(error);
+          Logger.error(
+            `problems creating the user with auth uid ${uid}.`,
+            UserExtraService.name,
+          );
+        }
+      }
+    })().catch((error) => console.error(error));
+
+    return {
+      message: 'processing...',
     };
   }
 }
