@@ -1,0 +1,295 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ApiKey {
+  alias: String
+  company: Company!
+  createdAt: DateTime!
+  id: Float!
+  uid: String!
+  updatedAt: DateTime!
+  value: String!
+}
+
+input AssignUserRoleInput {
+  roleUid: String!
+  userAuthUid: String!
+}
+
+type AssignedRole {
+  createdAt: DateTime!
+  id: Float!
+  role: Role!
+  updatedAt: DateTime!
+  user: User!
+}
+
+input ChangeUserEmailInput {
+  """uid from firebase"""
+  authUid: String!
+
+  """new email address"""
+  email: String!
+
+  """custom parameters for CONFIRMATION_EMAIL"""
+  emailTemplateParams: JSONObject
+}
+
+input ChangeUserPasswordInput {
+  authUid: String!
+  emailTemplateParams: JSONObject
+  newPassword: String!
+  oldPassword: String!
+}
+
+input ChangeUserPhoneInput {
+  authUid: String!
+  phone: String!
+}
+
+type Company {
+  accessKey: String
+  apiKeys: [ApiKey!]!
+  createdAt: DateTime!
+  firebaseAdminConfig: JSONObject
+  firebaseConfig: JSONObject
+  id: Float!
+  name: String!
+  projects: [Project!]!
+  roles: [Role!]!
+  uid: String!
+  updatedAt: DateTime!
+  users: [User!]!
+  website: String
+}
+
+input CreateApiKeyInput {
+  alias: String
+  companyUid: String!
+}
+
+input CreateCompanyInput {
+  firebaseAdminConfig: JSONObject!
+  firebaseConfig: JSONObject!
+  name: String!
+}
+
+input CreateProjectInput {
+  code: String!
+  companyUid: String!
+  description: String
+  name: String!
+}
+
+input CreateRoleInput {
+  code: String!
+  companyUid: String!
+  description: String
+  name: String!
+}
+
+input CreateUserInput {
+  """uid of the user in firebase."""
+  authUid: String
+
+  """uid of the owner company."""
+  companyUid: String!
+  email: String
+  emailTemplateParams: JSONObject
+  password: String
+  phone: String
+  roleCode: String
+  sendEmail: Boolean
+}
+
+input CreateUsersFromFirebaseInput {
+  companyUid: String!
+  roleCode: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input GetAllApiKeysInput {
+  companyUid: String!
+  limit: Int
+  q: String
+  skip: Int
+}
+
+input GetAllProjectsInput {
+  companyUid: String!
+  limit: Int
+  q: String
+  skip: Int
+}
+
+input GetAllRolesInput {
+  companyUid: String!
+  limit: Int
+  q: String
+  skip: Int
+}
+
+input GetAllUsersInput {
+  companyUid: String!
+  limit: Int
+  q: String
+  skip: Int
+}
+
+input GetOneApiKeyInput {
+  uid: String!
+}
+
+input GetOneCompanyInput {
+  uid: String!
+}
+
+input GetOneProjectInput {
+  uid: String!
+}
+
+input GetOneRoleInput {
+  uid: String!
+}
+
+input GetOneUserInput {
+  authUid: String!
+}
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
+
+type Mutation {
+  assignUserRole(assignUserRoleInput: AssignUserRoleInput!): User!
+  changeUserEmail(changeUserEmailInput: ChangeUserEmailInput!): User!
+  changeUserPassword(changeUserPasswordInput: ChangeUserPasswordInput!): User!
+  changeUserPhone(changeUserPhoneInput: ChangeUserPhoneInput!): User!
+  createApiKey(createApiKeyInput: CreateApiKeyInput!): ApiKey!
+  createCompany(createCompanyInput: CreateCompanyInput!): Company!
+  createProject(createProjectInput: CreateProjectInput!): Project!
+  createRole(createRoleInput: CreateRoleInput!): Role!
+  createUser(createUserInput: CreateUserInput!): User!
+  createUsersFromFirebase(createUsersFromFirebaseInput: CreateUsersFromFirebaseInput!): VoidOutput!
+  daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
+  deleteApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey!
+  deleteProject(getOneProjectInput: GetOneProjectInput!): Project!
+  deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
+  deleteUser(getOneUserInput: GetOneUserInput!): User!
+  resetUserPassword(resetUserPasswordInput: ResetUserPasswordInput!): ResetUserPasswordOutput!
+  sendConfirmationUserEmail(getOneUserInput: GetOneUserInput!): VoidOutput!
+  sendResetUserPasswordEmail(sendResetUserPasswordEmailInput: SendResetUserPasswordEmailInput!): VoidOutput!
+  updateApiKey(getOneApiKeyInput: GetOneApiKeyInput!, updateApiKeyInput: UpdateApiKeyInput!): ApiKey!
+  updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
+  updateProject(getOneProjectInput: GetOneProjectInput!, updateProjectInput: UpdateProjectInput!): Project!
+  updateRole(getOneRoleInput: GetOneRoleInput!, updateRoleInput: UpdateRoleInput!): Role!
+}
+
+type Project {
+  code: String!
+  company: Company!
+  createdAt: DateTime!
+  description: String
+  id: Float!
+  name: String!
+  uid: String!
+  updatedAt: DateTime!
+}
+
+type Query {
+  getAllApiKeys(getAllApiKeysInput: GetAllApiKeysInput!): [ApiKey!]!
+  getAllProjects(getProjectsInput: GetAllProjectsInput!): [Project!]
+  getAllRoles(getRolesInput: GetAllRolesInput!): [Role!]!
+  getAllUsers(getAllUsersInput: GetAllUsersInput!): [User!]!
+  getCompany(getOneCompanyInput: GetOneCompanyInput!): Company
+  getOneApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey
+  getOneProject(getOneProjectInput: GetOneProjectInput!): Project
+  getOneRole(getOneRoleInput: GetOneRoleInput!): Role
+  getOneUser(getOneUserInput: GetOneUserInput!): User
+  sayHello: String!
+}
+
+input ResetUserPasswordInput {
+  code: String!
+  emailTemplateParams: JSONObject
+  password: String!
+}
+
+type ResetUserPasswordOutput {
+  url: String!
+}
+
+type Role {
+  assignedRoles: [AssignedRole!]!
+  code: String!
+  company: Company!
+  createdAt: DateTime!
+  description: String
+  id: Float!
+  name: String!
+  uid: String!
+  updatedAt: DateTime!
+}
+
+input SendResetUserPasswordEmailInput {
+  companyUid: String!
+  email: String!
+  emailTemplateParams: JSONObject
+}
+
+input UpdateApiKeyInput {
+  alias: String
+  companyUid: String
+}
+
+input UpdateCompanyInput {
+  firebaseAdminConfig: JSONObject
+  firebaseConfig: JSONObject
+  name: String
+}
+
+input UpdateProjectInput {
+  code: String
+  companyUid: String
+  description: String
+  name: String
+}
+
+input UpdateRoleInput {
+  code: String
+  companyUid: String
+  description: String
+  name: String
+}
+
+type User {
+  assignedRoles: [AssignedRole!]!
+  authUid: String!
+  company: Company!
+  createdAt: DateTime!
+  email: String
+  id: Float!
+  phone: String
+  updatedAt: DateTime!
+  verificationCodes: [VerificationCode!]!
+}
+
+type VerificationCode {
+  code: String!
+  createdAt: DateTime!
+  id: Float!
+  type: String!
+  uid: String!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type VoidOutput {
+  message: String!
+}

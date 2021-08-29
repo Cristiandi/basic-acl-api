@@ -1,14 +1,21 @@
-import { CanActivate, ExecutionContext, Injectable, Inject, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Inject,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 // import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { ConfigType } from '@nestjs/config';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 import appConfig from '../../config/app.config';
 
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
-import { FirebaseAdminService } from '../plugins/firebase-admin/firebase-admin.service';
-import { UsersService } from 'src/modules/users/users.service';
+import { CompanyService } from '../../modules/company/services/company.service';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
@@ -16,49 +23,39 @@ export class AuthorizationGuard implements CanActivate {
     private readonly reflector: Reflector,
     @Inject(appConfig.KEY)
     private readonly appConfiguration: ConfigType<typeof appConfig>,
-    private readonly firebaseAdminService: FirebaseAdminService,
-    private readonly usersService: UsersService
+    private readonly companyService: CompanyService,
   ) {}
 
-  async canActivate(
-    context: ExecutionContext,
-  ): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.get(IS_PUBLIC_KEY, context.getHandler());
 
     if (isPublic) return true;
-    
-    const request = context.switchToHttp().getRequest();
-    
-    const companyUuid = request.headers['company-uuid'];
-    if (!companyUuid) {
-      throw new HttpException('company-uuid header not found', HttpStatus.UNAUTHORIZED);
-    }
 
-    const authorization: string = request.headers['Authorization'] || request.headers['authorization'];
-    if (!authorization) {
-      throw new HttpException('authorization header not found', HttpStatus.UNAUTHORIZED);
-    }
+    const ctx = GqlExecutionContext.create(context);
+    const { req: request } = ctx.getContext();
 
-    const authArray = authorization.split(' ');
-
-    const token = authArray.length ? authArray[1] : null;
-
-    if (!token) {
-      Logger.error('can not get the token from authorization header.', undefined, 'AuthorizationGuard');
-      return false;
+    const accessKey: string = request.headers['access-key'];
+    if (!accessKey) {
+      throw new UnauthorizedException('access-key header not found');
     }
 
     try {
-      const user = await this.usersService.getUserByToken({ companyUuid, token });
+      const company = await this.companyService.getOneByOneFields({
+        fields: { accessKey },
+        checkIfExists: false,
+      });
 
-      if (!user.isAdmin) {
-        Logger.error('the user is not an admin.', undefined, 'AuthorizationGuard');
+      if (!company) {
+        Logger.error(
+          `can't get the company for the access key ${accessKey}`,
+          AuthorizationGuard.name,
+        );
         return false;
       }
 
       return true;
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.FORBIDDEN);
+      throw new UnauthorizedException(error.message);
     }
   }
 }
