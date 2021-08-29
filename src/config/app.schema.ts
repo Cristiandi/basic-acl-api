@@ -19,4 +19,5 @@ export default Joi.object({
   MAILGUN_DOMAIN: Joi.required(),
   MAILGUN_PRIVATE_KEY: Joi.required(),
   MAILGUN_PUBLIC_KEY: Joi.required(),
+  MAILGUN_EMAIL_FROM: Joi.required(),
 });
