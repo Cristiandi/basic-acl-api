@@ -44,7 +44,7 @@ import { AssignedRoleModule } from './modules/assigned-role/assigned-role.module
           introspection: true,
           installSubscriptionHandlers: true,
           playground:
-            configService.get<string>('config.environment') === 'development',
+            configService.get<string>('config.environment') === 'local',
           formatError: (error) => {
             console.error(error);
             return error;
