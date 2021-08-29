@@ -54,10 +54,11 @@ export class UserExtraService {
     private readonly emailTemplateService: EmailTemplateService,
     private readonly mailgunService: MailgunService,
     private readonly verificationCodeService: VerificationCodeService,
-    private readonly companyService: CompanyService,
     private readonly roleService: RoleService,
     private readonly assignedRoleService: AssignedRoleService,
   ) {}
+
+  /* functions in charge of creating  */
 
   public async assignRole(input: AssignUserRoleInput): Promise<User> {
     const { userAuthUid, roleUid } = input;
@@ -86,6 +87,52 @@ export class UserExtraService {
 
     return exisitingUser;
   }
+
+  public async createUsersFromFirebase(
+    input: CreateUsersFromFirebaseInput,
+  ): Promise<VoidOutput> {
+    const { companyUid, roleCode } = input;
+
+    (async () => {
+      const firebaseUsers = await this.firebaseAdminService.getUsers({
+        companyUid,
+      });
+
+      for (const firebaseUser of firebaseUsers) {
+        const { email, uid, phoneNumber } = firebaseUser;
+
+        try {
+          await this.userService.create({
+            companyUid,
+            authUid: uid,
+            email,
+            phone: phoneNumber,
+            sendEmail: false,
+            roleCode,
+          });
+
+          Logger.log(
+            `user with auth uid ${uid} created.`,
+            UserExtraService.name,
+          );
+        } catch (error) {
+          console.error(error);
+          Logger.error(
+            `problems creating the user with auth uid ${uid}.`,
+            UserExtraService.name,
+          );
+        }
+      }
+    })().catch((error) => console.error(error));
+
+    return {
+      message: 'processing...',
+    };
+  }
+
+  /* functions in charge of creating  */
+
+  /* functions in charge of updating  */
 
   public async changePhone(input: ChangeUserPhoneInput): Promise<User> {
     const { authUid } = input;
@@ -226,6 +273,10 @@ export class UserExtraService {
 
     return existingUser;
   }
+
+  /* functions in charge of updating  */
+
+  /* other functions */
 
   public async sendConfirmationEmail(
     input: GetOneUserInput,
@@ -470,54 +521,5 @@ export class UserExtraService {
     };
   }
 
-  public async createUsersFromFirebase(
-    input: CreateUsersFromFirebaseInput,
-  ): Promise<VoidOutput> {
-    const { companyUid, roleCode } = input;
-
-    const company = await this.companyService.getOneByOneFields({
-      fields: { uid: companyUid },
-      checkIfExists: true,
-    });
-
-    const role = await this.roleService.getOneByOneFields({
-      fields: { company, code: roleCode },
-      checkIfExists: true,
-    });
-
-    (async () => {
-      const firebaseUsers = await this.firebaseAdminService.getUsers({
-        companyUid,
-      });
-
-      for (const firebaseUser of firebaseUsers) {
-        const { email, uid, phoneNumber } = firebaseUser;
-
-        try {
-          await this.userService.create({
-            companyUid,
-            authUid: uid,
-            email,
-            phone: phoneNumber,
-            sendEmail: false,
-          });
-
-          Logger.log(
-            `user with auth uid ${uid} created.`,
-            UserExtraService.name,
-          );
-        } catch (error) {
-          console.error(error);
-          Logger.error(
-            `problems creating the user with auth uid ${uid}.`,
-            UserExtraService.name,
-          );
-        }
-      }
-    })().catch((error) => console.error(error));
-
-    return {
-      message: 'processing...',
-    };
-  }
+  /* other functions */
 }

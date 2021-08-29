@@ -14,6 +14,8 @@ import { ApiKey } from '../api-key/api-key.entity';
 import { Role } from '../role/role.entity';
 import { User } from '../user/user.entity';
 
+import { Public } from '../../common/decorators/public.decorator';
+
 import { CompanyService } from './services/company.service';
 
 import { CreateCompanyInput } from './dto/create-company-input.dto';
@@ -25,6 +27,7 @@ import { UpdateCompanyInput } from './dto/update-company-input.dto';
 export class CompanyResolver {
   constructor(private readonly service: CompanyService) {}
 
+  @Public()
   @Mutation(() => Company, { name: 'createCompany' })
   public create(
     @Args('createCompanyInput') createCompanyInput: CreateCompanyInput,

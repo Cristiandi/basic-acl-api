@@ -15,6 +15,8 @@ import { GetOneUserInput } from '../dto/get-one-user-input.dto';
 import { VoidOutput } from '../dto/void-output.dto';
 import { ResetUserPasswordInput } from '../dto/reset-user-password-input.dto';
 import { ResetUserPasswordOutput } from '../dto/reset-user-password-output.dto';
+import { CreateUsersFromFirebaseInput } from '../dto/create-users-from-firebase-input.dto';
+import { AssignUserRoleInput } from '../dto/assign-user-role-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => User)
@@ -66,5 +68,20 @@ export class UserExtraResolver {
     input: ResetUserPasswordInput,
   ): Promise<ResetUserPasswordOutput> {
     return this.service.resetPassword(input);
+  }
+
+  @Mutation(() => VoidOutput, { name: 'createUsersFromFirebase' })
+  public createUsersFromFirebase(
+    @Args('createUsersFromFirebaseInput')
+    createUsersFromFirebaseInput: CreateUsersFromFirebaseInput,
+  ): Promise<VoidOutput> {
+    return this.service.createUsersFromFirebase(createUsersFromFirebaseInput);
+  }
+
+  @Mutation(() => User, { name: 'assignUserRole' })
+  public assignRole(
+    @Args('assignUserRoleInput') assignUserRoleInput: AssignUserRoleInput,
+  ): Promise<User> {
+    return this.service.assignRole(assignUserRoleInput);
   }
 }
