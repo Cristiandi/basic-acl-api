@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
-import { ClusterService } from './cluster.service';
+// import { ClusterService } from './cluster.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,4 +22,6 @@ async function bootstrap() {
   });
 }
 
-ClusterService.clusterize(bootstrap);
+// ClusterService.clusterize(bootstrap);
+
+bootstrap();
