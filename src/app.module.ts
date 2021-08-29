@@ -1,70 +1,103 @@
-import * as path from 'path';
+import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import appConfig from './config/app.config';
+
+// import { loggerMiddleware } from './common/middlewares/logger.middleware';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AppResolver } from './app.resolver';
 
-
+import { CompanyModule } from './modules/company/company.module';
+import { ProjectModule } from './modules/project/project.module';
+import { join } from 'path';
+import { RoleModule } from './modules/role/role.module';
+import { ApiKeyModule } from './modules/api-key/api-key.module';
+import { EmailTemplateModule } from './modules/email-template/email-template.module';
+import { UserModule } from './modules/user/user.module';
 import { CommonModule } from './common/common.module';
-import { CompaniesModule } from './modules/companies/companies.module';
-import { UsersModule } from './modules/users/users.module';
-import { ProjectsModule } from './modules/projects/projects.module';
-import { RolesModule } from './modules/roles/roles.module';
-import { ApiKeysModule } from './modules/api-keys/api-keys.module';
-import { AssignedRolesModule } from './modules/assigned-roles/assigned-roles.module';
-import { HttpRoutesModule } from './modules/http-routes/http-routes.module';
-import { PermissionsModule } from './modules/permisssions/permissions.module';
-import { VerificationCodesModule } from './modules/verification-codes/verification-codes.module';
-import { ConfirmationEmailConfigsModule } from './modules/confirmation-email-configs/confirmation-email-configs.module';
-import { ParametersModule } from './modules/parameters/parameters.module';
-import { ForgottenPasswordConfigsModule } from './modules/forgotten-password-configs/forgotten-password-configs.module';
-import { GraphqlActionsModule } from './modules/graphql-actions/graphql-actions.module';
-
-import appConfig from './config/app.config';
-import appConfigSchema from './config/app.config.schema';
-
-const NODE_ENV = process.env.NODE_ENV || 'local';
-const envPath = path.resolve(__dirname, `../.env.${NODE_ENV}`);
+import { FirebaseAdminModule } from './plugins/firebase-admin/firebase-admin.module';
+import { FirebaseModule } from './plugins/firebase/firebase.module';
+import { MailgunModule } from './plugins/mailgun/mailgun.module';
+import { VerificationCodeModule } from './modules/verification-code/verification-code.module';
+import { AssignedRoleModule } from './modules/assigned-role/assigned-role.module';
 
 @Module({
   imports: [
+    // config
     ConfigModule.forRoot({
-      envFilePath: envPath,
+      isGlobal: true,
       load: [appConfig],
-      validationSchema: appConfigSchema
     }),
+
+    // GraphQL
+    GraphQLModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          autoSchemaFile: join(process.cwd(), 'schema.gql'),
+          sortSchema: true,
+          introspection: true,
+          installSubscriptionHandlers: true,
+          playground:
+            configService.get<string>('config.environment') === 'local',
+          formatError: (error) => {
+            console.error(error);
+            return error;
+          },
+        };
+      },
+    }),
+
+    // TypeORM
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        type: 'postgres',
-        host: process.env.DATABASE_HOST,
-        port: +process.env.DATABASE_PORT,
-        username: process.env.DATABASE_USER,
-        password: process.env.DATABASE_PASSWORD,
-        database: process.env.DATABASE_NAME,
-        autoLoadEntities: true,
-        synchronize: process.env.NODE_ENV !== 'production',
-        logging: true
-      })
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          type: 'postgres',
+          host: configService.get<string>('config.database.host'),
+          port: configService.get<number>('config.database.port'),
+          username: configService.get<string>('config.database.user'),
+          password: configService.get<string>('config.database.password'),
+          database: configService.get<string>('config.database.database'),
+          autoLoadEntities: true,
+          synchronize:
+            configService.get<string>('config.environment') !== 'production',
+          logging: configService.get<string>('config.database.log') === 'yes',
+        };
+      },
     }),
+
+    CompanyModule,
+
+    ProjectModule,
+
+    RoleModule,
+
+    ApiKeyModule,
+
+    EmailTemplateModule,
+
+    UserModule,
+
     CommonModule,
-    CompaniesModule,
-    UsersModule,
-    ProjectsModule,
-    RolesModule,
-    ApiKeysModule,
-    AssignedRolesModule,
-    HttpRoutesModule,
-    PermissionsModule,
-    VerificationCodesModule,
-    ConfirmationEmailConfigsModule,
-    ParametersModule,
-    ForgottenPasswordConfigsModule,
-    GraphqlActionsModule
+
+    FirebaseAdminModule,
+
+    FirebaseModule,
+
+    MailgunModule,
+
+    VerificationCodeModule,
+
+    AssignedRoleModule,
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService, AppResolver],
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,53 +1,19 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { RedisModule} from 'nestjs-redis';
+import { APP_GUARD } from '@nestjs/core';
+import { CompanyModule } from '../modules/company/company.module';
 
 import appConfig from '../config/app.config';
 
 import { AuthorizationGuard } from './guards/authorization.guard';
-import { HitLimitGuard } from './guards/hit-limit.guard';
-
-import { FirebaseAdminModule } from './plugins/firebase-admin/firebase-admin.module';
-
-import { LoggingMiddleware } from './middlewares/logging.middleware';
-import { TemplatesModule } from './templates/templates.module';
-import { MailerModule } from './plugins/mailer/mailer.module';
-import { UsersModule } from 'src/modules/users/users.module';
-import { MailgunModule } from './plugins/mailgun/mailgun.module';
 
 @Module({
-  imports: [
-    ConfigModule.forFeature(appConfig),
-    RedisModule.forRootAsync({
-      useFactory: () => ({
-        host: process.env.REDIS_HOST,
-        port: +process.env.REDIS_PORT,
-        password: process.env.REDIS_PASSWORD,
-        name: process.env.REDIS_CLIENT_NAME
-      })
-    }),
-    FirebaseAdminModule,
-    TemplatesModule,
-    MailerModule,
-    UsersModule,
-    MailgunModule
-  ],
+  imports: [ConfigModule.forFeature(appConfig), CompanyModule],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: AuthorizationGuard
+      useClass: AuthorizationGuard,
     },
-    {
-      provide: APP_GUARD,
-      useClass: HitLimitGuard
-    }
-  ]
+  ],
 })
-export class CommonModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(LoggingMiddleware)
-      .forRoutes('*');
-  }
-
-}
+export class CommonModule {}

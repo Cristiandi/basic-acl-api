@@ -1,67 +1,27 @@
-import helmet from 'fastify-helmet';
-
-import { NestFactory } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
-import {
-  FastifyAdapter,
-  NestFastifyApplication
-} from '@nestjs/platform-fastify';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
-import { CustomExceptionFilter } from './common/filters/cutstom-exception.filter';
+// import { ClusterService } from './cluster.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter()
-  );
-  
+  const app = await NestFactory.create(AppModule);
+
   // getting the config service
   const configService = app.get(ConfigService);
-  
-  // enabling for cors policy
-  app.enableCors();
 
-  // use helmet
-  // await app.register(helmet, { hidePoweredBy: false });
-
-  /*
-  app.register(helmet, {
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ['self'],
-        styleSrc: ['self', 'unsafe-inline'],
-        imgSrc: ['self', 'data:', 'validator.swagger.io'],
-        scriptSrc: ['self', 'https: \'unsafe-inline\'']
-      }
-    }
-  });
-  */
-
-  app.register(helmet, {
-    hidePoweredBy: false,
-    contentSecurityPolicy: false
-  });
-  
-  // using the filters
-  app.useGlobalFilters(new CustomExceptionFilter());
-
-  // Setting up Swagger document 
-  const options = new DocumentBuilder()
-    .setTitle('Basic')
-    .setDescription('The basic ACL api description.')
-    .setVersion('1.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);
-
+  // getting the port env var
   const PORT = configService.get<number>('config.app.port');
-  const ENVIRONMENT = configService.get<string>('config.environment');
 
-  await app.listen(PORT, '0.0.0.0');
-  
-  Logger.debug(`server listening at ${PORT} | ${ENVIRONMENT} `, 'main.ts');
+  // getting the environment var
+  const ENV = configService.get<string>('config.environment');
+
+  await app.listen(PORT, () => {
+    Logger.log(`app listening at ${PORT} in ${ENV}`, 'main.ts');
+  });
 }
+
+// ClusterService.clusterize(bootstrap);
+
 bootstrap();
