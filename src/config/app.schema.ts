@@ -13,6 +13,7 @@ export default Joi.object({
   DATABASE_USER: Joi.required(),
   DATABASE_PASSWORD: Joi.required(),
   DATABASE_NAME: Joi.required(),
+  DATABASE_LOG: Joi.required(),
 
   /* MAILGUN */
   MAILGUN_DOMAIN: Joi.required(),
