@@ -3,13 +3,13 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigType } from '@nestjs/config';
-import { InternalServerError } from 'http-errors';
 
 import appConfig from '../../../config/app.config';
 
@@ -24,7 +24,6 @@ import { EmailTemplateService } from '../../email-template/email-template.servic
 import { MailgunService } from '../../../plugins/mailgun/mailgun.service';
 import { VerificationCodeService } from '../../verification-code/verification-code.service';
 import { RoleService } from '../../role/role.service';
-import { CompanyService } from '../../company/services/company.service';
 import { AssignedRoleService } from '../../assigned-role/assigned-role.service';
 
 import { addDaysToDate } from '../../../utils';
@@ -393,7 +392,7 @@ export class UserExtraService {
     }
 
     if (!existingUser.company) {
-      throw new InternalServerError('can not get company from user.');
+      throw new InternalServerErrorException('can not get company from user.');
     }
 
     // generate the verification code
