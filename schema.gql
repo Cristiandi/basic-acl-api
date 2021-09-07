@@ -193,6 +193,7 @@ type Mutation {
 }
 
 type Permission {
+  allowed: Boolean!
   apiKey: ApiKey!
   createdAt: DateTime!
   id: Float!

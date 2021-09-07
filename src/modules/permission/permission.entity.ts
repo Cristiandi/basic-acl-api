@@ -36,6 +36,10 @@ export class Permission extends BaseEntity {
   name: string;
 
   @Field()
+  @Column({ type: 'boolean', default: true })
+  allowed: boolean;
+
+  @Field()
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
