@@ -8,12 +8,14 @@ import {
   Generated,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { Company } from '../company/company.entity';
+import { Permission } from '../permission/permission.entity';
 
 @ObjectType()
 @Entity({ name: 'api_key' })
@@ -54,4 +56,8 @@ export class ApiKey extends BaseEntity {
   @ManyToOne(() => Company, (company) => company.apiKeys, { nullable: false })
   @JoinColumn({ name: 'company_id' })
   company: Company;
+
+  @Field(() => [Permission])
+  @OneToMany(() => Permission, (permission) => permission.apiKey)
+  permissions: Permission[];
 }

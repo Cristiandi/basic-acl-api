@@ -7,6 +7,7 @@ type ApiKey {
   company: Company!
   createdAt: DateTime!
   id: Float!
+  permissions: [Permission!]!
   uid: String!
   updatedAt: DateTime!
   value: String!
@@ -191,6 +192,17 @@ type Mutation {
   updateRole(getOneRoleInput: GetOneRoleInput!, updateRoleInput: UpdateRoleInput!): Role!
 }
 
+type Permission {
+  apiKey: ApiKey!
+  createdAt: DateTime!
+  id: Float!
+  name: String!
+  project: Project!
+  role: Role!
+  uid: String!
+  updatedAt: DateTime!
+}
+
 type Project {
   code: String!
   company: Company!
@@ -198,6 +210,7 @@ type Project {
   description: String
   id: Float!
   name: String!
+  permissions: [Permission!]!
   uid: String!
   updatedAt: DateTime!
 }
@@ -233,6 +246,7 @@ type Role {
   description: String
   id: Float!
   name: String!
+  permissions: [Permission!]!
   uid: String!
   updatedAt: DateTime!
 }

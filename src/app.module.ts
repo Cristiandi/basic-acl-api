@@ -24,6 +24,7 @@ import { FirebaseModule } from './plugins/firebase/firebase.module';
 import { MailgunModule } from './plugins/mailgun/mailgun.module';
 import { VerificationCodeModule } from './modules/verification-code/verification-code.module';
 import { AssignedRoleModule } from './modules/assigned-role/assigned-role.module';
+import { PermissionModule } from './modules/permission/permission.module';
 
 @Module({
   imports: [
@@ -96,6 +97,8 @@ import { AssignedRoleModule } from './modules/assigned-role/assigned-role.module
     VerificationCodeModule,
 
     AssignedRoleModule,
+
+    PermissionModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
