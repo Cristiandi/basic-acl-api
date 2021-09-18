@@ -42,7 +42,7 @@
     "graphql-type-json": "0.3.2",
     "handlebars": "4.7.7",
     "joi": "17.4.2",
-    "mailgun.js": "3.5.8",
+    "mailgun.js": "3.5.9",
     "mjml": "4.10.3",
     "nanoid": "3.1.23",
     "pg": "8.7.1",
