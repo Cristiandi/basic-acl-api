@@ -56,13 +56,13 @@ export class Permission extends BaseEntity {
   @JoinColumn({ name: 'project_id' })
   project: Project;
 
-  @Field(() => Role)
-  @ManyToOne(() => Role, (role) => role.permissions, { nullable: false })
+  @Field(() => Role, { nullable: true })
+  @ManyToOne(() => Role, (role) => role.permissions, { nullable: true })
   @JoinColumn({ name: 'role_id' })
   role: Role;
 
-  @Field(() => ApiKey)
-  @ManyToOne(() => ApiKey, (apiKey) => apiKey.permissions, { nullable: false })
+  @Field(() => ApiKey, { nullable: true })
+  @ManyToOne(() => ApiKey, (apiKey) => apiKey.permissions, { nullable: true })
   @JoinColumn({ name: 'api_key_id' })
   apiKey: ApiKey;
 }

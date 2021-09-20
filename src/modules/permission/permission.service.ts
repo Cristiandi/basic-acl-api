@@ -15,6 +15,10 @@ import { ApiKeyService } from '../api-key/api-key.service';
 import { ProjectService } from '../project/project.service';
 import { RoleService } from '../role/role.service';
 
+import { CreatePermissionInput } from './dto/create-permission-input.dto';
+import { GetOnePermissionInput } from './dto/get-one-permission-input.dto';
+import { GetAllPermissionsInput } from './dto/get-all-permissions-input.dto';
+
 @Injectable()
 export class PermissionService extends BaseService<Permission> {
   constructor(
@@ -29,7 +33,7 @@ export class PermissionService extends BaseService<Permission> {
 
   // CRUD
 
-  public async create(input: any): Promise<Permission> {
+  public async create(input: CreatePermissionInput): Promise<Permission> {
     const { projectUid } = input;
 
     const project = await this.projectService.getOne({
@@ -42,12 +46,16 @@ export class PermissionService extends BaseService<Permission> {
 
     const { roleUid } = input;
 
-    const role = await this.roleService.getOne({
-      uid: roleUid,
-    });
+    let role;
 
-    if (!role) {
-      throw new NotFoundException(`role with uid ${roleUid} not found.`);
+    if (roleUid) {
+      role = await this.roleService.getOne({
+        uid: roleUid,
+      });
+
+      if (!role) {
+        throw new NotFoundException(`role with uid ${roleUid} not found.`);
+      }
     }
 
     const { apiKeyUid } = input;
@@ -58,6 +66,18 @@ export class PermissionService extends BaseService<Permission> {
       apiKey = await this.apiKeyService.getOne({
         uid: apiKeyUid,
       });
+
+      if (!apiKey) {
+        throw new NotFoundException(`apiKey with uid ${apiKeyUid} not found.`);
+      }
+    }
+
+    if (!role && !apiKey) {
+      throw new ConflictException('must provide either a role or an apiKey.');
+    }
+
+    if (role && apiKey) {
+      throw new ConflictException(`apiKey and role cannot be both defined.`);
     }
 
     let existing = await this.getOneByOneFields({
@@ -100,6 +120,41 @@ export class PermissionService extends BaseService<Permission> {
     const saved = await this.permissionRepository.save(created);
 
     return saved;
+  }
+
+  public async getOne(
+    input: GetOnePermissionInput,
+  ): Promise<Permission | undefined> {
+    const { uid } = input;
+
+    const existing = await this.getOneByOneFields({
+      fields: { uid },
+      checkIfExists: false,
+    });
+
+    return existing;
+  }
+
+  public async getAll(input: GetAllPermissionsInput): Promise<Permission[]> {
+    const { companyUid, limit, skip, q } = input;
+
+    const query = this.permissionRepository
+      .createQueryBuilder('permission')
+      .loadAllRelationIds()
+      .innerJoin('permission.project', 'project')
+      .innerJoin('project.company', 'company')
+      .where('company.uid = :companyUid', { companyUid });
+
+    if (q)
+      query.andWhere('permission.name ilike :q', {
+        q: `%${q}%`,
+      });
+
+    query.limit(limit || 10).skip(skip);
+
+    const items = await query.getMany();
+
+    return items;
   }
 
   // CRUD
