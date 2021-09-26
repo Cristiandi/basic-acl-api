@@ -18,6 +18,7 @@ import { RoleService } from '../role/role.service';
 import { CreatePermissionInput } from './dto/create-permission-input.dto';
 import { GetOnePermissionInput } from './dto/get-one-permission-input.dto';
 import { GetAllPermissionsInput } from './dto/get-all-permissions-input.dto';
+import { UpdatePermissionInput } from './dto/update-permission-input.dto';
 
 @Injectable()
 export class PermissionService extends BaseService<Permission> {
@@ -156,6 +157,124 @@ export class PermissionService extends BaseService<Permission> {
     const items = await query.getMany();
 
     return items;
+  }
+
+  public async update(
+    getOnePermissionInput: GetOnePermissionInput,
+    input: UpdatePermissionInput,
+  ): Promise<Permission> {
+    const { uid } = getOnePermissionInput;
+
+    const existing = await this.getOneByOneFields({
+      fields: { uid },
+      checkIfExists: true,
+    });
+
+    const { roleUid, apiKeyUid } = input;
+
+    if (!roleUid && !apiKeyUid) {
+      throw new ConflictException('must provide either a role or an apiKey.');
+    }
+
+    if (roleUid && apiKeyUid) {
+      throw new ConflictException(`apiKey and role cannot be both defined.`);
+    }
+
+    const { projectUid } = input;
+
+    let project;
+    if (projectUid) {
+      project = await this.projectService.getOne({
+        uid: projectUid,
+      });
+
+      if (!project) {
+        throw new NotFoundException(
+          `project with uid ${projectUid} not found.`,
+        );
+      }
+    }
+
+    let role;
+    if (roleUid) {
+      role = await this.roleService.getOne({
+        uid: roleUid,
+      });
+
+      if (!role) {
+        throw new NotFoundException(`role with uid ${roleUid} not found.`);
+      }
+    }
+
+    let apiKey;
+    if (apiKeyUid) {
+      apiKey = await this.apiKeyService.getOne({
+        uid: apiKeyUid,
+      });
+
+      if (!apiKey) {
+        throw new NotFoundException(`apiKey with uid ${apiKeyUid} not found.`);
+      }
+    }
+
+    let existingForCheck = await this.getOneByOneFields({
+      fields: {
+        project,
+        role,
+        apiKey,
+      },
+    });
+
+    if (existingForCheck) {
+      throw new ConflictException(
+        `already exists a permission for the project ${projectUid}, role ${roleUid} and api key ${apiKeyUid}.`,
+      );
+    }
+
+    const { name } = input;
+
+    existingForCheck = await this.getOneByOneFields({
+      fields: {
+        name,
+        project,
+      },
+    });
+
+    if (existingForCheck) {
+      throw new ConflictException(
+        `already exists a permission for the project ${projectUid} and name ${name}.`,
+      );
+    }
+
+    const preloaded = await this.permissionRepository.preload({
+      id: existing.id,
+      name: input.name || existing.name,
+      project: project || existing.project,
+      role: role || existing.role,
+      apiKey: apiKey || existing.apiKey,
+    });
+
+    const saved = await this.permissionRepository.save(preloaded);
+
+    return {
+      ...existing,
+      ...saved,
+    } as Permission;
+  }
+
+  public async delete(input: GetOnePermissionInput): Promise<Permission> {
+    const { uid } = input;
+
+    const existing = await this.getOneByOneFields({
+      fields: { uid },
+      checkIfExists: true,
+    });
+
+    const clone = { ...existing };
+
+    await this.permissionRepository.remove(existing);
+
+    return clone as Permission;
   }
 
   // CRUD

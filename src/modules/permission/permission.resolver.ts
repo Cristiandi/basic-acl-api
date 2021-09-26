@@ -11,6 +11,7 @@ import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Permission } from './permission.entity';
 import { Project } from '../project/project.entity';
 import { Role } from '../role/role.entity';
+import { ApiKey } from '../api-key/api-key.entity';
 
 import { PermissionService } from './permission.service';
 import { PermissionLoaders } from './permission.loaders';
@@ -18,7 +19,7 @@ import { PermissionLoaders } from './permission.loaders';
 import { CreatePermissionInput } from './dto/create-permission-input.dto';
 import { GetOnePermissionInput } from './dto/get-one-permission-input.dto';
 import { GetAllPermissionsInput } from './dto/get-all-permissions-input.dto';
-import { ApiKey } from '../api-key/api-key.entity';
+import { UpdatePermissionInput } from './dto/update-permission-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => Permission)
@@ -47,6 +48,21 @@ export class PermissionResolver {
     @Args('getPermissionsInput') input: GetAllPermissionsInput,
   ): Promise<Permission[]> {
     return this.service.getAll(input);
+  }
+
+  @Mutation(() => Project, { name: 'updatePermission' })
+  public update(
+    @Args('getOnePermissionInput') getOnePermissionInput: GetOnePermissionInput,
+    @Args('updatePermissionInput') input: UpdatePermissionInput,
+  ): Promise<Permission> {
+    return this.service.update(getOnePermissionInput, input);
+  }
+
+  @Mutation(() => Permission, { name: 'deletePermission' })
+  public delete(
+    @Args('getOnePermissionInput') input: GetOnePermissionInput,
+  ): Promise<Permission> {
+    return this.service.delete(input);
   }
 
   @ResolveField(() => Project, { name: 'project' })
