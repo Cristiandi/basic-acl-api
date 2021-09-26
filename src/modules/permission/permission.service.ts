@@ -130,6 +130,7 @@ export class PermissionService extends BaseService<Permission> {
     const existing = await this.getOneByOneFields({
       fields: { uid },
       checkIfExists: false,
+      relations: ['project', 'role', 'apiKey'],
     });
 
     return existing;

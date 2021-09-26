@@ -123,4 +123,10 @@ export class ApiKeyService extends BaseService<ApiKey> {
   }
 
   // CRUD
+
+  public async getByIds(ids: number[]): Promise<ApiKey[]> {
+    return this.apiKeyRepository.findByIds(ids, {
+      loadRelationIds: true,
+    });
+  }
 }

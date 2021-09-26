@@ -134,4 +134,10 @@ export class RoleService extends BaseService<Role> {
   }
 
   // CRUD
+
+  public async getByIds(ids: number[]): Promise<Role[]> {
+    return this.roleRepository.findByIds(ids, {
+      loadRelationIds: true,
+    });
+  }
 }
