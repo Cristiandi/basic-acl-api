@@ -172,10 +172,6 @@ export class PermissionService extends BaseService<Permission> {
 
     const { roleUid, apiKeyUid } = input;
 
-    if (!roleUid && !apiKeyUid) {
-      throw new ConflictException('must provide either a role or an apiKey.');
-    }
-
     if (roleUid && apiKeyUid) {
       throw new ConflictException(`apiKey and role cannot be both defined.`);
     }

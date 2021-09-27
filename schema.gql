@@ -199,6 +199,7 @@ type Mutation {
   createUsersFromFirebase(createUsersFromFirebaseInput: CreateUsersFromFirebaseInput!): VoidOutput!
   daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
   deleteApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey!
+  deletePermission(getOnePermissionInput: GetOnePermissionInput!): Permission!
   deleteProject(getOneProjectInput: GetOneProjectInput!): Project!
   deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
   deleteUser(getOneUserInput: GetOneUserInput!): User!
@@ -207,6 +208,7 @@ type Mutation {
   sendResetUserPasswordEmail(sendResetUserPasswordEmailInput: SendResetUserPasswordEmailInput!): VoidOutput!
   updateApiKey(getOneApiKeyInput: GetOneApiKeyInput!, updateApiKeyInput: UpdateApiKeyInput!): ApiKey!
   updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
+  updatePermission(getOnePermissionInput: GetOnePermissionInput!, updatePermissionInput: UpdatePermissionInput!): Project!
   updateProject(getOneProjectInput: GetOneProjectInput!, updateProjectInput: UpdateProjectInput!): Project!
   updateRole(getOneRoleInput: GetOneRoleInput!, updateRoleInput: UpdateRoleInput!): Role!
 }
@@ -288,6 +290,13 @@ input UpdateCompanyInput {
   firebaseAdminConfig: JSONObject
   firebaseConfig: JSONObject
   name: String
+}
+
+input UpdatePermissionInput {
+  apiKeyUid: String
+  name: String
+  projectUid: String
+  roleUid: String
 }
 
 input UpdateProjectInput {
