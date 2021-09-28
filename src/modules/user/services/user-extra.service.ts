@@ -39,6 +39,7 @@ import { ResetUserPasswordInput } from '../dto/reset-user-password-input.dto';
 import { ResetUserPasswordOutput } from '../dto/reset-user-password-output.dto';
 import { CreateUsersFromFirebaseInput } from '../dto/create-users-from-firebase-input.dto';
 import { AssignUserRoleInput } from '../dto/assign-user-role-input.dto';
+import { CreateSuperAdmiUserInput } from '../dto/create-super-admin-user-input.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -128,6 +129,12 @@ export class UserExtraService {
       message: 'processing...',
     };
   }
+
+  /*
+  public async createSuperAdminUser(
+    input: CreateSuperAdmiUserInput,
+  ): Promise<User> {}
+  */
 
   /* functions in charge of creating  */
 
