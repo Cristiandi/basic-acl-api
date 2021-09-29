@@ -25,6 +25,7 @@ import { MailgunService } from '../../../plugins/mailgun/mailgun.service';
 import { VerificationCodeService } from '../../verification-code/verification-code.service';
 import { RoleService } from '../../role/role.service';
 import { AssignedRoleService } from '../../assigned-role/assigned-role.service';
+import { CompanyService } from 'src/modules/company/services/company.service';
 
 import { addDaysToDate } from '../../../utils';
 
@@ -56,6 +57,7 @@ export class UserExtraService {
     private readonly verificationCodeService: VerificationCodeService,
     private readonly roleService: RoleService,
     private readonly assignedRoleService: AssignedRoleService,
+    private readonly companyService: CompanyService,
   ) {}
 
   /* functions in charge of creating  */
@@ -130,11 +132,73 @@ export class UserExtraService {
     };
   }
 
-  /*
   public async createSuperAdminUser(
     input: CreateSuperAdmiUserInput,
-  ): Promise<User> {}
-  */
+  ): Promise<User> {
+    // get the company
+    const { companyUid } = input;
+
+    const company = await this.companyService.getOneByOneFields({
+      fields: { uid: companyUid },
+      checkIfExists: true,
+    });
+
+    // check if the user already exists by email
+    const { email } = input;
+
+    let existing = await this.userService.getOneByOneFields({
+      fields: {
+        company,
+        email,
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException(`user with email ${email} already exists.`);
+    }
+
+    // check if the user already exists by phone
+    const { phone } = input;
+
+    existing = await this.userService.getOneByOneFields({
+      fields: {
+        phone,
+        company,
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException(`user with phone ${phone} already exists.`);
+    }
+
+    // create the user in firebase
+    const { password } = input;
+
+    const firebaseUser = await this.firebaseAdminService.createUser({
+      companyUid,
+      email,
+      password,
+      phone,
+    });
+
+    // create the user in the database
+    const created = this.userRepository.create({
+      authUid: firebaseUser.uid,
+      email: firebaseUser.email,
+      phone: firebaseUser.phoneNumber,
+      company,
+    });
+
+    // save the user in the database
+    const saved = await this.userRepository.save(created);
+
+    // send the confirmation email
+    this.sendConfirmationEmail({
+      authUid: saved.authUid,
+    }).catch((error) => console.error(error));
+
+    return saved;
+  }
 
   /* functions in charge of creating  */
 
