@@ -187,13 +187,14 @@ export class UserExtraService {
       email: firebaseUser.email,
       phone: firebaseUser.phoneNumber,
       company,
+      isSuperAdmin: true,
     });
 
     // save the user in the database
     const saved = await this.userRepository.save(created);
 
     // send the confirmation email
-    this.sendConfirmationEmail({
+    this.sendSuperAdminConfirmationEmail({
       authUid: saved.authUid,
     }).catch((error) => console.error(error));
 
@@ -383,6 +384,62 @@ export class UserExtraService {
         type: TemplateType.CONFIRMATION_EMAIL,
         parameters: {
           firstName: email,
+          link:
+            this.appConfiguration.app.selfApiUrl +
+            'users/confirm-email?code=' +
+            verificationCode.code,
+        },
+      });
+
+    // send the email
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      subject: subject || 'Please confirm your email',
+      to: email,
+      html,
+    });
+
+    return {
+      message: 'an email has been sent.',
+    };
+  }
+
+  public async sendSuperAdminConfirmationEmail(
+    input: GetOneUserInput,
+  ): Promise<VoidOutput> {
+    const { authUid } = input;
+
+    // get the user and check if exists
+    const existingUser = await this.userService.getOneByOneFields({
+      fields: { authUid },
+      relations: ['company'],
+      checkIfExists: true,
+    });
+
+    // check the email
+    const { email } = existingUser;
+
+    if (!email) {
+      throw new ConflictException('the user does not have email.');
+    }
+
+    // generate the verification code
+    const verificationCode = await this.verificationCodeService.create({
+      expirationDate: addDaysToDate(new Date(), 1),
+      type: VerificationCodeType.CONFIRM_EMAIL,
+      user: existingUser,
+    });
+
+    const { company } = existingUser;
+
+    // generate the html for the email
+    const { html, subject } =
+      await this.emailTemplateService.generateTemplateHtml({
+        companyUid: company.uid,
+        type: TemplateType.SUPER_ADMIN_CONFIRMATION_EMAIL,
+        parameters: {
+          firstName: email,
+          companyName: company.name,
           link:
             this.appConfiguration.app.selfApiUrl +
             'users/confirm-email?code=' +

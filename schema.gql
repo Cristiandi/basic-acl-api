@@ -97,6 +97,14 @@ input CreateRoleInput {
   name: String!
 }
 
+input CreateSuperAdmiUserInput {
+  """uid of the owner company."""
+  companyUid: String!
+  email: String!
+  password: String!
+  phone: String!
+}
+
 input CreateUserInput {
   """uid of the user in firebase."""
   authUid: String
@@ -195,6 +203,7 @@ type Mutation {
   createPermission(createPermissionInput: CreatePermissionInput!): Permission!
   createProject(createProjectInput: CreateProjectInput!): Project!
   createRole(createRoleInput: CreateRoleInput!): Role!
+  createSuperAdmin(createSuperAdmiUserInput: CreateSuperAdmiUserInput!): User!
   createUser(createUserInput: CreateUserInput!): User!
   createUsersFromFirebase(createUsersFromFirebaseInput: CreateUsersFromFirebaseInput!): VoidOutput!
   daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!

@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsEmail, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsString, IsUUID, Length } from 'class-validator';
 
 @InputType()
 export class CreateSuperAdmiUserInput {
@@ -15,6 +15,7 @@ export class CreateSuperAdmiUserInput {
   @Field(() => String)
   readonly password: string;
 
+  @Length(13)
   @IsString()
   @Field(() => String)
   readonly phone: string;

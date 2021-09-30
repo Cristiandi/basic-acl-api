@@ -17,6 +17,7 @@ import { ResetUserPasswordInput } from '../dto/reset-user-password-input.dto';
 import { ResetUserPasswordOutput } from '../dto/reset-user-password-output.dto';
 import { CreateUsersFromFirebaseInput } from '../dto/create-users-from-firebase-input.dto';
 import { AssignUserRoleInput } from '../dto/assign-user-role-input.dto';
+import { CreateSuperAdmiUserInput } from '../dto/create-super-admin-user-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => User)
@@ -83,5 +84,12 @@ export class UserExtraResolver {
     @Args('assignUserRoleInput') assignUserRoleInput: AssignUserRoleInput,
   ): Promise<User> {
     return this.service.assignRole(assignUserRoleInput);
+  }
+
+  @Mutation(() => User, { name: 'createSuperAdmin' })
+  public create(
+    @Args('createSuperAdmiUserInput') input: CreateSuperAdmiUserInput,
+  ): Promise<User> {
+    return this.service.createSuperAdminUser(input);
   }
 }
