@@ -7,6 +7,7 @@ type ApiKey {
   company: Company!
   createdAt: DateTime!
   id: Float!
+  permissions: [Permission!]!
   uid: String!
   updatedAt: DateTime!
   value: String!
@@ -75,6 +76,13 @@ input CreateCompanyInput {
   name: String!
 }
 
+input CreatePermissionInput {
+  apiKeyUid: String
+  name: String!
+  projectUid: String!
+  roleUid: String
+}
+
 input CreateProjectInput {
   code: String!
   companyUid: String!
@@ -87,6 +95,14 @@ input CreateRoleInput {
   companyUid: String!
   description: String
   name: String!
+}
+
+input CreateSuperAdmiUserInput {
+  """uid of the owner company."""
+  companyUid: String!
+  email: String!
+  password: String!
+  phone: String!
 }
 
 input CreateUserInput {
@@ -114,6 +130,13 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 input GetAllApiKeysInput {
+  companyUid: String!
+  limit: Int
+  q: String
+  skip: Int
+}
+
+input GetAllPermissionsInput {
   companyUid: String!
   limit: Int
   q: String
@@ -149,6 +172,10 @@ input GetOneCompanyInput {
   uid: String!
 }
 
+input GetOnePermissionInput {
+  uid: String!
+}
+
 input GetOneProjectInput {
   uid: String!
 }
@@ -173,12 +200,15 @@ type Mutation {
   changeUserPhone(changeUserPhoneInput: ChangeUserPhoneInput!): User!
   createApiKey(createApiKeyInput: CreateApiKeyInput!): ApiKey!
   createCompany(createCompanyInput: CreateCompanyInput!): Company!
+  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
   createProject(createProjectInput: CreateProjectInput!): Project!
   createRole(createRoleInput: CreateRoleInput!): Role!
+  createSuperAdmin(createSuperAdmiUserInput: CreateSuperAdmiUserInput!): User!
   createUser(createUserInput: CreateUserInput!): User!
   createUsersFromFirebase(createUsersFromFirebaseInput: CreateUsersFromFirebaseInput!): VoidOutput!
   daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
   deleteApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey!
+  deletePermission(getOnePermissionInput: GetOnePermissionInput!): Permission!
   deleteProject(getOneProjectInput: GetOneProjectInput!): Project!
   deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
   deleteUser(getOneUserInput: GetOneUserInput!): User!
@@ -187,8 +217,21 @@ type Mutation {
   sendResetUserPasswordEmail(sendResetUserPasswordEmailInput: SendResetUserPasswordEmailInput!): VoidOutput!
   updateApiKey(getOneApiKeyInput: GetOneApiKeyInput!, updateApiKeyInput: UpdateApiKeyInput!): ApiKey!
   updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
+  updatePermission(getOnePermissionInput: GetOnePermissionInput!, updatePermissionInput: UpdatePermissionInput!): Project!
   updateProject(getOneProjectInput: GetOneProjectInput!, updateProjectInput: UpdateProjectInput!): Project!
   updateRole(getOneRoleInput: GetOneRoleInput!, updateRoleInput: UpdateRoleInput!): Role!
+}
+
+type Permission {
+  allowed: Boolean!
+  apiKey: ApiKey
+  createdAt: DateTime!
+  id: Float!
+  name: String!
+  project: Project!
+  role: Role
+  uid: String!
+  updatedAt: DateTime!
 }
 
 type Project {
@@ -198,17 +241,20 @@ type Project {
   description: String
   id: Float!
   name: String!
+  permissions: [Permission!]!
   uid: String!
   updatedAt: DateTime!
 }
 
 type Query {
   getAllApiKeys(getAllApiKeysInput: GetAllApiKeysInput!): [ApiKey!]!
+  getAllPermissions(getPermissionsInput: GetAllPermissionsInput!): [Permission!]
   getAllProjects(getProjectsInput: GetAllProjectsInput!): [Project!]
   getAllRoles(getRolesInput: GetAllRolesInput!): [Role!]!
   getAllUsers(getAllUsersInput: GetAllUsersInput!): [User!]!
   getCompany(getOneCompanyInput: GetOneCompanyInput!): Company
   getOneApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey
+  getOnePermission(fetOnePermissionInput: GetOnePermissionInput!): Permission
   getOneProject(getOneProjectInput: GetOneProjectInput!): Project
   getOneRole(getOneRoleInput: GetOneRoleInput!): Role
   getOneUser(getOneUserInput: GetOneUserInput!): User
@@ -233,6 +279,7 @@ type Role {
   description: String
   id: Float!
   name: String!
+  permissions: [Permission!]!
   uid: String!
   updatedAt: DateTime!
 }
@@ -252,6 +299,13 @@ input UpdateCompanyInput {
   firebaseAdminConfig: JSONObject
   firebaseConfig: JSONObject
   name: String
+}
+
+input UpdatePermissionInput {
+  apiKeyUid: String
+  name: String
+  projectUid: String
+  roleUid: String
 }
 
 input UpdateProjectInput {

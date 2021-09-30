@@ -134,4 +134,10 @@ export class ProjectService extends BaseService<Project> {
   }
 
   // CRUD
+
+  public async getByIds(ids: number[]): Promise<Project[]> {
+    return this.projectRepository.findByIds(ids, {
+      loadRelationIds: true,
+    });
+  }
 }

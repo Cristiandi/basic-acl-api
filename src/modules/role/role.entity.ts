@@ -16,6 +16,7 @@ import {
 
 import { Company } from '../company/company.entity';
 import { AssignedRole } from '../assigned-role/assigned-role.entity';
+import { Permission } from '../permission/permission.entity';
 
 @ObjectType()
 @Entity({ name: 'role' })
@@ -64,4 +65,8 @@ export class Role extends BaseEntity {
   @Field(() => [AssignedRole])
   @OneToMany(() => AssignedRole, (assignedRole) => assignedRole.role)
   assignedRoles: AssignedRole[];
+
+  @Field(() => [Permission])
+  @OneToMany(() => Permission, (permission) => permission.role)
+  permissions: Permission[];
 }

@@ -25,6 +25,7 @@ import { MailgunService } from '../../../plugins/mailgun/mailgun.service';
 import { VerificationCodeService } from '../../verification-code/verification-code.service';
 import { RoleService } from '../../role/role.service';
 import { AssignedRoleService } from '../../assigned-role/assigned-role.service';
+import { CompanyService } from 'src/modules/company/services/company.service';
 
 import { addDaysToDate } from '../../../utils';
 
@@ -39,6 +40,7 @@ import { ResetUserPasswordInput } from '../dto/reset-user-password-input.dto';
 import { ResetUserPasswordOutput } from '../dto/reset-user-password-output.dto';
 import { CreateUsersFromFirebaseInput } from '../dto/create-users-from-firebase-input.dto';
 import { AssignUserRoleInput } from '../dto/assign-user-role-input.dto';
+import { CreateSuperAdmiUserInput } from '../dto/create-super-admin-user-input.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -55,6 +57,7 @@ export class UserExtraService {
     private readonly verificationCodeService: VerificationCodeService,
     private readonly roleService: RoleService,
     private readonly assignedRoleService: AssignedRoleService,
+    private readonly companyService: CompanyService,
   ) {}
 
   /* functions in charge of creating  */
@@ -127,6 +130,75 @@ export class UserExtraService {
     return {
       message: 'processing...',
     };
+  }
+
+  public async createSuperAdminUser(
+    input: CreateSuperAdmiUserInput,
+  ): Promise<User> {
+    // get the company
+    const { companyUid } = input;
+
+    const company = await this.companyService.getOneByOneFields({
+      fields: { uid: companyUid },
+      checkIfExists: true,
+    });
+
+    // check if the user already exists by email
+    const { email } = input;
+
+    let existing = await this.userService.getOneByOneFields({
+      fields: {
+        company,
+        email,
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException(`user with email ${email} already exists.`);
+    }
+
+    // check if the user already exists by phone
+    const { phone } = input;
+
+    existing = await this.userService.getOneByOneFields({
+      fields: {
+        phone,
+        company,
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException(`user with phone ${phone} already exists.`);
+    }
+
+    // create the user in firebase
+    const { password } = input;
+
+    const firebaseUser = await this.firebaseAdminService.createUser({
+      companyUid,
+      email,
+      password,
+      phone,
+    });
+
+    // create the user in the database
+    const created = this.userRepository.create({
+      authUid: firebaseUser.uid,
+      email: firebaseUser.email,
+      phone: firebaseUser.phoneNumber,
+      company,
+      isSuperAdmin: true,
+    });
+
+    // save the user in the database
+    const saved = await this.userRepository.save(created);
+
+    // send the confirmation email
+    this.sendSuperAdminConfirmationEmail({
+      authUid: saved.authUid,
+    }).catch((error) => console.error(error));
+
+    return saved;
   }
 
   /* functions in charge of creating  */
@@ -312,6 +384,62 @@ export class UserExtraService {
         type: TemplateType.CONFIRMATION_EMAIL,
         parameters: {
           firstName: email,
+          link:
+            this.appConfiguration.app.selfApiUrl +
+            'users/confirm-email?code=' +
+            verificationCode.code,
+        },
+      });
+
+    // send the email
+    await this.mailgunService.sendEmail({
+      from: this.appConfiguration.mailgun.emailFrom,
+      subject: subject || 'Please confirm your email',
+      to: email,
+      html,
+    });
+
+    return {
+      message: 'an email has been sent.',
+    };
+  }
+
+  public async sendSuperAdminConfirmationEmail(
+    input: GetOneUserInput,
+  ): Promise<VoidOutput> {
+    const { authUid } = input;
+
+    // get the user and check if exists
+    const existingUser = await this.userService.getOneByOneFields({
+      fields: { authUid },
+      relations: ['company'],
+      checkIfExists: true,
+    });
+
+    // check the email
+    const { email } = existingUser;
+
+    if (!email) {
+      throw new ConflictException('the user does not have email.');
+    }
+
+    // generate the verification code
+    const verificationCode = await this.verificationCodeService.create({
+      expirationDate: addDaysToDate(new Date(), 1),
+      type: VerificationCodeType.CONFIRM_EMAIL,
+      user: existingUser,
+    });
+
+    const { company } = existingUser;
+
+    // generate the html for the email
+    const { html, subject } =
+      await this.emailTemplateService.generateTemplateHtml({
+        companyUid: company.uid,
+        type: TemplateType.SUPER_ADMIN_CONFIRMATION_EMAIL,
+        parameters: {
+          firstName: email,
+          companyName: company.name,
           link:
             this.appConfiguration.app.selfApiUrl +
             'users/confirm-email?code=' +

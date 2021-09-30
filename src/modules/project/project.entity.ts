@@ -8,12 +8,14 @@ import {
   Generated,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { Company } from '../company/company.entity';
+import { Permission } from '../permission/permission.entity';
 
 @ObjectType()
 @Entity({ name: 'project' })
@@ -58,4 +60,8 @@ export class Project extends BaseEntity {
   @ManyToOne(() => Company, (company) => company.projects, { nullable: false })
   @JoinColumn({ name: 'company_id' })
   company: Company;
+
+  @Field(() => [Permission])
+  @OneToMany(() => Permission, (permission) => permission.project)
+  permissions: Permission[];
 }
