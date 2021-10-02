@@ -20,6 +20,7 @@ import { MailgunModule } from '../../plugins/mailgun/mailgun.module';
 import { VerificationCodeModule } from '../verification-code/verification-code.module';
 import { UserController } from './user.controller';
 import { AssignedRoleModule } from '../assigned-role/assigned-role.module';
+import { FirebaseModule } from '../../plugins/firebase/firebase.module';
 @Module({
   imports: [
     ConfigModule.forFeature(appConfig),
@@ -31,6 +32,7 @@ import { AssignedRoleModule } from '../assigned-role/assigned-role.module';
     VerificationCodeModule,
     RoleModule,
     AssignedRoleModule,
+    FirebaseModule,
   ],
   providers: [
     UserService,

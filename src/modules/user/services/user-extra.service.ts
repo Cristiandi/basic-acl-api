@@ -25,7 +25,7 @@ import { MailgunService } from '../../../plugins/mailgun/mailgun.service';
 import { VerificationCodeService } from '../../verification-code/verification-code.service';
 import { RoleService } from '../../role/role.service';
 import { AssignedRoleService } from '../../assigned-role/assigned-role.service';
-import { CompanyService } from 'src/modules/company/services/company.service';
+import { CompanyService } from '../../company/services/company.service';
 
 import { addDaysToDate } from '../../../utils';
 
@@ -41,6 +41,9 @@ import { ResetUserPasswordOutput } from '../dto/reset-user-password-output.dto';
 import { CreateUsersFromFirebaseInput } from '../dto/create-users-from-firebase-input.dto';
 import { AssignUserRoleInput } from '../dto/assign-user-role-input.dto';
 import { CreateSuperAdmiUserInput } from '../dto/create-super-admin-user-input.dto';
+import { LoginSuperAdminInput } from '../dto/login-super-admin-input.dto';
+import { FirebaseService } from 'src/plugins/firebase/firebase.service';
+import { LoginSuperAdminOutput } from '../dto/login-super-admin-output.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -58,6 +61,7 @@ export class UserExtraService {
     private readonly roleService: RoleService,
     private readonly assignedRoleService: AssignedRoleService,
     private readonly companyService: CompanyService,
+    private readonly firebaseService: FirebaseService,
   ) {}
 
   /* functions in charge of creating  */
@@ -645,6 +649,42 @@ export class UserExtraService {
 
     return {
       message: 'an email has been sent.',
+    };
+  }
+
+  public async loginSuperAdmin(
+    input: LoginSuperAdminInput,
+  ): Promise<LoginSuperAdminOutput> {
+    const { email, password } = input;
+
+    const user = await this.userService.getOneByOneFields({
+      fields: { email, isSuperAdmin: true },
+      relations: ['company'],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`user with email ${email}, not found.`);
+    }
+
+    const { company } = user;
+
+    const firebaseUser = await this.firebaseService.login({
+      companyUid: company.uid,
+      email,
+      password,
+    });
+
+    const { token, authTime, issuedAtTime, expirationTime } =
+      await firebaseUser.getIdTokenResult();
+
+    const { accessKey } = company;
+
+    return {
+      accessKey,
+      token,
+      authTime,
+      issuedAtTime,
+      expirationTime,
     };
   }
 

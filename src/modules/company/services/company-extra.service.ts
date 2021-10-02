@@ -19,4 +19,16 @@ export class CompanyExtraService {
 
     return firebaseAdminConfig;
   }
+
+  public async getFirebaseConfig(input: GetOneCompanyInput): Promise<any> {
+    const { uid } = input;
+
+    const company = await this.companyService.getOne({
+      uid,
+    });
+
+    const { firebaseConfig } = company;
+
+    return firebaseConfig;
+  }
 }
