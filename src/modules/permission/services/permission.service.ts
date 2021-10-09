@@ -7,18 +7,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 
-import { BaseService } from '../../common/base.service';
+import { BaseService } from '../../../common/base.service';
 
-import { Permission } from './permission.entity';
+import { Permission } from '../permission.entity';
 
-import { ApiKeyService } from '../api-key/api-key.service';
-import { ProjectService } from '../project/project.service';
-import { RoleService } from '../role/role.service';
+import { ApiKeyService } from '../../api-key/api-key.service';
+import { ProjectService } from '../../project/project.service';
+import { RoleService } from '../../role/role.service';
 
-import { CreatePermissionInput } from './dto/create-permission-input.dto';
-import { GetOnePermissionInput } from './dto/get-one-permission-input.dto';
-import { GetAllPermissionsInput } from './dto/get-all-permissions-input.dto';
-import { UpdatePermissionInput } from './dto/update-permission-input.dto';
+import { CreatePermissionInput } from '../dto/create-permission-input.dto';
+import { GetOnePermissionInput } from '../dto/get-one-permission-input.dto';
+import { GetAllPermissionsInput } from '../dto/get-all-permissions-input.dto';
+import { UpdatePermissionInput } from '../dto/update-permission-input.dto';
 
 @Injectable()
 export class PermissionService extends BaseService<Permission> {

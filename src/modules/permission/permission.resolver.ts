@@ -13,7 +13,7 @@ import { Project } from '../project/project.entity';
 import { Role } from '../role/role.entity';
 import { ApiKey } from '../api-key/api-key.entity';
 
-import { PermissionService } from './permission.service';
+import { PermissionService } from './services/permission.service';
 import { PermissionLoaders } from './permission.loaders';
 
 import { CreatePermissionInput } from './dto/create-permission-input.dto';
