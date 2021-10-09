@@ -45,7 +45,7 @@
     "joi": "17.4.2",
     "mailgun.js": "3.5.9",
     "mjml": "4.10.4",
-    "nanoid": "3.1.28",
+    "nanoid": "3.1.29",
     "pg": "8.7.1",
     "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
