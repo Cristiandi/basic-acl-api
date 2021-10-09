@@ -2,6 +2,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 
 import appConfig from './config/app.config';
 
@@ -12,8 +13,6 @@ import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
 
 import { CompanyModule } from './modules/company/company.module';
-import { ProjectModule } from './modules/project/project.module';
-import { join } from 'path';
 import { RoleModule } from './modules/role/role.module';
 import { ApiKeyModule } from './modules/api-key/api-key.module';
 import { EmailTemplateModule } from './modules/email-template/email-template.module';
@@ -75,8 +74,6 @@ import { PermissionModule } from './modules/permission/permission.module';
     }),
 
     CompanyModule,
-
-    ProjectModule,
 
     RoleModule,
 

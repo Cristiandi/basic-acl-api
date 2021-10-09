@@ -9,7 +9,6 @@ import {
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { Permission } from './permission.entity';
-import { Project } from '../project/project.entity';
 import { Role } from '../role/role.entity';
 import { ApiKey } from '../api-key/api-key.entity';
 
@@ -50,7 +49,7 @@ export class PermissionResolver {
     return this.service.getAll(input);
   }
 
-  @Mutation(() => Project, { name: 'updatePermission' })
+  @Mutation(() => Permission, { name: 'updatePermission' })
   public update(
     @Args('getOnePermissionInput') getOnePermissionInput: GetOnePermissionInput,
     @Args('updatePermissionInput') input: UpdatePermissionInput,
@@ -63,17 +62,6 @@ export class PermissionResolver {
     @Args('getOnePermissionInput') input: GetOnePermissionInput,
   ): Promise<Permission> {
     return this.service.delete(input);
-  }
-
-  @ResolveField(() => Project, { name: 'project' })
-  public project(@Parent() parent: Permission): Promise<Project> {
-    const value: any = parent.project;
-
-    let id = value;
-
-    if (typeof id !== 'number') id = value.id;
-
-    return this.loaders.batchProjects.load(id);
   }
 
   @ResolveField(() => Role, { name: 'role' })

@@ -13,7 +13,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Project } from '../project/project.entity';
 import { Role } from '../role/role.entity';
 import { ApiKey } from '../api-key/api-key.entity';
 import { User } from '../user/user.entity';
@@ -97,10 +96,6 @@ export class Company extends BaseEntity {
   deletedAt: Date;
 
   // relations
-
-  @Field(() => [Project])
-  @OneToMany(() => Project, (project) => project.company)
-  projects: Project[];
 
   @Field(() => [Role])
   @OneToMany(() => Role, (role) => role.company)

@@ -9,7 +9,6 @@ import {
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { Company } from './company.entity';
-import { Project } from '../project/project.entity';
 import { ApiKey } from '../api-key/api-key.entity';
 import { Role } from '../role/role.entity';
 import { User } from '../user/user.entity';
@@ -55,11 +54,6 @@ export class CompanyResolver {
     @Args('getOneCompanyInput') getOneCompanyInput: GetOneCompanyInput,
   ): Promise<Company> {
     return this.service.delete(getOneCompanyInput);
-  }
-
-  @ResolveField(() => [Project], { name: 'projects' })
-  public projects(@Parent() parent: Company): Promise<Project[]> {
-    return this.service.projects(parent);
   }
 
   @ResolveField(() => [Role], { name: 'roles' })

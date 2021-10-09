@@ -12,7 +12,6 @@ import { BaseService } from '../../../common/base.service';
 import { Permission } from '../permission.entity';
 
 import { ApiKeyService } from '../../api-key/api-key.service';
-import { ProjectService } from '../../project/project.service';
 import { RoleService } from '../../role/role.service';
 
 import { CreatePermissionInput } from '../dto/create-permission-input.dto';
@@ -25,7 +24,6 @@ export class PermissionService extends BaseService<Permission> {
   constructor(
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
-    private readonly projectService: ProjectService,
     private readonly roleService: RoleService,
     private readonly apiKeyService: ApiKeyService,
   ) {
@@ -35,16 +33,6 @@ export class PermissionService extends BaseService<Permission> {
   // CRUD
 
   public async create(input: CreatePermissionInput): Promise<Permission> {
-    const { projectUid } = input;
-
-    const project = await this.projectService.getOne({
-      uid: projectUid,
-    });
-
-    if (!project) {
-      throw new NotFoundException(`project with uid ${projectUid} not found.`);
-    }
-
     const { roleUid } = input;
 
     let role;
@@ -81,39 +69,25 @@ export class PermissionService extends BaseService<Permission> {
       throw new ConflictException(`apiKey and role cannot be both defined.`);
     }
 
-    let existing = await this.getOneByOneFields({
-      fields: {
-        project,
-        role,
-        apiKey,
-      },
-    });
-
-    if (existing) {
-      throw new ConflictException(
-        `already exists a permission for the project ${projectUid}, role ${roleUid} and api key ${apiKeyUid}.`,
-      );
-    }
-
     const { name } = input;
 
-    existing = await this.getOneByOneFields({
+    const existing = await this.getOneByOneFields({
       fields: {
+        role,
+        apiKey,
         name,
-        project,
       },
     });
 
     if (existing) {
       throw new ConflictException(
-        `already exists a permission for the project ${projectUid} and name ${name}.`,
+        `already exists a permission for the name ${name} role ${roleUid} and api key ${apiKeyUid}.`,
       );
     }
 
     const created = this.permissionRepository.create({
       name,
       allowed: true,
-      project,
       role,
       apiKey,
     });
@@ -176,21 +150,6 @@ export class PermissionService extends BaseService<Permission> {
       throw new ConflictException(`apiKey and role cannot be both defined.`);
     }
 
-    const { projectUid } = input;
-
-    let project;
-    if (projectUid) {
-      project = await this.projectService.getOne({
-        uid: projectUid,
-      });
-
-      if (!project) {
-        throw new NotFoundException(
-          `project with uid ${projectUid} not found.`,
-        );
-      }
-    }
-
     let role;
     if (roleUid) {
       role = await this.roleService.getOne({
@@ -213,39 +172,25 @@ export class PermissionService extends BaseService<Permission> {
       }
     }
 
-    let existingForCheck = await this.getOneByOneFields({
-      fields: {
-        project,
-        role,
-        apiKey,
-      },
-    });
-
-    if (existingForCheck) {
-      throw new ConflictException(
-        `already exists a permission for the project ${projectUid}, role ${roleUid} and api key ${apiKeyUid}.`,
-      );
-    }
-
     const { name } = input;
 
-    existingForCheck = await this.getOneByOneFields({
+    const existingForCheck = await this.getOneByOneFields({
       fields: {
+        role,
+        apiKey,
         name,
-        project,
       },
     });
 
     if (existingForCheck) {
       throw new ConflictException(
-        `already exists a permission for the project ${projectUid} and name ${name}.`,
+        `already exists a permission for name ${name} role ${roleUid} and api key ${apiKeyUid}.`,
       );
     }
 
     const preloaded = await this.permissionRepository.preload({
       id: existing.id,
       name: input.name || existing.name,
-      project: project || existing.project,
       role: role || existing.role,
       apiKey: apiKey || existing.apiKey,
     });
