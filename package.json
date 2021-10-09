@@ -44,7 +44,7 @@
     "handlebars": "4.7.7",
     "joi": "17.4.2",
     "mailgun.js": "3.5.9",
-    "mjml": "4.10.3",
+    "mjml": "4.10.4",
     "nanoid": "3.1.28",
     "pg": "8.7.1",
     "reflect-metadata": "0.1.13",
