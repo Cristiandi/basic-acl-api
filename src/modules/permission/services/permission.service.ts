@@ -105,7 +105,7 @@ export class PermissionService extends BaseService<Permission> {
     const existing = await this.getOneByOneFields({
       fields: { uid },
       checkIfExists: false,
-      relations: ['project', 'role', 'apiKey'],
+      relations: ['role', 'apiKey'],
     });
 
     return existing;
@@ -117,9 +117,14 @@ export class PermissionService extends BaseService<Permission> {
     const query = this.permissionRepository
       .createQueryBuilder('permission')
       .loadAllRelationIds()
-      .innerJoin('permission.project', 'project')
-      .innerJoin('project.company', 'company')
-      .where('company.uid = :companyUid', { companyUid });
+      .leftJoin('permission.role', 'role')
+      .leftJoin('role.company', 'roleCompany')
+      .leftJoin('permission.apiKey', 'apiKey')
+      .leftJoin('apiKey.company', 'apiKeyCompany')
+      .where(
+        '(roleCompany.uid = :companyUid or apiKeyCompany.uid = :companyUid)',
+        { companyUid },
+      );
 
     if (q)
       query.andWhere('permission.name ilike :q', {

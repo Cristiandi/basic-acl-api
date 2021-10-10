@@ -60,4 +60,16 @@ export class AssignedRoleService extends BaseService<AssignedRole> {
     // return the clone as the existing one
     return clone as AssignedRole;
   }
+
+  public async getUserRoles(input: any): Promise<AssignedRole[]> {
+    const { user } = input;
+
+    const assignedRoles = await this.assignedRoleRepository
+      .createQueryBuilder('assignedRole')
+      .innerJoinAndSelect('assignedRole.role', 'role')
+      .where('assignedRole.user_id = :userId', { userId: user.id })
+      .getMany();
+
+    return assignedRoles;
+  }
 }

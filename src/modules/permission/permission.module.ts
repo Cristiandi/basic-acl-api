@@ -9,9 +9,17 @@ import { Permission } from './permission.entity';
 
 import { RoleModule } from '../role/role.module';
 import { ApiKeyModule } from '../api-key/api-key.module';
+import { UserModule } from '../user/user.module';
+import { AssignedRoleModule } from '../assigned-role/assigned-role.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Permission]), RoleModule, ApiKeyModule],
+  imports: [
+    TypeOrmModule.forFeature([Permission]),
+    RoleModule,
+    ApiKeyModule,
+    UserModule,
+    AssignedRoleModule,
+  ],
   providers: [PermissionService, PermissionLoaders, PermissionResolver],
   exports: [PermissionService],
 })

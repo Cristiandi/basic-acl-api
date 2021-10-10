@@ -3,10 +3,6 @@ import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 @InputType()
 export class CreatePermissionInput {
-  @IsUUID()
-  @Field(() => String)
-  readonly projectUid: string;
-
   @IsOptional()
   @IsUUID()
   @Field(() => String, { nullable: true })

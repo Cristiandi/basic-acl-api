@@ -78,7 +78,6 @@ input CreateCompanyInput {
 input CreatePermissionInput {
   apiKeyUid: String
   name: String!
-  projectUid: String!
   roleUid: String
 }
 
@@ -281,7 +280,6 @@ input UpdateCompanyInput {
 input UpdatePermissionInput {
   apiKeyUid: String
   name: String
-  projectUid: String
   roleUid: String
 }
 
