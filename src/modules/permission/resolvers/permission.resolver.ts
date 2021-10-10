@@ -8,18 +8,17 @@ import {
 } from '@nestjs/graphql';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 
-import { Permission } from './permission.entity';
-import { Project } from '../project/project.entity';
-import { Role } from '../role/role.entity';
-import { ApiKey } from '../api-key/api-key.entity';
+import { Permission } from '../permission.entity';
+import { Role } from '../../role/role.entity';
+import { ApiKey } from '../../api-key/api-key.entity';
 
-import { PermissionService } from './permission.service';
-import { PermissionLoaders } from './permission.loaders';
+import { PermissionService } from '../services/permission.service';
+import { PermissionLoaders } from '../permission.loaders';
 
-import { CreatePermissionInput } from './dto/create-permission-input.dto';
-import { GetOnePermissionInput } from './dto/get-one-permission-input.dto';
-import { GetAllPermissionsInput } from './dto/get-all-permissions-input.dto';
-import { UpdatePermissionInput } from './dto/update-permission-input.dto';
+import { CreatePermissionInput } from '../dto/create-permission-input.dto';
+import { GetOnePermissionInput } from '../dto/get-one-permission-input.dto';
+import { GetAllPermissionsInput } from '../dto/get-all-permissions-input.dto';
+import { UpdatePermissionInput } from '../dto/update-permission-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => Permission)
@@ -50,7 +49,7 @@ export class PermissionResolver {
     return this.service.getAll(input);
   }
 
-  @Mutation(() => Project, { name: 'updatePermission' })
+  @Mutation(() => Permission, { name: 'updatePermission' })
   public update(
     @Args('getOnePermissionInput') getOnePermissionInput: GetOnePermissionInput,
     @Args('updatePermissionInput') input: UpdatePermissionInput,
@@ -63,17 +62,6 @@ export class PermissionResolver {
     @Args('getOnePermissionInput') input: GetOnePermissionInput,
   ): Promise<Permission> {
     return this.service.delete(input);
-  }
-
-  @ResolveField(() => Project, { name: 'project' })
-  public project(@Parent() parent: Permission): Promise<Project> {
-    const value: any = parent.project;
-
-    let id = value;
-
-    if (typeof id !== 'number') id = value.id;
-
-    return this.loaders.batchProjects.load(id);
   }
 
   @ResolveField(() => Role, { name: 'role' })

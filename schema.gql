@@ -49,6 +49,13 @@ input ChangeUserPhoneInput {
   phone: String!
 }
 
+input CheckPermissionInput {
+  apiKey: String
+  companyUid: String!
+  permissionName: String!
+  token: String
+}
+
 type Company {
   accessKey: String
   apiKeys: [ApiKey!]!
@@ -57,7 +64,6 @@ type Company {
   firebaseConfig: JSONObject
   id: Float!
   name: String!
-  projects: [Project!]!
   roles: [Role!]!
   uid: String!
   updatedAt: DateTime!
@@ -79,15 +85,7 @@ input CreateCompanyInput {
 input CreatePermissionInput {
   apiKeyUid: String
   name: String!
-  projectUid: String!
   roleUid: String
-}
-
-input CreateProjectInput {
-  code: String!
-  companyUid: String!
-  description: String
-  name: String!
 }
 
 input CreateRoleInput {
@@ -143,13 +141,6 @@ input GetAllPermissionsInput {
   skip: Int
 }
 
-input GetAllProjectsInput {
-  companyUid: String!
-  limit: Int
-  q: String
-  skip: Int
-}
-
 input GetAllRolesInput {
   companyUid: String!
   limit: Int
@@ -173,10 +164,6 @@ input GetOneCompanyInput {
 }
 
 input GetOnePermissionInput {
-  uid: String!
-}
-
-input GetOneProjectInput {
   uid: String!
 }
 
@@ -214,7 +201,6 @@ type Mutation {
   createApiKey(createApiKeyInput: CreateApiKeyInput!): ApiKey!
   createCompany(createCompanyInput: CreateCompanyInput!): Company!
   createPermission(createPermissionInput: CreatePermissionInput!): Permission!
-  createProject(createProjectInput: CreateProjectInput!): Project!
   createRole(createRoleInput: CreateRoleInput!): Role!
   createSuperAdmin(createSuperAdmiUserInput: CreateSuperAdmiUserInput!): User!
   createUser(createUserInput: CreateUserInput!): User!
@@ -222,7 +208,6 @@ type Mutation {
   daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
   deleteApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey!
   deletePermission(getOnePermissionInput: GetOnePermissionInput!): Permission!
-  deleteProject(getOneProjectInput: GetOneProjectInput!): Project!
   deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
   deleteUser(getOneUserInput: GetOneUserInput!): User!
   loginSuperAdmin(loginSuperAdminInput: LoginSuperAdminInput!): LoginSuperAdminOutput!
@@ -231,8 +216,7 @@ type Mutation {
   sendResetUserPasswordEmail(sendResetUserPasswordEmailInput: SendResetUserPasswordEmailInput!): VoidOutput!
   updateApiKey(getOneApiKeyInput: GetOneApiKeyInput!, updateApiKeyInput: UpdateApiKeyInput!): ApiKey!
   updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
-  updatePermission(getOnePermissionInput: GetOnePermissionInput!, updatePermissionInput: UpdatePermissionInput!): Project!
-  updateProject(getOneProjectInput: GetOneProjectInput!, updateProjectInput: UpdateProjectInput!): Project!
+  updatePermission(getOnePermissionInput: GetOnePermissionInput!, updatePermissionInput: UpdatePermissionInput!): Permission!
   updateRole(getOneRoleInput: GetOneRoleInput!, updateRoleInput: UpdateRoleInput!): Role!
 }
 
@@ -242,34 +226,20 @@ type Permission {
   createdAt: DateTime!
   id: Float!
   name: String!
-  project: Project!
   role: Role
   uid: String!
   updatedAt: DateTime!
 }
 
-type Project {
-  code: String!
-  company: Company!
-  createdAt: DateTime!
-  description: String
-  id: Float!
-  name: String!
-  permissions: [Permission!]!
-  uid: String!
-  updatedAt: DateTime!
-}
-
 type Query {
+  checkPermission(checkPermissionInput: CheckPermissionInput!): Permission
   getAllApiKeys(getAllApiKeysInput: GetAllApiKeysInput!): [ApiKey!]!
   getAllPermissions(getPermissionsInput: GetAllPermissionsInput!): [Permission!]
-  getAllProjects(getProjectsInput: GetAllProjectsInput!): [Project!]
   getAllRoles(getRolesInput: GetAllRolesInput!): [Role!]!
   getAllUsers(getAllUsersInput: GetAllUsersInput!): [User!]!
   getCompany(getOneCompanyInput: GetOneCompanyInput!): Company
   getOneApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey
   getOnePermission(fetOnePermissionInput: GetOnePermissionInput!): Permission
-  getOneProject(getOneProjectInput: GetOneProjectInput!): Project
   getOneRole(getOneRoleInput: GetOneRoleInput!): Role
   getOneUser(getOneUserInput: GetOneUserInput!): User
   sayHello: String!
@@ -318,15 +288,7 @@ input UpdateCompanyInput {
 input UpdatePermissionInput {
   apiKeyUid: String
   name: String
-  projectUid: String
   roleUid: String
-}
-
-input UpdateProjectInput {
-  code: String
-  companyUid: String
-  description: String
-  name: String
 }
 
 input UpdateRoleInput {
