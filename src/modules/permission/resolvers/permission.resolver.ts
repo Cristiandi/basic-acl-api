@@ -8,17 +8,17 @@ import {
 } from '@nestjs/graphql';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 
-import { Permission } from './permission.entity';
-import { Role } from '../role/role.entity';
-import { ApiKey } from '../api-key/api-key.entity';
+import { Permission } from '../permission.entity';
+import { Role } from '../../role/role.entity';
+import { ApiKey } from '../../api-key/api-key.entity';
 
-import { PermissionService } from './services/permission.service';
-import { PermissionLoaders } from './permission.loaders';
+import { PermissionService } from '../services/permission.service';
+import { PermissionLoaders } from '../permission.loaders';
 
-import { CreatePermissionInput } from './dto/create-permission-input.dto';
-import { GetOnePermissionInput } from './dto/get-one-permission-input.dto';
-import { GetAllPermissionsInput } from './dto/get-all-permissions-input.dto';
-import { UpdatePermissionInput } from './dto/update-permission-input.dto';
+import { CreatePermissionInput } from '../dto/create-permission-input.dto';
+import { GetOnePermissionInput } from '../dto/get-one-permission-input.dto';
+import { GetAllPermissionsInput } from '../dto/get-all-permissions-input.dto';
+import { UpdatePermissionInput } from '../dto/update-permission-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => Permission)

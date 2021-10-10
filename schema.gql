@@ -49,6 +49,13 @@ input ChangeUserPhoneInput {
   phone: String!
 }
 
+input CheckPermissionInput {
+  apiKey: String
+  companyUid: String!
+  permissionName: String!
+  token: String
+}
+
 type Company {
   accessKey: String
   apiKeys: [ApiKey!]!
@@ -225,6 +232,7 @@ type Permission {
 }
 
 type Query {
+  checkPermission(checkPermissionInput: CheckPermissionInput!): Permission
   getAllApiKeys(getAllApiKeysInput: GetAllApiKeysInput!): [ApiKey!]!
   getAllPermissions(getPermissionsInput: GetAllPermissionsInput!): [Permission!]
   getAllRoles(getRolesInput: GetAllRolesInput!): [Role!]!
