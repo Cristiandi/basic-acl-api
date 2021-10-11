@@ -24,6 +24,7 @@ import { MailgunModule } from './plugins/mailgun/mailgun.module';
 import { VerificationCodeModule } from './modules/verification-code/verification-code.module';
 import { AssignedRoleModule } from './modules/assigned-role/assigned-role.module';
 import { PermissionModule } from './modules/permission/permission.module';
+import { RedisCacheModule } from './plugins/redis-cache/redis-cache.module';
 
 @Module({
   imports: [
@@ -96,6 +97,8 @@ import { PermissionModule } from './modules/permission/permission.module';
     AssignedRoleModule,
 
     PermissionModule,
+
+    RedisCacheModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

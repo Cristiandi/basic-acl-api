@@ -18,6 +18,7 @@ import { AssignedRoleService } from 'src/modules/assigned-role/assigned-role.ser
 import { ApiKeyService } from 'src/modules/api-key/api-key.service';
 
 import { CheckPermissionInput } from '../dto/check-permission-input.dto';
+import { RedisCacheService } from 'src/plugins/redis-cache/redis-cache.service';
 @Injectable()
 export class PermissionExtraService {
   constructor(
@@ -28,6 +29,7 @@ export class PermissionExtraService {
     private readonly userService: UserService,
     private readonly assignedRoleService: AssignedRoleService,
     private readonly apiKeyService: ApiKeyService,
+    private readonly redisCacheService: RedisCacheService,
   ) {}
 
   public async checkPermission(
@@ -54,6 +56,19 @@ export class PermissionExtraService {
 
     // if token is provided
     if (token) {
+      // check the cache
+      const cache = await this.redisCacheService.get({
+        keys: {
+          companyUid,
+          permissionName,
+          token,
+        },
+      });
+
+      if (cache) {
+        return cache as Permission;
+      }
+
       let verifiedToken;
 
       // try to verify token
@@ -106,11 +121,35 @@ export class PermissionExtraService {
         throw new ForbiddenException(`the permission is not allowed.`);
       }
 
+      // set the cache
+      await this.redisCacheService.set({
+        keys: {
+          companyUid,
+          permissionName,
+          token,
+        },
+        value: permission,
+        ttl: 60 * 60 * 24,
+      });
+
       return permission;
     }
 
     // if apiKey is provided
     if (apiKey) {
+      // check the cache
+      const cache = await this.redisCacheService.get({
+        keys: {
+          companyUid,
+          permissionName,
+          apiKey,
+        },
+      });
+
+      if (cache) {
+        return cache as Permission;
+      }
+
       // get the apiKey
       const apiKeyInstance = await this.apiKeyService.getOneByOneFields({
         fields: {
@@ -136,6 +175,17 @@ export class PermissionExtraService {
       if (!permission.allowed) {
         throw new ForbiddenException(`the permission is not allowed.`);
       }
+
+      // set the cache
+      await this.redisCacheService.set({
+        keys: {
+          companyUid,
+          permissionName,
+          apiKey,
+        },
+        value: permission,
+        ttl: 60 * 60 * 24,
+      });
 
       return permission;
     }
