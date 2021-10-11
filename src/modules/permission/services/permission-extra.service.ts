@@ -129,7 +129,7 @@ export class PermissionExtraService {
           token,
         },
         value: permission,
-        ttl: 60 * 60 * 24,
+        ttl: 60 * 60,
       });
 
       return permission;
