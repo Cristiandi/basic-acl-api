@@ -680,6 +680,7 @@ export class UserExtraService {
     const { accessKey } = company;
 
     return {
+      companyUid: company.uid,
       accessKey,
       token,
       authTime,
