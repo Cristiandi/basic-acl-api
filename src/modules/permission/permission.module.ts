@@ -15,6 +15,7 @@ import { UserModule } from '../user/user.module';
 import { AssignedRoleModule } from '../assigned-role/assigned-role.module';
 import { CompanyModule } from '../company/company.module';
 import { FirebaseAdminModule } from 'src/plugins/firebase-admin/firebase-admin.module';
+import { RedisCacheModule } from 'src/plugins/redis-cache/redis-cache.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FirebaseAdminModule } from 'src/plugins/firebase-admin/firebase-admin.m
     FirebaseAdminModule,
     UserModule,
     AssignedRoleModule,
+    RedisCacheModule,
   ],
   providers: [
     PermissionService,
