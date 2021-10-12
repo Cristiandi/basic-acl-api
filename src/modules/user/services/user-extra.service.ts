@@ -536,11 +536,7 @@ export class UserExtraService {
 
     const { company } = existingUser;
 
-    const link = company.website
-      ? company.website +
-        'change-forgotten-password?code=' +
-        verificationCode.code
-      : this.appConfiguration.app.selftWebUrl +
+    const link = this.appConfiguration.app.selftWebUrl +
         'change-forgotten-password?code=' +
         verificationCode.code;
 
