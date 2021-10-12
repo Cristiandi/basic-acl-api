@@ -64,8 +64,8 @@ export class RoleResolver {
   }
 
   @ResolveField(() => Company, { name: 'company' })
-  company(@Parent() role: Role): Promise<Company> {
-    const value: any = role.company;
+  company(@Parent() parent: Role): Promise<Company> {
+    const value: any = parent.company;
 
     let id = value;
 
