@@ -80,6 +80,7 @@ input CreateCompanyInput {
   firebaseAdminConfig: JSONObject!
   firebaseConfig: JSONObject!
   name: String!
+  website: String!
 }
 
 input CreatePermissionInput {
@@ -188,6 +189,7 @@ input LoginSuperAdminInput {
 type LoginSuperAdminOutput {
   accessKey: String!
   authTime: String!
+  companyUid: String!
   expirationTime: String!
   issuedAtTime: String!
   token: String!
@@ -283,6 +285,7 @@ input UpdateCompanyInput {
   firebaseAdminConfig: JSONObject
   firebaseConfig: JSONObject
   name: String
+  website: String
 }
 
 input UpdatePermissionInput {
