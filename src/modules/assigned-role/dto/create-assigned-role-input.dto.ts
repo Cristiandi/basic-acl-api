@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsUUID } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 
 @InputType()
 export class CreateAssignedRoleInput {
@@ -7,7 +7,7 @@ export class CreateAssignedRoleInput {
   @Field(() => String)
   readonly roleUid: string;
 
-  @IsUUID()
+  @IsString()
   @Field(() => String)
   readonly userUid: string;
 }
