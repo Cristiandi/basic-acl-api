@@ -222,6 +222,7 @@ type Mutation {
   createUsersFromFirebase(createUsersFromFirebaseInput: CreateUsersFromFirebaseInput!): VoidOutput!
   daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
   deleteApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey!
+  deleteAssignedRole(deleteAssignedRoleInput: CreateAssignedRoleInput!): AssignedRole!
   deletePermission(getOnePermissionInput: GetOnePermissionInput!): Permission!
   deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
   deleteUser(getOneUserInput: GetOneUserInput!): User!

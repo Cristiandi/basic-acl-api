@@ -40,6 +40,13 @@ export class AssignedRoleResolver {
     return this.service.getAll(input);
   }
 
+  @Mutation(() => AssignedRole, { name: 'deleteAssignedRole' })
+  public delete(
+    @Args('deleteAssignedRoleInput') input: CreateAssignedRoleInput,
+  ): Promise<AssignedRole> {
+    return this.service.delete(input);
+  }
+
   @ResolveField(() => Role, { name: 'role' })
   public role(@Parent() parent: AssignedRole): Promise<Role> {
     const value: any = parent.role;
