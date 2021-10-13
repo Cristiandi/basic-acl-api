@@ -101,4 +101,9 @@ export class CreateCompanyInput {
   @Type(() => FirebaseConfig)
   @Field(() => GraphQLJSONObject)
   readonly firebaseConfig: FirebaseConfig;
+
+  @IsOptional()
+  @IsString()
+  @Field(() => String)
+  readonly website?: string;
 }

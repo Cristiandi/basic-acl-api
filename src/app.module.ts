@@ -2,6 +2,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 
 import appConfig from './config/app.config';
 
@@ -12,8 +13,6 @@ import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
 
 import { CompanyModule } from './modules/company/company.module';
-import { ProjectModule } from './modules/project/project.module';
-import { join } from 'path';
 import { RoleModule } from './modules/role/role.module';
 import { ApiKeyModule } from './modules/api-key/api-key.module';
 import { EmailTemplateModule } from './modules/email-template/email-template.module';
@@ -25,6 +24,7 @@ import { MailgunModule } from './plugins/mailgun/mailgun.module';
 import { VerificationCodeModule } from './modules/verification-code/verification-code.module';
 import { AssignedRoleModule } from './modules/assigned-role/assigned-role.module';
 import { PermissionModule } from './modules/permission/permission.module';
+import { RedisCacheModule } from './plugins/redis-cache/redis-cache.module';
 
 @Module({
   imports: [
@@ -76,8 +76,6 @@ import { PermissionModule } from './modules/permission/permission.module';
 
     CompanyModule,
 
-    ProjectModule,
-
     RoleModule,
 
     ApiKeyModule,
@@ -99,6 +97,8 @@ import { PermissionModule } from './modules/permission/permission.module';
     AssignedRoleModule,
 
     PermissionModule,
+
+    RedisCacheModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

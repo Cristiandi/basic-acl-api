@@ -241,4 +241,10 @@ export class UserService extends BaseService<User> {
     return clone as User;
   }
   // CRUD
+
+  public async getByIds(ids: number[]): Promise<User[]> {
+    return this.userRepository.findByIds(ids, {
+      loadRelationIds: true,
+    });
+  }
 }

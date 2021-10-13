@@ -3,6 +3,9 @@ import { Field, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class LoginSuperAdminOutput {
   @Field(() => String)
+  readonly companyUid: string;
+
+  @Field(() => String)
   readonly accessKey: string;
 
   @Field(() => String)

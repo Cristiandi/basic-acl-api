@@ -3,13 +3,13 @@ import * as DataLoader from 'dataloader';
 import { Injectable, Scope } from '@nestjs/common';
 
 import { RoleService } from '../role/role.service';
-import { ApiKeyService } from '../api-key/api-key.service';
+import { UserService } from '../user/services/user.service';
 
 @Injectable({ scope: Scope.REQUEST })
-export class PermissionLoaders {
+export class AssignedRoleLoaders {
   constructor(
     private readonly roleService: RoleService,
-    private readonly apiKeyService: ApiKeyService,
+    private readonly userService: UserService,
   ) {}
 
   public readonly batchRoles = new DataLoader(async (masterIds: number[]) => {
@@ -18,8 +18,8 @@ export class PermissionLoaders {
     return masterIds.map((masterId) => mastersMap.get(masterId));
   });
 
-  public readonly batchApiKeys = new DataLoader(async (masterIds: number[]) => {
-    const masters = await this.apiKeyService.getByIds(masterIds);
+  public readonly batchUsers = new DataLoader(async (masterIds: number[]) => {
+    const masters = await this.userService.getByIds(masterIds);
     const mastersMap = new Map(masters.map((item) => [item.id, item]));
     return masterIds.map((masterId) => mastersMap.get(masterId));
   });

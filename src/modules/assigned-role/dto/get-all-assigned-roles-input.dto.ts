@@ -2,7 +2,7 @@ import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
 @InputType()
-export class GetAllProjectsInput {
+export class GetAllAssignedRolesInput {
   @IsUUID()
   @Field(() => String)
   readonly companyUid: string;
