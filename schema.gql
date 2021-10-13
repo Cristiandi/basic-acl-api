@@ -76,6 +76,11 @@ input CreateApiKeyInput {
   companyUid: String!
 }
 
+input CreateAssignedRoleInput {
+  roleUid: String!
+  userUid: String!
+}
+
 input CreateCompanyInput {
   firebaseAdminConfig: JSONObject!
   firebaseConfig: JSONObject!
@@ -129,6 +134,13 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 input GetAllApiKeysInput {
+  companyUid: String!
+  limit: Int
+  q: String
+  skip: Int
+}
+
+input GetAllAssignedRolesInput {
   companyUid: String!
   limit: Int
   q: String
@@ -201,6 +213,7 @@ type Mutation {
   changeUserPassword(changeUserPasswordInput: ChangeUserPasswordInput!): User!
   changeUserPhone(changeUserPhoneInput: ChangeUserPhoneInput!): User!
   createApiKey(createApiKeyInput: CreateApiKeyInput!): ApiKey!
+  createAssignedRole(createAssignedRoleInput: CreateAssignedRoleInput!): AssignedRole!
   createCompany(createCompanyInput: CreateCompanyInput!): Company!
   createPermission(createPermissionInput: CreatePermissionInput!): Permission!
   createRole(createRoleInput: CreateRoleInput!): Role!
@@ -236,6 +249,7 @@ type Permission {
 type Query {
   checkPermission(checkPermissionInput: CheckPermissionInput!): Permission
   getAllApiKeys(getAllApiKeysInput: GetAllApiKeysInput!): [ApiKey!]!
+  getAllAssignedRoles(getAllAssignedRolesInput: GetAllAssignedRolesInput!): [AssignedRole!]!
   getAllPermissions(getPermissionsInput: GetAllPermissionsInput!): [Permission!]
   getAllRoles(getRolesInput: GetAllRolesInput!): [Role!]!
   getAllUsers(getAllUsersInput: GetAllUsersInput!): [User!]!

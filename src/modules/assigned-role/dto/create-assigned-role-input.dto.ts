@@ -1,8 +1,13 @@
-import { Role } from '../../role/role.entity';
-import { User } from '../../user/user.entity';
+import { Field, InputType } from '@nestjs/graphql';
+import { IsUUID } from 'class-validator';
 
+@InputType()
 export class CreateAssignedRoleInput {
-  readonly role: Role;
+  @IsUUID()
+  @Field(() => String)
+  readonly roleUid: string;
 
-  readonly user: User;
+  @IsUUID()
+  @Field(() => String)
+  readonly userUid: string;
 }

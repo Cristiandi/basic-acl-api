@@ -87,8 +87,8 @@ export class UserExtraService {
 
     // assign the role to the user
     await this.assignedRoleService.create({
-      role: exisitingRole,
-      user: exisitingUser,
+      roleUid: exisitingRole.uid,
+      userUid: exisitingUser.authUid,
     });
 
     return exisitingUser;
@@ -536,9 +536,10 @@ export class UserExtraService {
 
     const { company } = existingUser;
 
-    const link = this.appConfiguration.app.selftWebUrl +
-        'change-forgotten-password?code=' +
-        verificationCode.code;
+    const link =
+      this.appConfiguration.app.selftWebUrl +
+      'change-forgotten-password?code=' +
+      verificationCode.code;
 
     const { emailTemplateParams } = input;
 
