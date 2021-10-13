@@ -16,7 +16,7 @@ import { User } from '../user/user.entity';
 
 @ObjectType()
 @Entity({ name: 'assigned_role' })
-@Unique('uk_assigned_role', ['role', 'user'])
+@Unique('uk_assigned_role', ['role', 'user', 'deletedAt'])
 export class AssignedRole extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
