@@ -68,7 +68,7 @@
     "@typescript-eslint/eslint-plugin": "^5.0.0-alpha.42",
     "@typescript-eslint/parser": "4.33.0",
     "commitizen": "4.2.4",
-    "eslint": "8.0.0",
+    "eslint": "8.1.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "4.0.0",
     "husky": "7.0.2",
