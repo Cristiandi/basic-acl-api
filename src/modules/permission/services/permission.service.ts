@@ -200,6 +200,14 @@ export class PermissionService extends BaseService<Permission> {
       apiKey: apiKey || existing.apiKey,
     });
 
+    if (role && preloaded.apiKey) {
+      preloaded.apiKey = undefined;
+    }
+
+    if (apiKey && preloaded.role) {
+      preloaded.role = undefined;
+    }
+
     const saved = await this.permissionRepository.save(preloaded);
 
     return {
