@@ -6,8 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "node": ">=14.17.4",
-    "npm": ">=7.20.3"
+    "node": ">=16.0.0",
+    "npm": ">=8.1.0"
   },
   "scripts": {
     "postinstall": "husky install",
