@@ -1,4 +1,4 @@
-import * as cluster from 'cluster';
+import cluster from 'cluster';
 import * as os from 'os';
 
 import { Injectable, Logger } from '@nestjs/common';
