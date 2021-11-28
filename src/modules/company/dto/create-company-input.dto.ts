@@ -104,6 +104,6 @@ export class CreateCompanyInput {
 
   @IsOptional()
   @IsString()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   readonly website?: string;
 }
