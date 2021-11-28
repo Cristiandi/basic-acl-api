@@ -88,6 +88,7 @@ export class UserExtraResolver {
     return this.service.assignRole(assignUserRoleInput);
   }
 
+  @Public()
   @Mutation(() => User, { name: 'createSuperAdmin' })
   public createSuperAdminUser(
     @Args('createSuperAdmiUserInput') input: CreateSuperAdmiUserInput,
