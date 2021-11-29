@@ -96,6 +96,7 @@ export class FirebaseAdminService {
     };
 
     const userRecord = await admin.auth().createUser(properties);
+
     return userRecord;
   }
 

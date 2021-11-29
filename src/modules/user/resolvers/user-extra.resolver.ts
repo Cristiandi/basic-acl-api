@@ -103,4 +103,11 @@ export class UserExtraResolver {
   ): Promise<LoginSuperAdminOutput> {
     return this.service.loginSuperAdmin(input);
   }
+
+  @Mutation(() => VoidOutput, { name: 'sendSuperAdminConfirmationEmail' })
+  public async sendSuperAdminConfirmationEmail(
+    @Args('getOneUserInput') input: GetOneUserInput,
+  ): Promise<VoidOutput> {
+    return this.service.sendSuperAdminConfirmationEmail(input);
+  }
 }
