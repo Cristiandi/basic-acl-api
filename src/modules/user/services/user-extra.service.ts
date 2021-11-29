@@ -448,6 +448,7 @@ export class UserExtraService {
             this.appConfiguration.app.selfApiUrl +
             'users/confirm-email?code=' +
             verificationCode.code,
+          accessKey: company.accessKey,
         },
       });
 
