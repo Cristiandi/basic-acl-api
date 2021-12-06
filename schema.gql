@@ -88,6 +88,12 @@ input CreateCompanyInput {
   website: String
 }
 
+input CreateEmailTemplateInput {
+  companyUid: String!
+  subject: String!
+  type: String!
+}
+
 input CreatePermissionInput {
   apiKeyUid: String
   name: String!
@@ -133,6 +139,16 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type EmailTemplate {
+  company: Company!
+  createdAt: DateTime!
+  id: Float!
+  subject: String!
+  type: String!
+  uid: String!
+  updatedAt: DateTime!
+}
+
 input GetAllApiKeysInput {
   companyUid: String!
   limit: Int
@@ -176,6 +192,10 @@ input GetOneCompanyInput {
   uid: String!
 }
 
+input GetOneEmailTemplateInput {
+  uid: String!
+}
+
 input GetOnePermissionInput {
   uid: String!
 }
@@ -215,6 +235,7 @@ type Mutation {
   createApiKey(createApiKeyInput: CreateApiKeyInput!): ApiKey!
   createAssignedRole(createAssignedRoleInput: CreateAssignedRoleInput!): AssignedRole!
   createCompany(createCompanyInput: CreateCompanyInput!): Company!
+  createEmailTemplate(createEmailTemplateInput: CreateEmailTemplateInput!): EmailTemplate!
   createPermission(createPermissionInput: CreatePermissionInput!): Permission!
   createRole(createRoleInput: CreateRoleInput!): Role!
   createSuperAdmin(createSuperAdmiUserInput: CreateSuperAdmiUserInput!): User!
@@ -223,6 +244,7 @@ type Mutation {
   daleteCompany(getOneCompanyInput: GetOneCompanyInput!): Company!
   deleteApiKey(getOneApiKeyInput: GetOneApiKeyInput!): ApiKey!
   deleteAssignedRole(deleteAssignedRoleInput: CreateAssignedRoleInput!): AssignedRole!
+  deleteEmailTemplate(getOneEmailTemplateInput: GetOneEmailTemplateInput!): EmailTemplate!
   deletePermission(getOnePermissionInput: GetOnePermissionInput!): Permission!
   deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
   deleteUser(getOneUserInput: GetOneUserInput!): User!
@@ -233,6 +255,7 @@ type Mutation {
   sendSuperAdminConfirmationEmail(getOneUserInput: GetOneUserInput!): VoidOutput!
   updateApiKey(getOneApiKeyInput: GetOneApiKeyInput!, updateApiKeyInput: UpdateApiKeyInput!): ApiKey!
   updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
+  updateEmailTemplate(getOneEmailTemplateInput: GetOneEmailTemplateInput!, updateCompanyInput: UpdateEmailTemplateInput!): EmailTemplate!
   updatePermission(getOnePermissionInput: GetOnePermissionInput!, updatePermissionInput: UpdatePermissionInput!): Permission!
   updateRole(getOneRoleInput: GetOneRoleInput!, updateRoleInput: UpdateRoleInput!): Role!
 }
@@ -302,6 +325,12 @@ input UpdateCompanyInput {
   firebaseConfig: JSONObject
   name: String
   website: String
+}
+
+input UpdateEmailTemplateInput {
+  companyUid: String
+  subject: String
+  type: String
 }
 
 input UpdatePermissionInput {
