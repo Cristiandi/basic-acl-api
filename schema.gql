@@ -256,6 +256,7 @@ type Mutation {
   deleteRole(getOneRoleInput: GetOneRoleInput!): Role!
   deleteUser(getOneUserInput: GetOneUserInput!): User!
   loginSuperAdmin(loginSuperAdminInput: LoginSuperAdminInput!): LoginSuperAdminOutput!
+  previewEmailTemplate(getOneEmailTemplateInput: GetOneEmailTemplateInput!, previewEmailTemplateInput: PreviewEmailTemplateInput!): PreviewEmailTemplateOutput!
   resetUserPassword(resetUserPasswordInput: ResetUserPasswordInput!): ResetUserPasswordOutput!
   sendConfirmationUserEmail(getOneUserInput: GetOneUserInput!): VoidOutput!
   sendResetUserPasswordEmail(sendResetUserPasswordEmailInput: SendResetUserPasswordEmailInput!): VoidOutput!
@@ -265,6 +266,7 @@ type Mutation {
   updateEmailTemplate(getOneEmailTemplateInput: GetOneEmailTemplateInput!, updateCompanyInput: UpdateEmailTemplateInput!): EmailTemplate!
   updatePermission(getOnePermissionInput: GetOnePermissionInput!, updatePermissionInput: UpdatePermissionInput!): Permission!
   updateRole(getOneRoleInput: GetOneRoleInput!, updateRoleInput: UpdateRoleInput!): Role!
+  uploadEmailTemplate(file: Upload!, getOneEmailTemplateInput: GetOneEmailTemplateInput!): EmailTemplate!
 }
 
 type Permission {
@@ -276,6 +278,14 @@ type Permission {
   role: Role
   uid: String!
   updatedAt: DateTime!
+}
+
+input PreviewEmailTemplateInput {
+  parameters: JSONObject
+}
+
+type PreviewEmailTemplateOutput {
+  html: String!
 }
 
 type Query {
@@ -353,6 +363,9 @@ input UpdateRoleInput {
   description: String
   name: String
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 type User {
   assignedRoles: [AssignedRole!]!

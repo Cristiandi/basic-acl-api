@@ -7,6 +7,7 @@ import {
   ResolveField,
   Parent,
 } from '@nestjs/graphql';
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
 
 import { EmailTemplate } from './email-template.entity';
 import { Company } from '../company/company.entity';
@@ -19,6 +20,8 @@ import { CreateEmailTemplateInput } from './dto/create-email-template-input.dto'
 import { GetOneEmailTemplateInput } from './dto/get-one-email-template-input.dto';
 import { UpdateEmailTemplateInput } from './dto/update-email-template-input.dto';
 import { GetAllEmailTemplatesInput } from './dto/get-all-email-templates-input,dto';
+import { PreviewEmailTemplateInput } from './dto/preview-email-template-input.dto';
+import { PreviewEmailTemplateOutput } from './dto/preview-email-template-output.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => EmailTemplate)
@@ -63,6 +66,24 @@ export class EmailTemplateResolver {
     getOneEmailTemplateInput: GetOneEmailTemplateInput,
   ): Promise<EmailTemplate> {
     return this.service.delete(getOneEmailTemplateInput);
+  }
+
+  @Mutation(() => EmailTemplate, { name: 'uploadEmailTemplate' })
+  upload(
+    @Args('getOneEmailTemplateInput')
+    getOneEmailTemplateInput: GetOneEmailTemplateInput,
+    @Args({ name: 'file', type: () => GraphQLUpload }) fileUpload: FileUpload,
+  ): Promise<EmailTemplate> {
+    return this.service.upload(getOneEmailTemplateInput, fileUpload);
+  }
+
+  @Mutation(() => PreviewEmailTemplateOutput, { name: 'previewEmailTemplate' })
+  preview(
+    @Args('getOneEmailTemplateInput')
+    getOneEmailTemplateInput: GetOneEmailTemplateInput,
+    @Args('previewEmailTemplateInput') input: PreviewEmailTemplateInput,
+  ): Promise<PreviewEmailTemplateOutput> {
+    return this.service.preview(getOneEmailTemplateInput, input);
   }
 
   @ResolveField(() => Company, { name: 'company' })
