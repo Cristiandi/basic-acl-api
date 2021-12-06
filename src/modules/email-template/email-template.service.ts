@@ -1,7 +1,11 @@
 import * as mjml2html from 'mjml';
 import hbs from 'handlebars';
 
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -15,6 +19,9 @@ import { GetEmailTemplateStringInput } from './dto/get-email-template-string-inp
 import { GenerateTemplateHtmlInput } from './dto/generate-template-html-input.dto';
 import { GetEmailTemplateStringOutput } from './dto/get-email-template-string-output.dto';
 import { GenerateTemplateHtmlOutput } from './dto/generate-template-html-output.dto';
+import { CreateEmailTemplateInput } from './dto/create-email-template-input.dto';
+import { GetOneEmailTemplateInput } from './dto/get-one-email-template-input.dto';
+import { UpdateEmailTemplateInput } from './dto/update-email-template-input.dto';
 
 @Injectable()
 export class EmailTemplateService extends BaseService<EmailTemplate> {
@@ -24,6 +31,40 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
     private readonly companyService: CompanyService,
   ) {
     super(emailTemplateRepository);
+  }
+
+  public async create(input: CreateEmailTemplateInput): Promise<EmailTemplate> {
+    const { companyUid, type, subject } = input;
+
+    // get the company
+    const company = await this.companyService.getOne({
+      uid: companyUid,
+    });
+
+    if (!company) {
+      throw new NotFoundException('company not found');
+    }
+
+    const existingEmailTemplate = await this.getOneByOneFields({
+      fields: {
+        type,
+        company,
+      },
+    });
+
+    if (existingEmailTemplate) {
+      throw new ConflictException('email template already exists');
+    }
+
+    const created = this.emailTemplateRepository.create({
+      type,
+      subject,
+      company,
+    });
+
+    const saved = await this.emailTemplateRepository.save(created);
+
+    return saved;
   }
 
   public async getEmailTemplateString(
@@ -94,5 +135,61 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
       html,
       subject,
     };
+  }
+
+  public async update(
+    getOneEmailTemplate: GetOneEmailTemplateInput,
+    input: UpdateEmailTemplateInput,
+  ): Promise<EmailTemplate> {
+    const { uid } = getOneEmailTemplate;
+
+    // get the email template
+    const existing = await this.getOneByOneFields({
+      fields: {
+        uid,
+      },
+      relations: ['company'],
+      checkIfExists: true,
+    });
+
+    const { type } = input;
+
+    const compareTo = await this.getOneByOneFields({
+      fields: {
+        type: type || existing.type,
+        company: existing.company,
+      },
+    });
+
+    if (compareTo && compareTo.id !== existing.id) {
+      throw new ConflictException('email template already exists');
+    }
+
+    const preloaded = await this.emailTemplateRepository.preload({
+      id: existing.id,
+      ...input,
+    });
+
+    const updated = await this.emailTemplateRepository.save(preloaded);
+
+    return updated;
+  }
+
+  public async delete(
+    getOneEmailTemplate: GetOneEmailTemplateInput,
+  ): Promise<EmailTemplate> {
+    const { uid } = getOneEmailTemplate;
+
+    // get the email template
+    const existing = await this.getOneByOneFields({
+      fields: {
+        uid,
+      },
+      checkIfExists: true,
+    });
+
+    const deleted = await this.emailTemplateRepository.remove(existing);
+
+    return deleted;
   }
 }

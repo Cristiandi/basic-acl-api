@@ -47,6 +47,7 @@ export class EmailTemplate extends BaseEntity {
 
   @Column({
     type: 'bytea',
+    nullable: true,
   })
   file: Buffer;
 
