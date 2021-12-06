@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 import { TemplateType } from '../email-template.entity';
 
 @InputType()
@@ -8,6 +8,12 @@ export class CreateEmailTemplateInput {
   @Field(() => String)
   readonly companyUid: string;
 
+  @IsEnum(TemplateType, {
+    message: () => {
+      const keys = Object.keys(TemplateType).filter((x) => !(parseInt(x) >= 0));
+      return `type must be one of ${keys.join(', ')}`;
+    },
+  })
   @Field(() => String)
   readonly type: TemplateType;
 

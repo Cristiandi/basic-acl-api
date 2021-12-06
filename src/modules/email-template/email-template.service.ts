@@ -22,6 +22,7 @@ import { GenerateTemplateHtmlOutput } from './dto/generate-template-html-output.
 import { CreateEmailTemplateInput } from './dto/create-email-template-input.dto';
 import { GetOneEmailTemplateInput } from './dto/get-one-email-template-input.dto';
 import { UpdateEmailTemplateInput } from './dto/update-email-template-input.dto';
+import { GetAllEmailTemplatesInput } from './dto/get-all-email-templates-input,dto';
 
 @Injectable()
 export class EmailTemplateService extends BaseService<EmailTemplate> {
@@ -65,6 +66,29 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
     const saved = await this.emailTemplateRepository.save(created);
 
     return saved;
+  }
+
+  public async getAll(
+    input: GetAllEmailTemplatesInput,
+  ): Promise<EmailTemplate[]> {
+    const { companyUid, limit, skip, q } = input;
+
+    const query = this.emailTemplateRepository
+      .createQueryBuilder('emailTemplate')
+      .loadAllRelationIds()
+      .innerJoin('emailTemplate.company', 'company')
+      .where('company.uid = :companyUid', { companyUid });
+
+    if (q)
+      query.andWhere('emailTemplate.subject ilike :q', {
+        q: `%${q}%`,
+      });
+
+    query.limit(limit || 10).skip(skip);
+
+    const items = await query.getMany();
+
+    return items;
   }
 
   public async getEmailTemplateString(
@@ -188,8 +212,10 @@ export class EmailTemplateService extends BaseService<EmailTemplate> {
       checkIfExists: true,
     });
 
-    const deleted = await this.emailTemplateRepository.remove(existing);
+    const clone = { ...existing };
 
-    return deleted;
+    await this.emailTemplateRepository.remove(existing);
+
+    return clone as EmailTemplate;
   }
 }
