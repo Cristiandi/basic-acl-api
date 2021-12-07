@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { graphqlUploadExpress } from 'graphql-upload';
 
 import { AppModule } from './app.module';
 // import { ClusterService } from './cluster.service';
@@ -16,6 +17,9 @@ async function bootstrap() {
 
   // getting the environment var
   const ENV = configService.get<string>('config.environment' as never);
+
+  app.enableCors();
+  app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
 
   await app.listen(PORT, () => {
     Logger.log(`app listening at ${PORT} in ${ENV}`, 'main.ts');
