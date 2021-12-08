@@ -20,6 +20,7 @@ import { AssignUserRoleInput } from '../dto/assign-user-role-input.dto';
 import { CreateSuperAdmiUserInput } from '../dto/create-super-admin-user-input.dto';
 import { LoginSuperAdminInput } from '../dto/login-super-admin-input.dto';
 import { LoginSuperAdminOutput } from '../dto/login-super-admin-output.dto';
+import { SendUserConfirmationEmailInput } from '../dto/send-user-confirmation-email-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => User)
@@ -50,9 +51,11 @@ export class UserExtraResolver {
   @Mutation(() => VoidOutput, { name: 'sendConfirmationUserEmail' })
   public sendConfirmationEmail(
     @Args('getOneUserInput')
-    input: GetOneUserInput,
+    getOneUserInput: GetOneUserInput,
+    @Args('sendUserConfirmationEmailInput')
+    input: SendUserConfirmationEmailInput,
   ): Promise<VoidOutput> {
-    return this.service.sendConfirmationEmail(input);
+    return this.service.sendConfirmationEmail(getOneUserInput, input);
   }
 
   @Public()
