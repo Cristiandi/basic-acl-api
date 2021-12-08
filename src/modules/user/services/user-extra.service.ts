@@ -45,6 +45,7 @@ import { LoginSuperAdminInput } from '../dto/login-super-admin-input.dto';
 import { FirebaseService } from 'src/plugins/firebase/firebase.service';
 import { LoginSuperAdminOutput } from '../dto/login-super-admin-output.dto';
 import { SendUserConfirmationEmailInput } from '../dto/send-user-confirmation-email-input.dto';
+import { SendUserPasswordUpdatedEmailInput } from '../dto/send-user-password-updated-email-input.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -350,9 +351,16 @@ export class UserExtraService {
     });
 
     // send a notification to the user
-    this.sendPasswordUpdatedEmail({
-      authUid,
-    }).catch((error) => console.error(error));
+    const { emailTemplateParams = {} } = input;
+
+    this.sendPasswordUpdatedEmail(
+      {
+        authUid,
+      },
+      {
+        emailTemplateParams,
+      },
+    ).catch((error) => console.error(error));
 
     return existingUser;
   }
@@ -613,9 +621,16 @@ export class UserExtraService {
     });
 
     // notify the user
-    this.sendPasswordUpdatedEmail({
-      authUid: user.authUid,
-    }).catch((error) => console.error(error));
+    const { emailTemplateParams } = input;
+
+    this.sendPasswordUpdatedEmail(
+      {
+        authUid: user.authUid,
+      },
+      {
+        emailTemplateParams,
+      },
+    ).catch((error) => console.error(error));
 
     // determinate the url to redirect
     const urlToRedirect =
@@ -628,9 +643,10 @@ export class UserExtraService {
   }
 
   public async sendPasswordUpdatedEmail(
-    input: GetOneUserInput,
+    getOneUserInput: GetOneUserInput,
+    input?: SendUserPasswordUpdatedEmailInput,
   ): Promise<VoidOutput> {
-    const { authUid } = input;
+    const { authUid } = getOneUserInput;
 
     // get the user and check if exists
     const existingUser = await this.userService.getOneByOneFields({
@@ -640,9 +656,13 @@ export class UserExtraService {
     });
 
     // generate the html for the email
+    const { emailTemplateParams } = input;
+
     const { html, subject } =
       await this.emailTemplateService.generateTemplateHtml({
-        parameters: {},
+        parameters: {
+          ...emailTemplateParams,
+        },
         type: TemplateType.PASSWORD_UPDATED_EMAIL,
       });
 
