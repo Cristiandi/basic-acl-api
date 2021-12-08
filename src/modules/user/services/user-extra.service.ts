@@ -660,6 +660,7 @@ export class UserExtraService {
 
     const { html, subject } =
       await this.emailTemplateService.generateTemplateHtml({
+        companyUid: existingUser.company.uid,
         parameters: {
           ...emailTemplateParams,
         },
