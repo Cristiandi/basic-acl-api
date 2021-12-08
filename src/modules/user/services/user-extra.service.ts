@@ -44,6 +44,7 @@ import { CreateSuperAdmiUserInput } from '../dto/create-super-admin-user-input.d
 import { LoginSuperAdminInput } from '../dto/login-super-admin-input.dto';
 import { FirebaseService } from 'src/plugins/firebase/firebase.service';
 import { LoginSuperAdminOutput } from '../dto/login-super-admin-output.dto';
+import { SendUserConfirmationEmailInput } from '../dto/send-user-confirmation-email-input.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -300,10 +301,17 @@ export class UserExtraService {
 
     const saved = await this.userRepository.save(preloaded);
 
+    const { emailTemplateParams = {} } = input;
+
     // send confirmation email
-    this.sendConfirmationEmail({
-      authUid,
-    }).catch((err) => console.error(err));
+    this.sendConfirmationEmail(
+      {
+        authUid,
+      },
+      {
+        emailTemplateParams,
+      },
+    ).catch((err) => console.error(err));
 
     return {
       ...saved,
@@ -354,9 +362,10 @@ export class UserExtraService {
   /* other functions */
 
   public async sendConfirmationEmail(
-    input: GetOneUserInput,
+    getOneUserInput: GetOneUserInput,
+    input?: SendUserConfirmationEmailInput,
   ): Promise<VoidOutput> {
-    const { authUid } = input;
+    const { authUid } = getOneUserInput;
 
     // get the user and check if exists
     const existingUser = await this.userService.getOneByOneFields({
@@ -381,17 +390,19 @@ export class UserExtraService {
 
     const { company } = existingUser;
 
+    const { emailTemplateParams = {} } = input;
+
     // generate the html for the email
     const { html, subject } =
       await this.emailTemplateService.generateTemplateHtml({
         companyUid: company.uid,
         type: TemplateType.CONFIRMATION_EMAIL,
         parameters: {
-          firstName: email,
           link:
             this.appConfiguration.app.selfApiUrl +
             'users/confirm-email?code=' +
             verificationCode.code,
+          ...emailTemplateParams,
         },
       });
 

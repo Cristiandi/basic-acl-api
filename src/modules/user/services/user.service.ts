@@ -165,15 +165,20 @@ export class UserService extends BaseService<User> {
       }
     }
 
-    const { sendEmail = true } = input;
+    const { sendEmail = true, emailTemplateParams = {} } = input;
 
     // decide if need to send an email to the user
     if (sendEmail && saved.email) {
       // send the confirmation email
       this.userExtraService
-        .sendConfirmationEmail({
-          authUid: saved.authUid,
-        })
+        .sendConfirmationEmail(
+          {
+            authUid: saved.authUid,
+          },
+          {
+            emailTemplateParams,
+          },
+        )
         .catch((error) => console.error(error));
     }
 
