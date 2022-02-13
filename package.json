@@ -32,7 +32,7 @@
     "@nestjs/graphql": "9.1.2",
     "@nestjs/platform-express": "8.2.6",
     "@nestjs/typeorm": "8.0.3",
-    "apollo-server-express": "3.6.2",
+    "apollo-server-express": "3.6.3",
     "cache-manager": "3.6.0",
     "cache-manager-redis-store": "2.0.0",
     "class-transformer": "0.5.1",
