@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 import appConfig from './config/app.config';
 
@@ -35,23 +36,17 @@ import { RedisCacheModule } from './plugins/redis-cache/redis-cache.module';
     }),
 
     // GraphQL
-    GraphQLModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          autoSchemaFile: join(process.cwd(), 'schema.gql'),
-          sortSchema: true,
-          introspection: true,
-          installSubscriptionHandlers: true,
-          playground:
-            configService.get<string>('config.environment') === 'local',
-          formatError: (error) => {
-            console.error(error);
-            return error;
-          },
-        };
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      autoSchemaFile: join(process.cwd(), 'schema.gql'),
+      sortSchema: true,
+      introspection: true,
+      installSubscriptionHandlers: true,
+      playground: process.env.NODE_ENV === 'development',
+      formatError: (error) => {
+        console.error(error);
+        return error;
       },
+      driver: ApolloDriver,
     }),
 
     // TypeORM
