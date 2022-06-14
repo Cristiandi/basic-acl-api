@@ -39,7 +39,7 @@
     "cache-manager-redis-store": "2.0.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
-    "dataloader": "2.0.0",
+    "dataloader": "2.1.0",
     "firebase": "9.8.3",
     "firebase-admin": "10.0.2",
     "form-data": "4.0.0",
