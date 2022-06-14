@@ -41,7 +41,7 @@
     "class-validator": "0.13.2",
     "dataloader": "2.1.0",
     "firebase": "9.8.3",
-    "firebase-admin": "10.0.2",
+    "firebase-admin": "10.3.0",
     "form-data": "4.0.0",
     "graphql": "15.8.0",
     "graphql-type-json": "0.3.2",
