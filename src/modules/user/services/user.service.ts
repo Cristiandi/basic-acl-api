@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { auth } from 'firebase-admin';
 
 import { BaseService } from '../../../common/base.service';
@@ -248,7 +248,10 @@ export class UserService extends BaseService<User> {
   // CRUD
 
   public async getByIds(ids: number[]): Promise<User[]> {
-    return this.userRepository.findByIds(ids, {
+    return this.userRepository.find({
+      where: {
+        id: In(ids),
+      },
       loadRelationIds: true,
     });
   }

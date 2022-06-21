@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 
 import { BaseService } from '../../common/base.service';
 import { CompanyService } from '../company/services/company.service';
@@ -136,7 +136,10 @@ export class RoleService extends BaseService<Role> {
   // CRUD
 
   public async getByIds(ids: number[]): Promise<Role[]> {
-    return this.roleRepository.findByIds(ids, {
+    return this.roleRepository.find({
+      where: {
+        id: In(ids),
+      },
       loadRelationIds: true,
     });
   }
