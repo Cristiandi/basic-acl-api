@@ -685,21 +685,23 @@ export class UserExtraService {
   public async loginSuperAdmin(
     input: LoginSuperAdminInput,
   ): Promise<LoginSuperAdminOutput> {
-    const { email, password } = input;
+    const { companyUid, email, password } = input;
+
+    const existingCompany = await this.companyService.getOneByOneFields({
+      fields: { uid: companyUid },
+      checkIfExists: true,
+    });
 
     const user = await this.userService.getOneByOneFields({
-      fields: { email, isSuperAdmin: true },
-      relations: ['company'],
+      fields: { company: existingCompany, email, isSuperAdmin: true },
     });
 
     if (!user) {
       throw new NotFoundException(`user with email ${email}, not found.`);
     }
 
-    const { company } = user;
-
     const firebaseUser = await this.firebaseService.login({
-      companyUid: company.uid,
+      companyUid: existingCompany.uid,
       email,
       password,
     });
@@ -707,10 +709,10 @@ export class UserExtraService {
     const { token, authTime, issuedAtTime, expirationTime } =
       await firebaseUser.getIdTokenResult();
 
-    const { accessKey } = company;
+    const { accessKey } = existingCompany;
 
     return {
-      companyUid: company.uid,
+      companyUid: existingCompany.uid,
       accessKey,
       token,
       authTime,
