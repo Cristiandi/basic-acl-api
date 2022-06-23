@@ -47,6 +47,7 @@ import { RedisCacheModule } from './plugins/redis-cache/redis-cache.module';
         return error;
       },
       driver: ApolloDriver,
+      persistedQueries: false, // this is to prevent denial of service attacks
     }),
 
     // TypeORM

@@ -3,6 +3,10 @@ import { IsEmail, IsString } from 'class-validator';
 
 @InputType()
 export class LoginSuperAdminInput {
+  @IsString()
+  @Field()
+  readonly companyUid: string;
+
   @IsEmail()
   @Field(() => String)
   readonly email: string;

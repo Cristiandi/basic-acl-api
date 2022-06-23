@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 
 import { BaseService } from '../../common/base.service';
 
@@ -125,7 +125,10 @@ export class ApiKeyService extends BaseService<ApiKey> {
   // CRUD
 
   public async getByIds(ids: number[]): Promise<ApiKey[]> {
-    return this.apiKeyRepository.findByIds(ids, {
+    return this.apiKeyRepository.find({
+      where: {
+        id: In(ids),
+      },
       loadRelationIds: true,
     });
   }
