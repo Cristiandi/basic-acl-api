@@ -9,12 +9,29 @@ export class BaseService<Entity extends BaseEntity> {
   public async getOneByOneFields(
     input: GetOneByOneFieldInput,
   ): Promise<Entity | undefined> {
-    const { fields, relations, checkIfExists = false } = input;
+    const {
+      fields,
+      relations,
+      checkIfExists = false,
+      loadRelationIds = true,
+    } = input;
+
+    // create a simpler fields object
+    const fieldsToDoWhere = {};
+    for (const [key, value] of Object.entries(fields)) {
+      if (typeof value === 'object' && value.hasOwnProperty('id')) {
+        fieldsToDoWhere[key] = {
+          id: value.id,
+        };
+      } else {
+        fieldsToDoWhere[key] = value;
+      }
+    }
 
     const existing = await this.repository.findOne({
-      where: { ...(fields as any) },
+      where: { ...(fieldsToDoWhere as any) },
       relations,
-      loadRelationIds: !relations?.length ? true : false,
+      loadRelationIds: !relations?.length && loadRelationIds ? true : false,
     });
 
     if (!existing && checkIfExists) {
