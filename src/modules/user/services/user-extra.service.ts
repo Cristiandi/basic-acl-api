@@ -147,6 +147,7 @@ export class UserExtraService {
     const company = await this.companyService.getOneByOneFields({
       fields: { uid: companyUid },
       checkIfExists: true,
+      loadRelationIds: false,
     });
 
     // check if the user already exists by email

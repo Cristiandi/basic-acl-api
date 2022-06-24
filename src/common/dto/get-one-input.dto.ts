@@ -4,4 +4,6 @@ export class GetOneByOneFieldInput {
   readonly relations?: string[];
 
   readonly checkIfExists?: boolean;
+
+  readonly loadRelationIds?: boolean;
 }
