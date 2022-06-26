@@ -49,6 +49,12 @@ export class VerificationCodeService extends BaseService<VerificationCode> {
       relations: ['user'],
     });
 
+    if (!existing.user) {
+      await this.verificationCodeRepository.softRemove(existing);
+
+      throw new ConflictException('the verification code is not longer valid.');
+    }
+
     const { expirationDate } = existing;
 
     const currentDate = new Date();
