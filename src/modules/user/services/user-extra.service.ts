@@ -236,7 +236,7 @@ export class UserExtraService {
       },
     });
 
-    if (existingUserWithSamePhone) {
+    if (existingUser.id !== existingUserWithSamePhone.id) {
       throw new ConflictException(`the phone ${phone} it's already used.`);
     }
 
