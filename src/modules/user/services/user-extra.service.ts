@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -26,6 +27,7 @@ import { VerificationCodeService } from '../../verification-code/verification-co
 import { RoleService } from '../../role/role.service';
 import { AssignedRoleService } from '../../assigned-role/assigned-role.service';
 import { CompanyService } from '../../company/services/company.service';
+import { FirebaseService } from '../../../plugins/firebase/firebase.service';
 
 import { addDaysToDate } from '../../../utils';
 
@@ -42,7 +44,6 @@ import { CreateUsersFromFirebaseInput } from '../dto/create-users-from-firebase-
 import { AssignUserRoleInput } from '../dto/assign-user-role-input.dto';
 import { CreateSuperAdmiUserInput } from '../dto/create-super-admin-user-input.dto';
 import { LoginSuperAdminInput } from '../dto/login-super-admin-input.dto';
-import { FirebaseService } from 'src/plugins/firebase/firebase.service';
 import { LoginSuperAdminOutput } from '../dto/login-super-admin-output.dto';
 import { SendUserConfirmationEmailInput } from '../dto/send-user-confirmation-email-input.dto';
 import { SendUserPasswordUpdatedEmailInput } from '../dto/send-user-password-updated-email-input.dto';
@@ -333,15 +334,21 @@ export class UserExtraService {
       checkIfExists: true,
     });
 
+    // check if the old password is correct
     const { oldPassword } = input;
 
-    // TODO: check if the old password is correct
-    Logger.log(
-      `remenber to check the old password ${oldPassword}`,
-      UserExtraService.name,
-    );
-
     const { company } = existingUser;
+
+    try {
+      this.firebaseService.login({
+        companyUid: company.uid,
+        email: existingUser.email,
+        password: oldPassword,
+      });
+    } catch (error) {
+      throw new UnauthorizedException('the password is incorrect.');
+    }
+
     const { newPassword } = input;
 
     // update the user in firebase
