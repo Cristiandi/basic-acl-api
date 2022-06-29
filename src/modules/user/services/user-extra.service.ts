@@ -340,7 +340,7 @@ export class UserExtraService {
     const { company } = existingUser;
 
     try {
-      this.firebaseService.login({
+      await this.firebaseService.login({
         companyUid: company.uid,
         email: existingUser.email,
         password: oldPassword,
