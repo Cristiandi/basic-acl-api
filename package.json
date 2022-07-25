@@ -26,7 +26,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestjs/apollo": "10.0.17",
+    "@nestjs/apollo": "10.0.19",
     "@nestjs/common": "9.0.3",
     "@nestjs/config": "2.2.0",
     "@nestjs/core": "9.0.3",
