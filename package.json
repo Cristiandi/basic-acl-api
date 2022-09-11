@@ -115,5 +115,11 @@
     "*.ts": [
       "npm run lint"
     ]
+  },
+  "comments": {
+    "dependencies": {
+      "graphql-upload": "couldn't update cuz pure ESM compatibility",
+      "nanoid": "couldn't update cuz pure ESM compatibility"
+    }
   }
 }

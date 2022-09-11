@@ -135,7 +135,7 @@ export class RoleService extends BaseService<Role> {
 
   // CRUD
 
-  public async getByIds(ids: number[]): Promise<Role[]> {
+  public getByIds(ids: number[]): Promise<Role[]> {
     return this.roleRepository.find({
       where: {
         id: In(ids),
