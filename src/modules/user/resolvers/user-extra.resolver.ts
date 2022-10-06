@@ -108,7 +108,7 @@ export class UserExtraResolver {
   }
 
   @Mutation(() => VoidOutput, { name: 'sendSuperAdminConfirmationEmail' })
-  public async sendSuperAdminConfirmationEmail(
+  public sendSuperAdminConfirmationEmail(
     @Args('getOneUserInput') input: GetOneUserInput,
   ): Promise<VoidOutput> {
     return this.service.sendSuperAdminConfirmationEmail(input);
