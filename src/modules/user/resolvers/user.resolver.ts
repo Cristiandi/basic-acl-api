@@ -10,6 +10,7 @@ import {
 
 import { User } from '../user.entity';
 import { Company } from '../../company/company.entity';
+import { AssignedRole } from '../../assigned-role/assigned-role.entity';
 
 import { UserService } from '../services/user.service';
 import { UserLoaders } from '../user.loaders';
@@ -63,5 +64,10 @@ export class UserResolver {
     if (typeof id !== 'number') id = value.id;
 
     return this.loaders.batchCompanies.load(id);
+  }
+
+  @ResolveField(() => [AssignedRole], { name: 'assignedRoles' })
+  public assignedRoles(@Parent() parent: User): Promise<AssignedRole[]> {
+    return this.service.assignedRoles(parent);
   }
 }

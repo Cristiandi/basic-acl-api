@@ -247,12 +247,27 @@ export class UserService extends BaseService<User> {
   }
   // CRUD
 
-  public async getByIds(ids: number[]): Promise<User[]> {
+  public getByIds(ids: number[]): Promise<User[]> {
     return this.userRepository.find({
       where: {
         id: In(ids),
       },
       loadRelationIds: true,
     });
+  }
+
+  public async assignedRoles(parent: User): Promise<any[]> {
+    const { id } = parent;
+
+    const master = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.assignedRoles', 'assignedRoles')
+      .leftJoinAndSelect('assignedRoles.role', 'role')
+      .where('user.id = :id', { id })
+      .getOne();
+
+    const items = master ? master.assignedRoles : [];
+
+    return items.map((item) => ({ ...item, user: master.id }));
   }
 }
