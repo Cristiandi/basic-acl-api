@@ -14,7 +14,9 @@ type ApiKey {
 }
 
 input AssignUserRoleInput {
-  roleUid: String!
+  companyUid: String
+  roleCode: String
+  roleUid: String
   userAuthUid: String!
 }
 
