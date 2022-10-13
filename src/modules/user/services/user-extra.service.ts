@@ -69,7 +69,7 @@ export class UserExtraService {
   /* functions in charge of creating  */
 
   public async assignRole(input: AssignUserRoleInput): Promise<User> {
-    const { userAuthUid, roleUid } = input;
+    const { userAuthUid, roleUid, companyUid, roleCode } = input;
 
     // get the user
     const exisitingUser = await this.userService.getOneByOneFields({
@@ -79,10 +79,24 @@ export class UserExtraService {
       checkIfExists: true,
     });
 
+    // try to get the company if we have the company uid
+    let company;
+    if (companyUid) {
+      company = await this.companyService.getOneByOneFields({
+        fields: {
+          uid: companyUid,
+        },
+        checkIfExists: true,
+        loadRelationIds: false,
+      });
+    }
+
     // get the role
     const exisitingRole = await this.roleService.getOneByOneFields({
       fields: {
         uid: roleUid,
+        company,
+        code: roleCode,
       },
       checkIfExists: true,
     });
@@ -96,9 +110,9 @@ export class UserExtraService {
     return exisitingUser;
   }
 
-  public async createUsersFromFirebase(
+  public createUsersFromFirebase(
     input: CreateUsersFromFirebaseInput,
-  ): Promise<VoidOutput> {
+  ): VoidOutput {
     const { companyUid, roleCode } = input;
 
     (async () => {

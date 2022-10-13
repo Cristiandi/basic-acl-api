@@ -80,7 +80,7 @@ export class UserExtraResolver {
   public createUsersFromFirebase(
     @Args('createUsersFromFirebaseInput')
     createUsersFromFirebaseInput: CreateUsersFromFirebaseInput,
-  ): Promise<VoidOutput> {
+  ): VoidOutput {
     return this.service.createUsersFromFirebase(createUsersFromFirebaseInput);
   }
 
