@@ -47,6 +47,7 @@ import { LoginSuperAdminInput } from '../dto/login-super-admin-input.dto';
 import { LoginSuperAdminOutput } from '../dto/login-super-admin-output.dto';
 import { SendUserConfirmationEmailInput } from '../dto/send-user-confirmation-email-input.dto';
 import { SendUserPasswordUpdatedEmailInput } from '../dto/send-user-password-updated-email-input.dto';
+import { UnassignUserRoleInput } from '../dto/unassign-user-role-input.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -391,6 +392,52 @@ export class UserExtraService {
   }
 
   /* functions in charge of updating  */
+
+  /* functions in charge of deleting */
+
+  public async unassignRole(input: UnassignUserRoleInput): Promise<User> {
+    const { userAuthUid, roleUid, companyUid, roleCode } = input;
+
+    // get the user
+    const exisitingUser = await this.userService.getOneByOneFields({
+      fields: {
+        authUid: userAuthUid,
+      },
+      checkIfExists: true,
+    });
+
+    // try to get the company if we have the company uid
+    let company;
+    if (companyUid) {
+      company = await this.companyService.getOneByOneFields({
+        fields: {
+          uid: companyUid,
+        },
+        checkIfExists: true,
+        loadRelationIds: false,
+      });
+    }
+
+    // get the role
+    const exisitingRole = await this.roleService.getOneByOneFields({
+      fields: {
+        uid: roleUid,
+        company,
+        code: roleCode,
+      },
+      checkIfExists: true,
+    });
+
+    // assign the role to the user
+    await this.assignedRoleService.delete({
+      roleUid: exisitingRole.uid,
+      userUid: exisitingUser.authUid,
+    });
+
+    return exisitingUser;
+  }
+
+  /* functions in charge of deleting */
 
   /* other functions */
 

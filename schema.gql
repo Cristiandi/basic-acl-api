@@ -264,6 +264,7 @@ type Mutation {
   sendConfirmationUserEmail(getOneUserInput: GetOneUserInput!, sendUserConfirmationEmailInput: SendUserConfirmationEmailInput!): VoidOutput!
   sendResetUserPasswordEmail(sendResetUserPasswordEmailInput: SendResetUserPasswordEmailInput!): VoidOutput!
   sendSuperAdminConfirmationEmail(getOneUserInput: GetOneUserInput!): VoidOutput!
+  unassignUserRole(unassignUserRoleInput: UnassignUserRoleInput!): User!
   updateApiKey(getOneApiKeyInput: GetOneApiKeyInput!, updateApiKeyInput: UpdateApiKeyInput!): ApiKey!
   updateCompany(getOneCompanyInput: GetOneCompanyInput!, updateCompanyInput: UpdateCompanyInput!): Company!
   updateEmailTemplate(getOneEmailTemplateInput: GetOneEmailTemplateInput!, updateCompanyInput: UpdateEmailTemplateInput!): EmailTemplate!
@@ -338,6 +339,13 @@ input SendResetUserPasswordEmailInput {
 
 input SendUserConfirmationEmailInput {
   emailTemplateParams: JSONObject
+}
+
+input UnassignUserRoleInput {
+  companyUid: String
+  roleCode: String
+  roleUid: String
+  userAuthUid: String!
 }
 
 input UpdateApiKeyInput {
