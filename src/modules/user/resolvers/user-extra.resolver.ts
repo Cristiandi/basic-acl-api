@@ -21,6 +21,7 @@ import { CreateSuperAdmiUserInput } from '../dto/create-super-admin-user-input.d
 import { LoginSuperAdminInput } from '../dto/login-super-admin-input.dto';
 import { LoginSuperAdminOutput } from '../dto/login-super-admin-output.dto';
 import { SendUserConfirmationEmailInput } from '../dto/send-user-confirmation-email-input.dto';
+import { UnassignUserRoleInput } from '../dto/unassign-user-role-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => User)
@@ -112,5 +113,12 @@ export class UserExtraResolver {
     @Args('getOneUserInput') input: GetOneUserInput,
   ): Promise<VoidOutput> {
     return this.service.sendSuperAdminConfirmationEmail(input);
+  }
+
+  @Mutation(() => User, { name: 'unassignUserRole' })
+  public unassignRole(
+    @Args('unassignUserRoleInput') unassignUserRoleInput: UnassignUserRoleInput,
+  ): Promise<User> {
+    return this.service.unassignRole(unassignUserRoleInput);
   }
 }
