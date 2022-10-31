@@ -3,7 +3,6 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   Generated,
   JoinColumn,
@@ -46,9 +45,6 @@ export class ApiKey extends BaseEntity {
   @Field()
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: Date;
 
   // relations
 

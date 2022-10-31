@@ -3,7 +3,6 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   Generated,
   JoinColumn,
@@ -51,9 +50,6 @@ export class Role extends BaseEntity {
   @Field()
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: Date;
 
   // relations
 
