@@ -6,6 +6,7 @@ import { join } from 'path';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 import appConfig from './config/app.config';
+import ormConfig from './config/orm.config';
 
 // import { loggerMiddleware } from './common/middlewares/logger.middleware';
 
@@ -56,15 +57,7 @@ import { RedisCacheModule } from './plugins/redis-cache/redis-cache.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          type: 'postgres',
-          host: configService.get<string>('config.database.host'),
-          port: configService.get<number>('config.database.port'),
-          username: configService.get<string>('config.database.user'),
-          password: configService.get<string>('config.database.password'),
-          database: configService.get<string>('config.database.database'),
-          autoLoadEntities: true,
-          synchronize:
-            configService.get<string>('config.environment') !== 'production',
+          ...ormConfig,
           logging: configService.get<string>('config.database.log') === 'yes',
         };
       },

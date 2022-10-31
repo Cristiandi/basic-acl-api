@@ -62,7 +62,10 @@ export class VerificationCode extends BaseEntity {
   // relations
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.verificationCodes, { nullable: true })
+  @ManyToOne(() => User, (user) => user.verificationCodes, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'user_id' })
   user: User;
 }
