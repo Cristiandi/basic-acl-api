@@ -80,7 +80,7 @@ export class VerificationCodeService extends BaseService<VerificationCode> {
 
     const clone = { ...existing };
 
-    await this.verificationCodeRepository.softRemove(existing);
+    await this.verificationCodeRepository.remove(existing);
 
     return clone as VerificationCode;
   }

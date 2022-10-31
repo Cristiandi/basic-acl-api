@@ -114,7 +114,7 @@ export class CompanyService extends BaseService<Company> {
 
     const clone = { ...existing };
 
-    await this.companyRepository.softRemove(existing);
+    await this.companyRepository.remove(existing);
 
     delete clone.firebaseAdminConfig;
     delete clone.firebaseConfig;
@@ -124,7 +124,7 @@ export class CompanyService extends BaseService<Company> {
 
   // CRUD
 
-  public async getByIds(ids: number[]): Promise<Company[]> {
+  public getByIds(ids: number[]): Promise<Company[]> {
     return this.companyRepository.find({
       where: {
         id: In(ids),

@@ -241,7 +241,7 @@ export class UserService extends BaseService<User> {
 
     const clone = { ...existing };
 
-    await this.userRepository.softRemove(existing);
+    await this.userRepository.remove(existing);
 
     return clone as User;
   }

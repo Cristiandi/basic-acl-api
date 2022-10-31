@@ -128,7 +128,7 @@ export class RoleService extends BaseService<Role> {
 
     const clone = { ...existing };
 
-    await this.roleRepository.softRemove(existing);
+    await this.roleRepository.remove(existing);
 
     return clone as Role;
   }
