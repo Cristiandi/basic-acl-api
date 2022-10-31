@@ -86,7 +86,7 @@
     "jest": "jest",
     "lint-staged": "13.0.3",
     "prettier": "2.7.1",
-    "supertest": "6.2.4",
+    "supertest": "6.3.1",
     "ts-jest": "28.0.8",
     "ts-loader": "9.4.1",
     "ts-node": "10.9.1",
