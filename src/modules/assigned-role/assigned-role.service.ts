@@ -118,7 +118,7 @@ export class AssignedRoleService extends BaseService<AssignedRole> {
     const clone = { ...existing };
 
     // remove the existing one from the database
-    await this.assignedRoleRepository.softRemove(existing);
+    await this.assignedRoleRepository.remove(existing);
 
     // return the clone as the existing one
     return clone as AssignedRole;

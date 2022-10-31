@@ -117,14 +117,14 @@ export class ApiKeyService extends BaseService<ApiKey> {
 
     const clone = { ...existing };
 
-    await this.apiKeyRepository.softRemove(existing);
+    await this.apiKeyRepository.remove(existing);
 
     return clone as ApiKey;
   }
 
   // CRUD
 
-  public async getByIds(ids: number[]): Promise<ApiKey[]> {
+  public getByIds(ids: number[]): Promise<ApiKey[]> {
     return this.apiKeyRepository.find({
       where: {
         id: In(ids),
