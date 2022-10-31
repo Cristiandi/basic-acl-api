@@ -3,7 +3,6 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   Generated,
   JoinColumn,
@@ -56,13 +55,13 @@ export class VerificationCode extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: Date;
-
   // relations
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.verificationCodes, { nullable: true })
+  @ManyToOne(() => User, (user) => user.verificationCodes, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

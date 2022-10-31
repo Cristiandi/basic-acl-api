@@ -2,7 +2,6 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import {
   BaseEntity,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -16,7 +15,7 @@ import { User } from '../user/user.entity';
 
 @ObjectType()
 @Entity({ name: 'assigned_role' })
-@Unique('uk_assigned_role', ['role', 'user', 'deletedAt'])
+@Unique('uk_assigned_role', ['role', 'user'])
 export class AssignedRole extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
@@ -30,9 +29,6 @@ export class AssignedRole extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: Date;
-
   // relations
 
   @Field(() => Role)
@@ -41,7 +37,10 @@ export class AssignedRole extends BaseEntity {
   role: Role;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.assignedRoles, { nullable: false })
+  @ManyToOne(() => User, (user) => user.assignedRoles, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

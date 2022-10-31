@@ -3,7 +3,6 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -19,7 +18,7 @@ import { AssignedRole } from '../assigned-role/assigned-role.entity';
 
 @ObjectType()
 @Entity({ name: 'user' })
-@Unique('uk_user_auth_uid', ['authUid', 'deletedAt'])
+@Unique('uk_user_auth_uid', ['authUid'])
 export class User extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
@@ -48,9 +47,6 @@ export class User extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: Date;
-
   // relations
 
   @Field(() => Company)
@@ -63,10 +59,15 @@ export class User extends BaseEntity {
   @OneToMany(
     () => VerificationCode,
     (verificationCode) => verificationCode.user,
+    {
+      cascade: ['insert', 'remove'],
+    },
   )
   verificationCodes: VerificationCode[];
 
   @Field(() => [AssignedRole])
-  @OneToMany(() => AssignedRole, (assignedRole) => assignedRole.user)
+  @OneToMany(() => AssignedRole, (assignedRole) => assignedRole.user, {
+    cascade: ['insert', 'remove'],
+  })
   assignedRoles: AssignedRole[];
 }
