@@ -21,10 +21,10 @@ export class RedisCacheService {
 
     // const newValue = JSON.stringify(value);
 
-    await this.cacheManager.set(md5Key, value, { ttl });
+    await this.cacheManager.set(md5Key, value, ttl);
   }
 
-  public async get(input: GetInput): Promise<Record<string, any> | null> {
+  public async get(input: GetInput): Promise<Record<string, any> | undefined> {
     const { keys } = input;
 
     const key = Object.keys(keys)
@@ -33,14 +33,15 @@ export class RedisCacheService {
 
     const md5Key = await md5(key);
 
-    const value = await this.cacheManager.get(md5Key);
+    const value: string = await this.cacheManager.get(md5Key);
 
-    if (!value) return null;
+    if (!value) return undefined;
 
     try {
       JSON.parse(value);
     } catch (error) {
-      return value;
+      console.error(error);
+      return undefined;
     }
   }
 }
