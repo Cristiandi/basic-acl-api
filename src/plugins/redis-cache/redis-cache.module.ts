@@ -1,5 +1,6 @@
-import type { ClientOpts } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
+
+import type { ClientOpts } from 'redis';
 import { Module, CacheModule } from '@nestjs/common';
 import { RedisCacheService } from './redis-cache.service';
 
