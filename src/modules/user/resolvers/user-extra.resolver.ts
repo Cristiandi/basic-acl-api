@@ -1,5 +1,5 @@
 import { UsePipes, ValidationPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { User } from '../user.entity';
 
@@ -22,6 +22,7 @@ import { LoginSuperAdminInput } from '../dto/login-super-admin-input.dto';
 import { LoginSuperAdminOutput } from '../dto/login-super-admin-output.dto';
 import { SendUserConfirmationEmailInput } from '../dto/send-user-confirmation-email-input.dto';
 import { UnassignUserRoleInput } from '../dto/unassign-user-role-input.dto';
+import { GetUsersByAuthUidsInput } from '../dto/get-users-by-auth-uids-input.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Resolver(() => User)
@@ -120,5 +121,12 @@ export class UserExtraResolver {
     @Args('unassignUserRoleInput') unassignUserRoleInput: UnassignUserRoleInput,
   ): Promise<User> {
     return this.service.unassignRole(unassignUserRoleInput);
+  }
+
+  @Query(() => [User], { name: 'getUsersByAuthUids' })
+  public getUsersByAuthUids(
+    @Args('getUsersByAuthUidsInput') input: GetUsersByAuthUidsInput,
+  ): Promise<User[]> {
+    return this.service.getUsersByAuthUids(input);
   }
 }
