@@ -48,6 +48,7 @@ import { LoginSuperAdminOutput } from '../dto/login-super-admin-output.dto';
 import { SendUserConfirmationEmailInput } from '../dto/send-user-confirmation-email-input.dto';
 import { SendUserPasswordUpdatedEmailInput } from '../dto/send-user-password-updated-email-input.dto';
 import { UnassignUserRoleInput } from '../dto/unassign-user-role-input.dto';
+import { GetUsersByAuthUidsInput } from '../dto/get-users-by-auth-uids-input.dto';
 
 @Injectable()
 export class UserExtraService {
@@ -225,6 +226,24 @@ export class UserExtraService {
   }
 
   /* functions in charge of creating  */
+
+  /* functions in charge of reading  */
+
+  public async getUsersByAuthUids(
+    input: GetUsersByAuthUidsInput,
+  ): Promise<User[]> {
+    const { authUids } = input;
+
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .loadAllRelationIds()
+      .where('user.authUid IN (:...authUids)', { authUids })
+      .getMany();
+
+    return users;
+  }
+
+  /* functions in charge of reading  */
 
   /* functions in charge of updating  */
 
