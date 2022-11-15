@@ -1,20 +1,12 @@
-import type { ClientOpts } from 'redis';
-import * as redisStore from 'cache-manager-redis-store';
-import { Module, CacheModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
+import appConfig from '../../config/app.config';
+
 import { RedisCacheService } from './redis-cache.service';
 
 @Module({
-  imports: [
-    CacheModule.registerAsync<ClientOpts>({
-      useFactory: () => ({
-        store: redisStore,
-        host: process.env.REDIS_HOST,
-        port: +process.env.REDIS_PORT,
-        password: process.env.REDIS_PASSWORD,
-        name: process.env.REDIS_CLIENT_NAME,
-      }),
-    }),
-  ],
+  imports: [ConfigModule.forFeature(appConfig)],
   providers: [RedisCacheService],
   exports: [RedisCacheService],
 })

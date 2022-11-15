@@ -1,39 +1,78 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Inject, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
 import { md5 } from 'hash-wasm';
+import { createClient, RedisClientType } from 'redis';
+
+import appConfig from '../../config/app.config';
 
 import { GetInput } from './dto/get-input.dto';
-
 import { SetInput } from './dto/set-input.dto';
+
+const KEY_PREFIX = 'basic_acl';
 
 @Injectable()
 export class RedisCacheService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  private client: RedisClientType;
+
+  constructor(
+    @Inject(appConfig.KEY)
+    private readonly appConfiguration: ConfigType<typeof appConfig>,
+  ) {
+    this.init();
+  }
+
+  private async init() {
+    this.client = createClient({
+      socket: {
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
+      },
+      password: process.env.REDIS_PASSWORD,
+    });
+
+    this.client.on('error', (err) => {
+      Logger.error(`Redis Client Error: ${err}`, RedisCacheService.name);
+      throw err;
+    });
+
+    await this.client.connect();
+  }
+
+  private getKey(keys: Record<string, string | number>): string {
+    const { environment } = this.appConfiguration;
+
+    const key = Object.keys(keys)
+      .map((key) => {
+        if (key === 'token') {
+          return md5(keys[key] as string);
+        }
+        return keys[key];
+      })
+      .join(':');
+
+    return KEY_PREFIX + ':' + environment + ':' + key;
+  }
 
   public async set(input: SetInput): Promise<void> {
     const { keys, value, ttl = 0 } = input;
 
-    const key = Object.keys(keys)
-      .map((key) => keys[key])
-      .join(':');
+    const key = this.getKey(keys);
 
-    const md5Key = await md5(key);
+    const newValue = JSON.stringify(value);
 
-    // const newValue = JSON.stringify(value);
-
-    await this.cacheManager.set(md5Key, value, ttl);
+    await this.client.set(key, newValue, {
+      EX: ttl,
+      NX: true,
+    });
   }
 
   public async get(input: GetInput): Promise<Record<string, any> | undefined> {
     const { keys } = input;
 
-    const key = Object.keys(keys)
-      .map((key) => keys[key])
-      .join(':');
+    const key = this.getKey(keys);
 
-    const md5Key = await md5(key);
-
-    const value: string = await this.cacheManager.get(md5Key);
+    const value: string = await this.client.get(key);
 
     if (!value) return undefined;
 
