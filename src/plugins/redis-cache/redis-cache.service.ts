@@ -39,17 +39,19 @@ export class RedisCacheService {
     await this.client.connect();
   }
 
-  private getKey(keys: Record<string, string | number>): string {
+  private async getKey(keys: Record<string, string | number>): Promise<string> {
     const { environment } = this.appConfiguration;
 
-    const key = Object.keys(keys)
-      .map((key) => {
+    const result = await Promise.all(
+      Object.keys(keys).map((key) => {
         if (key === 'token') {
           return md5(keys[key] as string);
         }
         return keys[key];
-      })
-      .join(':');
+      }),
+    );
+
+    const key = result.join(':');
 
     return KEY_PREFIX + ':' + environment + ':' + key;
   }
@@ -57,7 +59,7 @@ export class RedisCacheService {
   public async set(input: SetInput): Promise<void> {
     const { keys, value, ttl = 0 } = input;
 
-    const key = this.getKey(keys);
+    const key = await this.getKey(keys);
 
     const newValue = JSON.stringify(value);
 
