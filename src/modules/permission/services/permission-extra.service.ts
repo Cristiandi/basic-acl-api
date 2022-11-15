@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -122,15 +123,19 @@ export class PermissionExtraService {
       }
 
       // set the cache
-      await this.redisCacheService.set({
-        keys: {
-          companyUid,
-          permissionName,
-          token,
-        },
-        value: permission,
-        ttl: 60 * 60,
-      });
+      this.redisCacheService
+        .set({
+          keys: {
+            companyUid,
+            permissionName,
+            token,
+          },
+          value: permission,
+          ttl: 60 * 60 * 24,
+        })
+        .catch((error) => {
+          Logger.error(error, PermissionExtraService.name);
+        });
 
       return permission;
     }
