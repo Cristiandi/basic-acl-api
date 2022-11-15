@@ -72,7 +72,7 @@ export class RedisCacheService {
   public async get(input: GetInput): Promise<Record<string, any> | undefined> {
     const { keys } = input;
 
-    const key = this.getKey(keys);
+    const key = await this.getKey(keys);
 
     const value: string = await this.client.get(key);
 
