@@ -1,4 +1,5 @@
 import * as firebaseAdmin from 'firebase-admin';
+import { UpdateRequest } from 'firebase-admin/lib/auth/auth-config';
 
 import { Injectable, PreconditionFailedException } from '@nestjs/common';
 
@@ -190,14 +191,12 @@ export class FirebaseAdminService {
 
     const { phone, email, password, emailVerified } = updateUserInput;
 
-    let updateRequest = {};
+    let updateRequest: UpdateRequest = {};
     if (email) updateRequest = { ...updateRequest, email };
     if (password) updateRequest = { ...updateRequest, password };
-    if (phone) updateRequest = { ...updateRequest, phone };
+    if (phone) updateRequest = { ...updateRequest, phoneNumber: phone };
     if (typeof emailVerified === 'boolean')
       updateRequest = { ...updateRequest, emailVerified };
-
-    // console.log(updateRequest, 'updateRequest');
 
     return app.auth().updateUser(uid, updateRequest);
   }
