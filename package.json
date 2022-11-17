@@ -46,7 +46,7 @@
     "class-transformer": "0.5.1",
     "class-validator": "0.13.2",
     "dataloader": "2.1.0",
-    "firebase": "9.13.0",
+    "firebase": "9.14.0",
     "firebase-admin": "11.2.1",
     "form-data": "4.0.0",
     "graphql": "16.6.0",
