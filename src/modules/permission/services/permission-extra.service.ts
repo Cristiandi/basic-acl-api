@@ -82,20 +82,11 @@ export class PermissionExtraService {
         throw new UnauthorizedException(error.message);
       }
 
-      // get the user
+      // get the assigned roles of the user
       const { uid } = verifiedToken;
 
-      const user = await this.userService.getOneByOneFields({
-        fields: {
-          authUid: uid,
-          company,
-        },
-        checkIfExists: true,
-      });
-
-      // get the assigned roles
       const assignedRoles = await this.assignedRoleService.getUserRoles({
-        user,
+        userUid: uid,
       });
 
       const roles = assignedRoles.map((assignedRole) => assignedRole.role);

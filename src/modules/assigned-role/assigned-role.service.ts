@@ -15,6 +15,7 @@ import { AssignedRole } from './assigned-role.entity';
 
 import { CreateAssignedRoleInput } from './dto/create-assigned-role-input.dto';
 import { GetAllAssignedRolesInput } from './dto/get-all-assigned-roles-input.dto';
+import { getUserRolesInput } from './dto/get-user-roles-input.dto';
 
 @Injectable()
 export class AssignedRoleService extends BaseService<AssignedRole> {
@@ -124,13 +125,14 @@ export class AssignedRoleService extends BaseService<AssignedRole> {
     return clone as AssignedRole;
   }
 
-  public async getUserRoles(input: any): Promise<AssignedRole[]> {
-    const { user } = input;
+  public async getUserRoles(input: getUserRolesInput): Promise<AssignedRole[]> {
+    const { userUid } = input;
 
     const assignedRoles = await this.assignedRoleRepository
       .createQueryBuilder('assignedRole')
       .innerJoinAndSelect('assignedRole.role', 'role')
-      .where('assignedRole.user_id = :userId', { userId: user.id })
+      .innerJoinAndSelect('assignedRole.user', 'user')
+      .where('user.uid = :userUid', { userUid })
       .getMany();
 
     return assignedRoles;
