@@ -132,7 +132,7 @@ export class AssignedRoleService extends BaseService<AssignedRole> {
       .createQueryBuilder('assignedRole')
       .innerJoinAndSelect('assignedRole.role', 'role')
       .innerJoinAndSelect('assignedRole.user', 'user')
-      .where('user.uid = :userUid', { userUid })
+      .where('user.auth_uid = :userUid', { userUid })
       .getMany();
 
     return assignedRoles;
