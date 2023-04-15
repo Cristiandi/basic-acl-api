@@ -33,7 +33,7 @@
     "seed:run": "npx ts-node ./src/database/seeds"
   },
   "dependencies": {
-    "@nestjs/apollo": "10.2.0",
+    "@nestjs/apollo": "10.2.1",
     "@nestjs/common": "9.3.12",
     "@nestjs/config": "2.3.1",
     "@nestjs/core": "9.3.12",
