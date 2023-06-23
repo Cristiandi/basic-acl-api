@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { TerminusModule } from '@nestjs/terminus';
 
 import appConfig from './config/app.config';
 import ormConfig from './config/orm.config';
@@ -27,6 +28,7 @@ import { VerificationCodeModule } from './modules/verification-code/verification
 import { AssignedRoleModule } from './modules/assigned-role/assigned-role.module';
 import { PermissionModule } from './modules/permission/permission.module';
 import { RedisCacheModule } from './plugins/redis-cache/redis-cache.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -63,6 +65,12 @@ import { RedisCacheModule } from './plugins/redis-cache/redis-cache.module';
       },
     }),
 
+    TerminusModule,
+
+    HttpModule,
+
+    CommonModule,
+
     CompanyModule,
 
     RoleModule,
@@ -72,8 +80,6 @@ import { RedisCacheModule } from './plugins/redis-cache/redis-cache.module';
     EmailTemplateModule,
 
     UserModule,
-
-    CommonModule,
 
     FirebaseAdminModule,
 
