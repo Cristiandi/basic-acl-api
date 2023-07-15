@@ -51,7 +51,7 @@
     "form-data": "4.0.0",
     "graphql": "16.7.1",
     "graphql-type-json": "0.3.2",
-    "graphql-upload": "13.0.0",
+    "graphql-upload": "16.0.2",
     "handlebars": "4.7.7",
     "hash-wasm": "4.9.0",
     "joi": "17.9.2",
