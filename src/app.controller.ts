@@ -33,8 +33,10 @@ export class AppController {
         break;
       case 'development':
         urlToCheck = 'https://dev.api.basic-acl.com/';
+        break;
       case 'production':
         urlToCheck = 'https://api.basic-acl.com/';
+        break;
       default:
         throw new Error(
           `NODE_ENV does not contain a valid value for health check ${process.env.NODE_ENV}`,
