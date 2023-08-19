@@ -37,7 +37,7 @@ export class AppController {
         urlToCheck = 'https://api.basic-acl.com/';
       default:
         throw new Error(
-          'NODE_ENV does not contain a valid value for health check',
+          `NODE_ENV does not contain a valid value for health check ${process.env.NODE_ENV}`,
         );
         break;
     }
