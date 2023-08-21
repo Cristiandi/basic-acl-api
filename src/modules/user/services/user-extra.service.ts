@@ -577,7 +577,7 @@ export class UserExtraService {
 
   public async confirmEmail(
     input: ConfirmUserEmailInput,
-  ): Promise<{ url: string }> {
+  ): Promise<{ message: string; url: string }> {
     const { code } = input;
 
     // validate and get the verification code
@@ -608,9 +608,10 @@ export class UserExtraService {
 
     // determinate the url to redirect
     const urlToRedirect =
-      company.website || this.appConfiguration.app.selfApiUrl;
+      company.website ?? this.appConfiguration.app.selfApiUrl;
 
     return {
+      message: 'your email has been confirmed',
       url: urlToRedirect,
     };
   }
