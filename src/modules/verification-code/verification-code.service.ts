@@ -45,9 +45,14 @@ export class VerificationCodeService extends BaseService<VerificationCode> {
 
     const existing = await this.getOneByOneFields({
       fields: { code },
-      checkIfExists: true,
       relations: ['user'],
     });
+
+    if (!existing) {
+      throw new ConflictException(
+        `the verification code ${code} has been used or doesn't exist.`,
+      );
+    }
 
     if (!existing.user) {
       await this.verificationCodeRepository.softRemove(existing);

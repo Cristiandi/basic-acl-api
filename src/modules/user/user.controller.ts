@@ -2,7 +2,7 @@ import {
   Controller,
   Get,
   Query,
-  Redirect,
+  Render,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -19,7 +19,7 @@ export class UserController {
   constructor(private readonly userExtraService: UserExtraService) {}
 
   @Public()
-  @Redirect('https://nestjs.com', 302)
+  @Render('index')
   @Get('/confirm-email')
   confirmEmail(@Query() input: ConfirmUserEmailInput): Promise<any> {
     return this.userExtraService.confirmEmail(input);
