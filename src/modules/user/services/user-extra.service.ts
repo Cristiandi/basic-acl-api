@@ -653,6 +653,11 @@ export class UserExtraService {
       'change-forgotten-password?code=' +
       verificationCode.code;
 
+    Logger.log(
+      `link: ${link}`,
+      UserExtraService.name + '.sendResetPasswordEmail',
+    );
+
     const { emailTemplateParams } = input;
 
     // generate the html for the email
