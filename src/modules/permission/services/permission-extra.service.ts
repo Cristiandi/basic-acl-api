@@ -152,6 +152,8 @@ export class PermissionExtraService {
           value: apiKey,
           company,
         },
+        checkIfExists: true,
+        loadRelationIds: false,
       });
 
       // try to get the permission
