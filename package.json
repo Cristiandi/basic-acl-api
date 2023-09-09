@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "engines": {
     "node": "18.17.1",
-    "npm": "9.8.1"
+    "npm": "10.1.0"
   },
   "scripts": {
     "postinstall": "husky install",
