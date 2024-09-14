@@ -46,7 +46,13 @@ class FirebaseAdminConfig {
   readonly auth_provider_x509_cert_url: string;
 
   @IsString()
+  @Field(() => String)
   readonly client_x509_cert_url: string;
+
+  @IsOptional()
+  @IsString()
+  @Field(() => String)
+  readonly universe_domain?: string;
 }
 
 class FirebaseConfig {
